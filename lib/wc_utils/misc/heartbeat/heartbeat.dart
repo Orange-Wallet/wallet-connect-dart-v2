@@ -1,7 +1,37 @@
-const HEARTBEAT_INTERVAL = 5; // 5 sec
+import 'dart:async';
 
-class HeartbeatEvents {
-  HeartbeatEvents._();
+import 'package:wallet_connect/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
+import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
 
-  static const String pulse = "heartbeat_pulse";
+class HeartBeat with IEvents implements IHeartBeat {
+  static HeartBeat get instance {
+    final heartbeat = HeartBeat();
+    heartbeat.init();
+    return heartbeat;
+  }
+
+  @override
+  final EventSubject events;
+
+  @override
+  final int interval;
+
+  HeartBeat({this.interval = HEARTBEAT_INTERVAL}) : events = EventSubject();
+
+  @override
+  Future<void> init() async => _initialize();
+
+  // ---------- Private ----------------------------------------------- //
+
+  void _initialize() {
+    Timer.periodic(
+      const Duration(seconds: HEARTBEAT_INTERVAL),
+      (_) => _pulse(),
+    );
+  }
+
+  _pulse() {
+    events.emitData(HeartbeatEvents.pulse);
+  }
 }

@@ -10,3 +10,16 @@ bool isJsonRpcRequest(dynamic payload) {
       isJsonRpcPayload(payload) &&
       payload.containsKey('method');
 }
+
+bool isJsonRpcResponse(dynamic payload) {
+  return isJsonRpcPayload(payload) &&
+      (isJsonRpcResult(payload) || isJsonRpcError(payload));
+}
+
+bool isJsonRpcResult(dynamic payload) {
+  return payload is Map && payload.containsKey('result');
+}
+
+bool isJsonRpcError(dynamic payload) {
+  return payload is Map && payload.containsKey('error');
+}

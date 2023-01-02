@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
@@ -45,7 +47,7 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
   // ---------- Protected ----------------------------------------------- //
 
   @override
-  Future<Result?> requestStrict<Result, Params>({
+  Future<Result> requestStrict<Result, Params>({
     required JsonRpcRequest<Params> request,
     dynamic context,
   }) async {
@@ -59,19 +61,16 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
 
     try {
       connection.send(payload: request, context: context);
-
-      await for (final event in events) {
-        if (event.name == request.id.toString()) {
-          if (event.data is JsonRpcResult) {
-            if (event.data.error != null) {
-              return event.data.error;
-            } else {
-              return event.data.result;
-            }
-          }
+      final completer = Completer<Result>();
+      events.once(request.id.toString(), null, (event, _) {
+        if (event.eventData is JsonRpcResult) {
+          completer.complete((event.eventData as JsonRpcResult).result);
+        } else {
+          completer.completeError(
+              (event.eventData as JsonRpcError).error.toString());
         }
-      }
-      return null;
+      });
+      return completer.future;
     } catch (e) {
       throw WCException(e.toString());
     }

@@ -24,16 +24,19 @@ JsonRpcRequest<T> formatJsonRpcRequest<T>({
   );
 }
 
-JsonRpcResult<T> formatJsonRpcResult<T>(int id, T result) {
+JsonRpcResult<T> formatJsonRpcResult<T>({
+  required int id,
+  required T result,
+}) {
   return JsonRpcResult<T>(id: id, jsonrpc: '2.0', result: result);
 }
 
-formatJsonRpcError({
+JsonRpcError formatJsonRpcError({
   required int id,
   dynamic error,
   String? data,
 }) {
-  return JsonRpcResult(
+  return JsonRpcError(
     id: id,
     jsonrpc: "2.0",
     error: formatErrorMessage(error: error, data: data),

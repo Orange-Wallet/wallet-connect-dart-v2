@@ -17,12 +17,14 @@ dependencies:
   rxdart: ^0.27.7
   web_socket_channel: ^2.2.0
   logger: ^1.1.0
-  crypto: ^3.0.2
   eventify:
     git:
       url: https://github.com/thelazyindian/EventEmitter.git
       ref: master
   convert: ^3.1.1
+  cryptography: ^2.0.5
+  hive: ^2.2.3
+  bs58: ^1.0.2
 
 dev_dependencies:
   flutter_test:

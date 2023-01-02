@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
@@ -48,7 +49,7 @@ class WsConnection with IEvents implements IJsonRpcConnection {
   }
 
   @override
-  Future<void> send({required JsonRpcRequest payload, dynamic context}) async {
+  Future<void> send({required JsonRpcPayload payload, dynamic context}) async {
     socket ??= await _register();
     try {
       socket!.sink.add(jsonEncode(payload.toJson()));
@@ -67,16 +68,18 @@ class WsConnection with IEvents implements IJsonRpcConnection {
     }
 
     if (registering) {
-      await for (final event in events.stream) {
-        if (event.name == 'register_error') {
-          throw WCException(event.data);
-        } else if (event.name == 'open') {
-          if (socket == null) {
-            throw WCException("WebSocket connection is missing or invalid");
-          }
-          return socket!;
+      final completer = Completer<WebSocketChannel>();
+      events.once('register_error', null, (event, _) {
+        completer.completeError(WCException(event.eventData!.toString()));
+      });
+      events.once('open', null, (event, _) {
+        if (socket == null) {
+          completer.completeError(
+              WCException("WebSocket connection is missing or invalid"));
         }
-      }
+        completer.complete(socket!);
+      });
+      return completer.future;
     }
     this.url = url;
     registering = true;

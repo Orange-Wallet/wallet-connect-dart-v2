@@ -1,4 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:wallet_connect/utils/validator.dart';
+
+part 'types.g.dart';
 
 class JsonRpcProviderMessage<T> {
   final String type;
@@ -51,9 +54,18 @@ class RequestArguments<T> {
 
 // }
 
+abstract class JsonRpcPayload {
+  int get id;
+  String get jsonrpc;
+
+  // Map<String, dynamic> toJson();
+}
+
 @JsonSerializable(genericArgumentFactories: true)
-class JsonRpcRequest<T> {
+class JsonRpcRequest<T> implements JsonRpcPayload {
+  @override
   final int id;
+  @override
   final String jsonrpc;
   final String method;
   final T? params;
@@ -77,46 +89,94 @@ class JsonRpcRequest<T> {
       _$JsonRpcRequestToJson(this, toJsonT);
 }
 
-@JsonSerializable()
-class JsonRpcResult<T> {
+abstract class JsonRpcResponse implements JsonRpcPayload {}
+
+@JsonSerializable(genericArgumentFactories: true)
+class JsonRpcResult<T> implements JsonRpcResponse {
+  @override
   final int id;
+  @override
   final String jsonrpc;
   final T? result;
-  final ErrorResponse? error;
 
   JsonRpcResult({
     required this.id,
     required this.jsonrpc,
     this.result,
+  });
+
+  // factory JsonRpcResult.fromJson(Map<String, dynamic> json) {
+  // if (json['result'] != null &&
+  //     json['result'].containsKey('code') &&
+  //     json['result'].containsKey('message')) {
+  //   return JsonRpcResult(
+  //     id: json['id']!,
+  //     jsonrpc: json['jsonrpc']!,
+  //     error: ErrorResponse.fromJson(json),
+  //   );
+  // } else {
+  //   return JsonRpcResult<T>(
+  //     id: json['id']!,
+  //     jsonrpc: json['jsonrpc']!,
+  //     result: json['result'],
+  //   );
+  // }
+  // }
+
+  factory JsonRpcResult.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) =>
+      _$JsonRpcResultFromJson(json, fromJsonT);
+
+  // Map<String, dynamic> toJson(
+  //   Object? Function(T value) toJsonT,
+  // ) =>
+  //     _$JsonRpcResultToJson(this, toJsonT);
+
+  // @override
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'jsonrpc': jsonrpc,
+  //     // TODO: result converter
+  //     'result': null,
+  //   };
+  // }
+}
+
+@JsonSerializable()
+class JsonRpcError implements JsonRpcResponse {
+  @override
+  final int id;
+  @override
+  final String jsonrpc;
+  final ErrorResponse? error;
+
+  JsonRpcError({
+    required this.id,
+    required this.jsonrpc,
     this.error,
   });
 
-  factory JsonRpcResult.fromJson(Map<String, dynamic> json) {
-    if (json['result'] != null &&
-        json['result'].containsKey('code') &&
-        json['result'].containsKey('message')) {
-      return JsonRpcResult(
-        id: json['id']!,
-        jsonrpc: json['jsonrpc']!,
-        error: ErrorResponse.fromJson(json),
-      );
-    } else {
-      return JsonRpcResult<T>(
-        id: json['id']!,
-        jsonrpc: json['jsonrpc']!,
-        result: json['result'],
-      );
-    }
+  factory JsonRpcError.fromJson(Map<String, dynamic> json) =>
+      _$JsonRpcErrorFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'jsonrpc': jsonrpc,
+      'error': error?.toJson(),
+    };
   }
 }
 
 @JsonSerializable()
-class ErrorResponse {
-  final int code;
-  final String message;
+class ErrorResponse extends ErrorObject {
   final String? data;
 
-  const ErrorResponse({required this.code, required this.message, this.data});
+  const ErrorResponse({required super.code, required super.message, this.data});
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
       _$ErrorResponseFromJson(json);
@@ -134,4 +194,8 @@ class ErrorResponse {
       data: data ?? this.data,
     );
   }
+
+  @override
+  String toString() =>
+      'ErrorResponse(code: $code, message: $message, data: $data)';
 }

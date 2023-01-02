@@ -7,7 +7,7 @@ abstract class IJsonRpcConnection with IEvents {
 
   Future<void> open({String? url});
   Future<void> close();
-  Future<void> send({required JsonRpcRequest payload, dynamic context});
+  Future<void> send({required JsonRpcPayload payload, dynamic context});
 }
 
 abstract class IBaseJsonRpcProvider with IEvents {
