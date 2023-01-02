@@ -62,23 +62,28 @@ class PairingTypesStruct {
 // -- core ------------------------------------------------------- //
 // type DefaultResponse = true | ErrorResponse;
 
-enum PairingJsonRpcWcMethod {
-  @JsonValue("wc_pairingDelete")
+enum PairingRpcMethod {
   WC_PAIRING_DELETE,
-  @JsonValue("wc_pairingPing")
   WC_PAIRING_PING,
 }
 
-extension PairingJsonRpcWcMethodExt on PairingJsonRpcWcMethod {
+Map<PairingRpcMethod, String> _pairingRpcMethodMap = {
+  PairingRpcMethod.WC_PAIRING_DELETE: "wc_pairingDelete",
+  PairingRpcMethod.WC_PAIRING_PING: "wc_pairingPing",
+};
+
+extension PairingRpcMethodExt on PairingRpcMethod {
   String get value {
-    switch (this) {
-      case PairingJsonRpcWcMethod.WC_PAIRING_DELETE:
-        return "wc_pairingDelete";
-      case PairingJsonRpcWcMethod.WC_PAIRING_PING:
-        return "wc_pairingPing";
-      default:
-        throw WCException('Invalid PairingJsonRpcWcMethod');
-    }
+    return _pairingRpcMethodMap[this]!;
+  }
+}
+
+extension PairingRpcMethodExtStr on String {
+  PairingRpcMethod get pairingRpcMethod {
+    return _pairingRpcMethodMap.entries
+        .where((element) => element.value == this)
+        .first
+        .key;
   }
 }
 

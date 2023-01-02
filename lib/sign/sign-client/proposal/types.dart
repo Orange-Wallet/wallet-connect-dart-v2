@@ -71,6 +71,7 @@ class ProposalTypesRequestStruct {
       _$ProposalTypesRequestStructFromJson(json);
 }
 
+@JsonSerializable()
 class ProposalTypesStruct extends ProposalTypesRequestStruct {
   final int id;
   final int expiry;
@@ -84,6 +85,11 @@ class ProposalTypesStruct extends ProposalTypesRequestStruct {
     required super.requiredNamespaces,
     this.pairingTopic,
   });
+
+  factory ProposalTypesStruct.fromJson(Map<String, dynamic> json) =>
+      _$ProposalTypesStructFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProposalTypesStructToJson(this);
 }
 
 typedef IProposal = IStore<String, ProposalTypesStruct>;

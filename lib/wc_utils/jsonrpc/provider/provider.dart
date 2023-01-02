@@ -60,7 +60,6 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
     }
 
     try {
-      connection.send(payload: request, context: context);
       final completer = Completer<Result>();
       events.once(request.id.toString(), null, (event, _) {
         if (event.eventData is JsonRpcResult) {
@@ -70,6 +69,7 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
               (event.eventData as JsonRpcError).error.toString());
         }
       });
+      await connection.send(payload: request, context: context);
       return completer.future;
     } catch (e) {
       throw WCException(e.toString());

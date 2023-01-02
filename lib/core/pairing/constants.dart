@@ -11,9 +11,9 @@ const ONE_DAY = 1 * 24 * 60 * 60;
 
 const THIRTY_SECONDS = 30;
 
-PairingJsonRpcOptions getPairingRpcOptions(PairingJsonRpcWcMethod? method) {
+PairingJsonRpcOptions getPairingRpcOptions(PairingRpcMethod? method) {
   switch (method) {
-    case PairingJsonRpcWcMethod.WC_PAIRING_DELETE:
+    case PairingRpcMethod.WC_PAIRING_DELETE:
       return PairingJsonRpcOptions(
         req: RelayerTypesPublishOptions(
           ttl: ONE_DAY,
@@ -26,7 +26,7 @@ PairingJsonRpcOptions getPairingRpcOptions(PairingJsonRpcWcMethod? method) {
           tag: 1001,
         ),
       );
-    case PairingJsonRpcWcMethod.WC_PAIRING_PING:
+    case PairingRpcMethod.WC_PAIRING_PING:
       return PairingJsonRpcOptions(
         req: RelayerTypesPublishOptions(
           ttl: THIRTY_SECONDS,

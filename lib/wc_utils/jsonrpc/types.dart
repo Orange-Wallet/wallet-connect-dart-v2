@@ -14,8 +14,14 @@ class JsonRpcProviderMessage<T> {
 class RequestArguments<T> {
   final String method;
   final T? params;
+  @JsonKey(ignore: true)
+  final Object? Function(T value)? paramsToJson;
 
-  RequestArguments({required this.method, this.params});
+  RequestArguments({
+    required this.method,
+    this.params,
+    this.paramsToJson,
+  });
 
   factory RequestArguments.fromJson(
     Map<String, dynamic> json,
@@ -23,58 +29,31 @@ class RequestArguments<T> {
   ) =>
       _$RequestArgumentsFromJson(json, fromJsonT);
 
-  Map<String, dynamic> toJson(
-    Object? Function(T value) toJsonT,
-  ) =>
-      _$RequestArgumentsToJson(this, toJsonT);
+  Map<String, dynamic> toJson() =>
+      _$RequestArgumentsToJson(this, paramsToJson ?? (_) => null);
 }
 
-// @JsonSerializable(genericArgumentFactories: true)
-// class JsonRpcRequest<T> extends RequestArguments<T> {
-//   final int id;
-//   final String jsonrpc;
-
-//   JsonRpcRequest({
-//     required this.id,
-//     required this.jsonrpc,
-//     required String method,
-//     T? params,
-//   }) : super(method: method, params: params);
-
-//   factory JsonRpcRequest.fromJson(
-//     Map<String, dynamic> json,
-//     T Function(Object? json) fromJsonT,
-//   ) =>
-//       _$JsonRpcRequestFromJson(json, fromJsonT);
-
-//   Map<String, dynamic> toJson(
-//     Object? Function(T value) toJsonT,
-//   ) =>
-//       _$JsonRpcRequestToJson(this, toJsonT);
-
-// }
-
-abstract class JsonRpcPayload {
+abstract class JsonRpcPayload<T> {
   int get id;
   String get jsonrpc;
 
-  // Map<String, dynamic> toJson();
+  Map<String, dynamic> toJson();
 }
 
 @JsonSerializable(genericArgumentFactories: true)
-class JsonRpcRequest<T> implements JsonRpcPayload {
+class JsonRpcRequest<T> extends RequestArguments<T>
+    implements JsonRpcPayload<T> {
   @override
   final int id;
   @override
   final String jsonrpc;
-  final String method;
-  final T? params;
 
   JsonRpcRequest({
     required this.id,
     required this.jsonrpc,
-    required this.method,
-    this.params,
+    required super.method,
+    super.params,
+    super.paramsToJson,
   });
 
   factory JsonRpcRequest.fromJson(
@@ -83,45 +62,29 @@ class JsonRpcRequest<T> implements JsonRpcPayload {
   ) =>
       _$JsonRpcRequestFromJson(json, fromJsonT);
 
-  Map<String, dynamic> toJson(
-    Object? Function(T value) toJsonT,
-  ) =>
-      _$JsonRpcRequestToJson(this, toJsonT);
+  @override
+  Map<String, dynamic> toJson() =>
+      _$JsonRpcRequestToJson(this, super.paramsToJson ?? (_) => null);
 }
 
-abstract class JsonRpcResponse implements JsonRpcPayload {}
+abstract class JsonRpcResponse<T> implements JsonRpcPayload<T> {}
 
 @JsonSerializable(genericArgumentFactories: true)
-class JsonRpcResult<T> implements JsonRpcResponse {
+class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
   @override
   final int id;
   @override
   final String jsonrpc;
   final T? result;
+  @JsonKey(ignore: true)
+  final Object? Function(T value)? resultToJson;
 
-  JsonRpcResult({
+  const JsonRpcResult({
     required this.id,
     required this.jsonrpc,
     this.result,
+    this.resultToJson,
   });
-
-  // factory JsonRpcResult.fromJson(Map<String, dynamic> json) {
-  // if (json['result'] != null &&
-  //     json['result'].containsKey('code') &&
-  //     json['result'].containsKey('message')) {
-  //   return JsonRpcResult(
-  //     id: json['id']!,
-  //     jsonrpc: json['jsonrpc']!,
-  //     error: ErrorResponse.fromJson(json),
-  //   );
-  // } else {
-  //   return JsonRpcResult<T>(
-  //     id: json['id']!,
-  //     jsonrpc: json['jsonrpc']!,
-  //     result: json['result'],
-  //   );
-  // }
-  // }
 
   factory JsonRpcResult.fromJson(
     Map<String, dynamic> json,
@@ -129,24 +92,13 @@ class JsonRpcResult<T> implements JsonRpcResponse {
   ) =>
       _$JsonRpcResultFromJson(json, fromJsonT);
 
-  // Map<String, dynamic> toJson(
-  //   Object? Function(T value) toJsonT,
-  // ) =>
-  //     _$JsonRpcResultToJson(this, toJsonT);
-
-  // @override
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'id': id,
-  //     'jsonrpc': jsonrpc,
-  //     // TODO: result converter
-  //     'result': null,
-  //   };
-  // }
+  @override
+  Map<String, dynamic> toJson() =>
+      _$JsonRpcResultToJson(this, resultToJson ?? (_) => null);
 }
 
 @JsonSerializable()
-class JsonRpcError implements JsonRpcResponse {
+class JsonRpcError implements JsonRpcResponse<ErrorResponse> {
   @override
   final int id;
   @override

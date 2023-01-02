@@ -70,7 +70,7 @@ class SessionTypesStruct {
   final bool acknowledged;
   final String controller;
   final SessionTypesNamespaces namespaces;
-  final ProposalTypesRequiredNamespaces requiredNamespaces;
+  final ProposalTypesRequiredNamespaces? requiredNamespaces;
   final SessionTypesPublicKeyMetadata self;
   final SessionTypesPublicKeyMetadata peer;
 
@@ -81,7 +81,7 @@ class SessionTypesStruct {
     required this.acknowledged,
     required this.controller,
     required this.namespaces,
-    required this.requiredNamespaces,
+    this.requiredNamespaces,
     required this.self,
     required this.peer,
   });

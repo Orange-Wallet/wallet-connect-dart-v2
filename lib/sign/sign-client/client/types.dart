@@ -4,6 +4,7 @@ import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 enum SignClientTypesEvent {
   SESSION_PROPOSAL,
@@ -50,7 +51,7 @@ abstract class ISignClient {
 
   ICore get core;
   Logger get logger;
-  ISignClientEvents get events;
+  EventSubject get events;
   IEngine get engine;
   ISession get session;
   IProposal get proposal;

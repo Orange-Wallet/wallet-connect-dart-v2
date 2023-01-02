@@ -52,13 +52,13 @@ Map<String, dynamic> _$JsonRpcRequestToJson<T>(
   Object? Function(T value) toJsonT,
 ) =>
     <String, dynamic>{
-      'id': instance.id,
-      'jsonrpc': instance.jsonrpc,
       'method': instance.method,
       'params': _$nullableGenericToJson(instance.params, toJsonT),
+      'id': instance.id,
+      'jsonrpc': instance.jsonrpc,
     };
 
-JsonRpcResult<T> _$JsonRpcResultFromJson<T>(
+JsonRpcResult<T> _$JsonRpcResultFromJson<T extends Object?>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
 ) =>
@@ -68,7 +68,7 @@ JsonRpcResult<T> _$JsonRpcResultFromJson<T>(
       result: _$nullableGenericFromJson(json['result'], fromJsonT),
     );
 
-Map<String, dynamic> _$JsonRpcResultToJson<T>(
+Map<String, dynamic> _$JsonRpcResultToJson<T extends Object?>(
   JsonRpcResult<T> instance,
   Object? Function(T value) toJsonT,
 ) =>

@@ -91,6 +91,7 @@ class Publisher implements IPublisher {
         prompt: prompt,
         tag: tag,
       ),
+      paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
     logger.i({'type': "message", 'direction': "outgoing", 'request': request});

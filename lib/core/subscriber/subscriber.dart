@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core/constants.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
@@ -213,13 +214,15 @@ class Subscriber with IEvents implements ISubscriber {
   _rpcSubscribe(String topic, RelayerTypesProtocolOptions relay) {
     final api = getRelayProtocolApi(relay.protocol);
     final request = RequestArguments<RelayJsonRpcSubscribeParams>(
-        method: api.subscribe,
-        params: RelayJsonRpcSubscribeParams(topic: topic));
+      method: api.subscribe,
+      params: RelayJsonRpcSubscribeParams(topic: topic),
+      paramsToJson: (value) => value.toJson(),
+    );
     logger.d('Outgoing Relay Payload');
     logger.i({
       'type': "payload",
       'direction': "outgoing",
-      'request': request.toJson((value) => null)
+      'request': request.toJson(),
     });
     return relayer.provider.request(request: request);
   }
@@ -232,6 +235,7 @@ class Subscriber with IEvents implements ISubscriber {
         topic: topic,
         id: id,
       ),
+      paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
     logger.i({'type': "payload", 'direction': "outgoing", 'request': request});
@@ -261,7 +265,7 @@ class Subscriber with IEvents implements ISubscriber {
   }
 
   _onUnsubscribe(String topic, String id, ErrorResponse reason) async {
-    events.removeAllListeners(id);
+    // events.removeAllListeners(id); TODO
     if (_hasSubscription(id, topic)) {
       _deleteSubscription(id, reason);
     }

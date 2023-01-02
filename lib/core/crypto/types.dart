@@ -121,7 +121,7 @@ abstract class ICrypto {
 
   Future<String> encode({
     required String topic,
-    required dynamic payload,
+    required Object payload,
     CryptoTypesEncodeOptions? opts,
   });
 

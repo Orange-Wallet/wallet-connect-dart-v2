@@ -86,3 +86,32 @@ Map<String, dynamic> _$ProposalTypesRequestStructToJson(
       'proposer': instance.proposer,
       'requiredNamespaces': instance.requiredNamespaces,
     };
+
+ProposalTypesStruct _$ProposalTypesStructFromJson(Map<String, dynamic> json) =>
+    ProposalTypesStruct(
+      id: json['id'] as int,
+      expiry: json['expiry'] as int,
+      relays: (json['relays'] as List<dynamic>)
+          .map((e) =>
+              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      proposer: ProposalTypesProposer.fromJson(
+          json['proposer'] as Map<String, dynamic>),
+      requiredNamespaces:
+          (json['requiredNamespaces'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k,
+            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+      ),
+      pairingTopic: json['pairingTopic'] as String?,
+    );
+
+Map<String, dynamic> _$ProposalTypesStructToJson(
+        ProposalTypesStruct instance) =>
+    <String, dynamic>{
+      'relays': instance.relays,
+      'proposer': instance.proposer,
+      'requiredNamespaces': instance.requiredNamespaces,
+      'id': instance.id,
+      'expiry': instance.expiry,
+      'pairingTopic': instance.pairingTopic,
+    };

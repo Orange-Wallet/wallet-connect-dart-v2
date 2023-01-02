@@ -1,3 +1,7 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'types.g.dart';
+
 class RelayJsonRpcMethods {
   final String publish;
   final String subscribe;
@@ -12,14 +16,21 @@ class RelayJsonRpcMethods {
   });
 }
 
+@JsonSerializable()
 class RelayJsonRpcSubscribeParams {
   final String topic;
 
   const RelayJsonRpcSubscribeParams({
     required this.topic,
   });
+
+  factory RelayJsonRpcSubscribeParams.fromJson(Map<String, dynamic> json) =>
+      _$RelayJsonRpcSubscribeParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayJsonRpcSubscribeParamsToJson(this);
 }
 
+@JsonSerializable()
 class RelayJsonRpcPublishParams {
   final String topic;
   final String message;
@@ -34,6 +45,11 @@ class RelayJsonRpcPublishParams {
     this.prompt,
     this.tag,
   });
+
+  factory RelayJsonRpcPublishParams.fromJson(Map<String, dynamic> json) =>
+      _$RelayJsonRpcPublishParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayJsonRpcPublishParamsToJson(this);
 }
 
 class RelayJsonRpcSubscriptionData {
@@ -56,6 +72,7 @@ class RelayJsonRpcSubscriptionParams {
   });
 }
 
+@JsonSerializable()
 class RelayJsonRpcUnsubscribeParams {
   final String id;
   final String topic;
@@ -64,4 +81,9 @@ class RelayJsonRpcUnsubscribeParams {
     required this.id,
     required this.topic,
   });
+
+  factory RelayJsonRpcUnsubscribeParams.fromJson(Map<String, dynamic> json) =>
+      _$RelayJsonRpcUnsubscribeParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayJsonRpcUnsubscribeParamsToJson(this);
 }

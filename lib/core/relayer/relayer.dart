@@ -165,13 +165,13 @@ class Relayer with IEvents implements IRelayer {
   }
 
   _recordMessageEvent(RelayerTypesMessageEvent messageEvent) async {
-    // await messages.set(messageEvent.topic, messageEvent.message);
+    await messages.set(messageEvent.topic, messageEvent.message);
   }
 
   _shouldIgnoreMessageEvent(RelayerTypesMessageEvent messageEvent) async {
-    // if (!(await subscriber.isSubscribed(messageEvent.topic))) return true;
-    // final exists = messages.has(messageEvent.topic, messageEvent.message);
-    // return exists;
+    if (!(await subscriber.isSubscribed(messageEvent.topic))) return true;
+    final exists = messages.has(messageEvent.topic, messageEvent.message);
+    return exists;
   }
 
   _onProviderPayload(dynamic payload) async {

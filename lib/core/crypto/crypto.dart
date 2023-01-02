@@ -119,7 +119,7 @@ class Crypto implements ICrypto {
   @override
   Future<String> encode({
     required String topic,
-    required dynamic payload,
+    required Object payload,
     CryptoTypesEncodeOptions? opts,
   }) async {
     _isInitialized();

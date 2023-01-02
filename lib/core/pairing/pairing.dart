@@ -155,7 +155,7 @@ class Pairing with IEvents implements IPairing {
     await _isValidPairingTopic(topic);
     if (pairings.keys.contains(topic)) {
       final id =
-          await _sendRequest(topic, PairingJsonRpcWcMethod.WC_PAIRING_PING, {});
+          await _sendRequest(topic, PairingRpcMethod.WC_PAIRING_PING, {});
       final completer = Completer<void>();
       events.once(engineEvent(EngineTypesEvent.PAIRING_PING, id), null,
           (event, _) {
@@ -195,7 +195,7 @@ class Pairing with IEvents implements IPairing {
     if (pairings.keys.contains(topic)) {
       await _sendRequest<ErrorResponse>(
         topic,
-        PairingJsonRpcWcMethod.WC_PAIRING_DELETE,
+        PairingRpcMethod.WC_PAIRING_DELETE,
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
       );
       await _deletePairing(topic: topic);
@@ -205,31 +205,48 @@ class Pairing with IEvents implements IPairing {
   // ---------- Private Helpers ----------------------------------------------- //
 
   Future<int> _sendRequest<T>(
-      String topic, PairingJsonRpcWcMethod method, T params) async {
+    String topic,
+    PairingRpcMethod method,
+    T params,
+  ) async {
     final payload =
         formatJsonRpcRequest<T>(method: method.value, params: params);
-    final message = await core.crypto.encode(topic: topic, payload: payload);
+    final message = await core.crypto.encode(
+      topic: topic,
+      payload: payload.toJson(),
+    );
     final opts = getPairingRpcOptions(method).req;
     core.history.set(topic: topic, request: payload);
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     return payload.id;
   }
 
-  Future<void> _sendResult<T>(int id, String topic, T result) async {
+  Future<void> _sendResult<T>(
+    int id,
+    String topic,
+    T result,
+  ) async {
     final payload = formatJsonRpcResult<T>(id: id, result: result);
-    final message = await core.crypto.encode(topic: topic, payload: payload);
+    final message = await core.crypto.encode(
+      topic: topic,
+      payload: payload.toJson(),
+    );
     final record = await core.history.get(topic: topic, id: id);
-    final opts = getPairingRpcOptions(record.request.method).res;
+    final opts =
+        getPairingRpcOptions(record.request.method.pairingRpcMethod).res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     await core.history.resolve(payload);
   }
 
   Future<void> _sendError(int id, String topic, dynamic error) async {
     final payload = formatJsonRpcError(id: id, error: error);
-    final message = await core.crypto.encode(topic: topic, payload: payload);
+    final message = await core.crypto.encode(
+      topic: topic,
+      payload: payload.toJson(),
+    );
     final record = await core.history.get(topic: topic, id: id);
-    final opts = getPairingRpcOptions(record.request.method).res;
-
+    final opts =
+        getPairingRpcOptions(record.request.method.pairingRpcMethod).res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     await core.history.resolve(payload);
   }
@@ -328,7 +345,7 @@ class Pairing with IEvents implements IPairing {
   }) async {
     try {
       _isValidPairingTopic(topic);
-      await _sendResult<Map<String, bool>>(id, topic, {'wc_pairingPing': true});
+      await _sendResult<bool>(id, topic, true);
       events.emitData(
           EngineTypesEvent.PAIRING_PING.value, {'id': id, 'topic': topic});
     } catch (err) {
@@ -360,8 +377,7 @@ class Pairing with IEvents implements IPairing {
     try {
       _isValidPairingTopic(topic);
       // RPC request needs to happen before deletion as it utilises pairing encryption
-      await _sendResult<Map<String, bool>>(
-          id, topic, {'wc_pairingDelete': true});
+      await _sendResult<bool>(id, topic, true);
       await _deletePairing(topic: topic);
       events.emitData("pairing_delete", {id, topic});
     } catch (err) {
@@ -400,7 +416,7 @@ class Pairing with IEvents implements IPairing {
       if (event.eventData is ExpirerTypesExpiration) {
         final eventData = event.eventData as ExpirerTypesExpiration;
         final expirerTarget = parseExpirerTarget(eventData.target);
-        final topic = expirerTarget['topic'];
+        final topic = expirerTarget.topic;
         if (topic != null) {
           if (pairings.keys.contains(topic)) {
             await _deletePairing(topic: topic, expirerHasDeleted: true);

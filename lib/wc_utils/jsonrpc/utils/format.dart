@@ -14,6 +14,7 @@ int payloadId() {
 JsonRpcRequest<T> formatJsonRpcRequest<T>({
   required String method,
   T? params,
+  Object? Function(T)? paramsToJson,
   int? id,
 }) {
   return JsonRpcRequest<T>(
@@ -21,14 +22,21 @@ JsonRpcRequest<T> formatJsonRpcRequest<T>({
     jsonrpc: "2.0",
     method: method,
     params: params,
+    paramsToJson: paramsToJson,
   );
 }
 
 JsonRpcResult<T> formatJsonRpcResult<T>({
   required int id,
   required T result,
+  required Object? Function(T) resultToJson,
 }) {
-  return JsonRpcResult<T>(id: id, jsonrpc: '2.0', result: result);
+  return JsonRpcResult<T>(
+    id: id,
+    jsonrpc: '2.0',
+    result: result,
+    resultToJson: resultToJson,
+  );
 }
 
 JsonRpcError formatJsonRpcError({
