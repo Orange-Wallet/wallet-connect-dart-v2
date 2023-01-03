@@ -32,7 +32,7 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
   Future<void> disconnect() => close();
 
   @override
-  Future<Result?> request<Result, Params>({
+  Future<dynamic> request<Params>({
     required RequestArguments<Params> request,
     dynamic context,
   }) =>
@@ -47,7 +47,7 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
   // ---------- Protected ----------------------------------------------- //
 
   @override
-  Future<Result> requestStrict<Result, Params>({
+  Future<dynamic> requestStrict<Params>({
     required JsonRpcRequest<Params> request,
     dynamic context,
   }) async {
@@ -60,7 +60,7 @@ class JsonRpcProvider with IEvents implements IJsonRpcProvider {
     }
 
     try {
-      final completer = Completer<Result>();
+      final completer = Completer<dynamic>();
       events.once(request.id.toString(), null, (event, _) {
         if (event.eventData is JsonRpcResult) {
           completer.complete((event.eventData as JsonRpcResult).result);

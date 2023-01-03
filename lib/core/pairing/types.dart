@@ -1,11 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
-
 import 'package:wallet_connect/core/core/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
+part 'types.g.dart';
+
+@JsonSerializable()
 class PairingTypesStruct {
   final String topic;
   final int expiry;
@@ -20,6 +21,11 @@ class PairingTypesStruct {
     required this.active,
     this.peerMetadata,
   });
+
+  factory PairingTypesStruct.fromJson(Map<String, dynamic> json) =>
+      _$PairingTypesStructFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PairingTypesStructToJson(this);
 
   PairingTypesStruct copyWith({
     String? topic,
@@ -165,44 +171,3 @@ abstract class IPairing {
   // for either peer to disconnect a pairing
   Future<void> disconnect({required String topic});
 }
-
-// abstract class IPairingPrivate {
-//   sendRequest<M extends PairingJsonRpcTypes.WcMethod>(
-//     topic: string,
-//     method: M,
-//     params: PairingJsonRpcTypes.RequestParams[M],
-//   ): Promise<number>;
-
-//   sendResult<M extends PairingJsonRpcTypes.WcMethod>(
-//     id: number,
-//     topic: string,
-//     result: PairingJsonRpcTypes.Results[M],
-//   ): Promise<void>;
-
-//   sendError(id: number, topic: string, error: PairingJsonRpcTypes.Error): Promise<void>;
-
-//   onRelayEventRequest(event: PairingJsonRpcTypes.EventCallback<JsonRpcRequest>): void;
-
-//   onRelayEventResponse(event: PairingJsonRpcTypes.EventCallback<JsonRpcResponse>): Promise<void>;
-
-//   onPairingPingRequest(
-//     topic: string,
-//     payload: JsonRpcRequest<PairingJsonRpcTypes.RequestParams["wc_pairingPing"]>,
-//   ): Promise<void>;
-
-//   onPairingPingResponse(
-//     topic: string,
-//     payload: JsonRpcResult<PairingJsonRpcTypes.Results["wc_pairingPing"]> | JsonRpcError,
-//   ): void;
-
-//   onPairingDeleteRequest(
-//     topic: string,
-//     payload: JsonRpcRequest<PairingJsonRpcTypes.RequestParams["wc_pairingDelete"]>,
-//   ): Promise<void>;
-
-//   onUnknownRpcMethodRequest(topic: string, payload: JsonRpcRequest): Promise<void>;
-
-//   onUnknownRpcMethodResponse(method: string): void;
-
-//   deletePairing(topic: string, expirerHasDeleted?: boolean): Promise<void>;
-// }

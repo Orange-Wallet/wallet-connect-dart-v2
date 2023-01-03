@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';
+import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
@@ -61,6 +62,8 @@ class SessionSettleParams {
 
   factory SessionSettleParams.fromJson(Map<String, dynamic> json) =>
       _$SessionSettleParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionSettleParamsToJson(this);
 }
 
 @JsonSerializable()
@@ -270,25 +273,25 @@ abstract class IEngine {
 
   Future<PairingTypesStruct> pair(String uri);
 
-//   public abstract approve(
-//     params: ApproveParams,
-//   ): Promise<{ topic: string; acknowledged: () => Promise<SessionTypes.Struct> }>;
+  Future<EngineTypesApproved> approve(SessionApproveParams params);
 
-//  Future<void> reject(params: RejectParams);
+  Future<void> reject(SessionRejectParams params);
 
-//   public abstract update(params: UpdateParams): AcknowledgedPromise;
+  Future<bool> update(SessionUpdateParams params);
 
-//   public abstract extend(params: ExtendParams): AcknowledgedPromise;
+  Future<bool> extend(String topic);
 
-//   public abstract request<T>(params: RequestParams): Promise<T>;
+  Future<T> request<T>(SessionRequestParams params);
 
-//  Future<void> respond(params: RespondParams);
+  Future<void> respond(SessionRespondParams params);
 
-//  Future<void> emit(params: EmitParams);
+  Future<void> ping(String topic);
 
-//  Future<void> ping(params: PingParams);
+  Future<void> emit(SessionEmitParams params);
 
-//  Future<void> disconnect(params: DisconnectParams);
+  Future<void> disconnect(String topic);
 
-//   public abstract find: (params: FindParams) => SessionTypes.Struct[];
+  List<SessionTypesStruct> find(params);
+
+  List<PendingRequestTypesStruct> getPendingSessionRequests();
 }

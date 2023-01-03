@@ -6,6 +6,18 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+RelayJsonRpcSubscribeParams _$RelayJsonRpcSubscribeParamsFromJson(
+        Map<String, dynamic> json) =>
+    RelayJsonRpcSubscribeParams(
+      topic: json['topic'] as String,
+    );
+
+Map<String, dynamic> _$RelayJsonRpcSubscribeParamsToJson(
+        RelayJsonRpcSubscribeParams instance) =>
+    <String, dynamic>{
+      'topic': instance.topic,
+    };
+
 RelayJsonRpcPublishParams _$RelayJsonRpcPublishParamsFromJson(
         Map<String, dynamic> json) =>
     RelayJsonRpcPublishParams(
@@ -24,4 +36,47 @@ Map<String, dynamic> _$RelayJsonRpcPublishParamsToJson(
       'ttl': instance.ttl,
       'prompt': instance.prompt,
       'tag': instance.tag,
+    };
+
+RelayJsonRpcSubscriptionData _$RelayJsonRpcSubscriptionDataFromJson(
+        Map<String, dynamic> json) =>
+    RelayJsonRpcSubscriptionData(
+      topic: json['topic'] as String,
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$RelayJsonRpcSubscriptionDataToJson(
+        RelayJsonRpcSubscriptionData instance) =>
+    <String, dynamic>{
+      'topic': instance.topic,
+      'message': instance.message,
+    };
+
+RelayJsonRpcSubscriptionParams _$RelayJsonRpcSubscriptionParamsFromJson(
+        Map<String, dynamic> json) =>
+    RelayJsonRpcSubscriptionParams(
+      id: json['id'] as String,
+      data: RelayJsonRpcSubscriptionData.fromJson(
+          json['data'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$RelayJsonRpcSubscriptionParamsToJson(
+        RelayJsonRpcSubscriptionParams instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'data': instance.data,
+    };
+
+RelayJsonRpcUnsubscribeParams _$RelayJsonRpcUnsubscribeParamsFromJson(
+        Map<String, dynamic> json) =>
+    RelayJsonRpcUnsubscribeParams(
+      id: json['id'] as String,
+      topic: json['topic'] as String,
+    );
+
+Map<String, dynamic> _$RelayJsonRpcUnsubscribeParamsToJson(
+        RelayJsonRpcUnsubscribeParams instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'topic': instance.topic,
     };

@@ -17,6 +17,10 @@ abstract class IStore<K, V> {
 
   String get name;
 
+  dynamic Function(V) get toJson;
+
+  V Function(Object?) get fromJson;
+
   String? get storagePrefix;
 
   Future<void> init();

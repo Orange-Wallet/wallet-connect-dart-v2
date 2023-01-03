@@ -114,8 +114,10 @@ class WsConnection with IEvents implements IJsonRpcConnection {
   _onPayload(dynamic data) {
     if (data == null) return;
 
-    final payload =
-        JsonRpcResult.fromJson(data is String ? jsonDecode(data) : data);
+    final payload = JsonRpcResult.fromJson(
+      data is String ? jsonDecode(data) : data,
+      (v) => v,
+    );
     events.emitData("payload", payload);
   }
 

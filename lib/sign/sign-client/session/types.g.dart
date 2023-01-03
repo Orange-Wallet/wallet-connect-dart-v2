@@ -62,3 +62,39 @@ Map<String, dynamic> _$SessionTypesPublicKeyMetadataToJson(
       'publicKey': instance.publicKey,
       'metadata': instance.metadata,
     };
+
+SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
+    SessionTypesStruct(
+      topic: json['topic'] as String,
+      relay: RelayerTypesProtocolOptions.fromJson(
+          json['relay'] as Map<String, dynamic>),
+      expiry: json['expiry'] as int,
+      acknowledged: json['acknowledged'] as bool,
+      controller: json['controller'] as String,
+      namespaces: (json['namespaces'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(
+            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+      ),
+      requiredNamespaces:
+          (json['requiredNamespaces'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k,
+            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+      ),
+      self: SessionTypesPublicKeyMetadata.fromJson(
+          json['self'] as Map<String, dynamic>),
+      peer: SessionTypesPublicKeyMetadata.fromJson(
+          json['peer'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$SessionTypesStructToJson(SessionTypesStruct instance) =>
+    <String, dynamic>{
+      'topic': instance.topic,
+      'relay': instance.relay,
+      'expiry': instance.expiry,
+      'acknowledged': instance.acknowledged,
+      'controller': instance.controller,
+      'namespaces': instance.namespaces,
+      'requiredNamespaces': instance.requiredNamespaces,
+      'self': instance.self,
+      'peer': instance.peer,
+    };

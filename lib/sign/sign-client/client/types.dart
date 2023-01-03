@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
@@ -45,28 +46,40 @@ extension SignClientTypesEventExtStr on String {
   }
 }
 
-abstract class ISignClient {
+abstract class ISignClient with IEvents {
   String get name;
   Metadata get metadata;
 
   ICore get core;
   Logger get logger;
-  EventSubject get events;
   IEngine get engine;
   ISession get session;
   IProposal get proposal;
   IPendingRequest get pendingRequest;
 
-  // public abstract connect: IEngine["connect"];
-  // public abstract pair: IEngine["pair"];
-  // public abstract approve: IEngine["approve"];
-  // public abstract reject: IEngine["reject"];
-  // public abstract update: IEngine["update"];
-  // public abstract extend: IEngine["extend"];
-  // public abstract request: IEngine["request"];
-  // public abstract respond: IEngine["respond"];
-  // public abstract ping: IEngine["ping"];
-  // public abstract emit: IEngine["emit"];
-  // public abstract disconnect: IEngine["disconnect"];
-  // public abstract find: IEngine["find"];
+  Future<EngineTypesConnection> connect(SessionConnectParams params);
+
+  Future<PairingTypesStruct> pair(String uri);
+
+  Future<EngineTypesApproved> approve(SessionApproveParams params);
+
+  Future<void> reject(SessionRejectParams params);
+
+  Future<bool> update(SessionUpdateParams params);
+
+  Future<bool> extend(String topic);
+
+  Future<T> request<T>(SessionRequestParams params);
+
+  Future<void> respond(SessionRespondParams params);
+
+  Future<void> ping(String topic);
+
+  Future<void> emit(SessionEmitParams params);
+
+  Future<void> disconnect(String topic);
+
+  List<SessionTypesStruct> find(params);
+
+  List<PendingRequestTypesStruct> getPendingSessionRequests();
 }

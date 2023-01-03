@@ -1,3 +1,12 @@
 {
-  "dart.flutterSdkPath": "C:\\Users\\Satyabrat\\Desktop\\wallet_connect_dart_v2\\wallet_connect\\.fvm\\flutter_sdk"
+  "dart.flutterSdkPath": ".fvm/flutter_sdk",
+  // Remove .fvm files from search
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  // Remove from file watching
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "editor.formatOnSave": true
 }

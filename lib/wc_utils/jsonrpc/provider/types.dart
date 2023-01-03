@@ -15,14 +15,14 @@ abstract class IBaseJsonRpcProvider with IEvents {
 
   Future<void> disconnect();
 
-  Future<Result?> request<Result, Params>({
+  Future<dynamic> request<Params>({
     required RequestArguments<Params> request,
     dynamic context,
   });
 
   // ---------- Protected ----------------------------------------------- //
 
-  Future<Result?> requestStrict<Result, Params>({
+  Future<dynamic> requestStrict<Params>({
     required JsonRpcRequest<Params> request,
     dynamic context,
   });

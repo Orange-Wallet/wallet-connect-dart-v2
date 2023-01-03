@@ -1,18 +1,28 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
-class RpcSessionRequestParams<T> {
-  final RequestArguments<T> request;
+part 'types.g.dart';
+
+@JsonSerializable()
+class RpcSessionRequestParams {
+  final RequestArguments request;
   final String chainId;
 
   const RpcSessionRequestParams({
     required this.request,
     required this.chainId,
   });
+
+  factory RpcSessionRequestParams.fromJson(Map<String, dynamic> json) =>
+      _$RpcSessionRequestParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RpcSessionRequestParamsToJson(this);
 }
 
+@JsonSerializable()
 class RpcSessionEventParams {
   final SessionEmitEvent event;
   final String chainId;
@@ -21,14 +31,25 @@ class RpcSessionEventParams {
     required this.event,
     required this.chainId,
   });
+
+  factory RpcSessionEventParams.fromJson(Map<String, dynamic> json) =>
+      _$RpcSessionEventParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RpcSessionEventParamsToJson(this);
 }
 
+@JsonSerializable()
 class RpcSessionUpdateParams {
   final SessionTypesNamespaces namespaces;
 
   const RpcSessionUpdateParams({
     required this.namespaces,
   });
+
+  factory RpcSessionUpdateParams.fromJson(Map<String, dynamic> json) =>
+      _$RpcSessionUpdateParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RpcSessionUpdateParamsToJson(this);
 }
 
 // export interface RequestParams {
@@ -82,6 +103,7 @@ class RpcSessionUpdateParams {
 typedef ResultPairingDelete = bool;
 typedef ResultPairingPing = bool;
 
+@JsonSerializable()
 class ResultSessionPropose {
   final RelayerTypesProtocolOptions relay;
   final String responderPublicKey;
@@ -90,6 +112,11 @@ class ResultSessionPropose {
     required this.relay,
     required this.responderPublicKey,
   });
+
+  factory ResultSessionPropose.fromJson(Map<String, dynamic> json) =>
+      _$ResultSessionProposeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ResultSessionProposeToJson(this);
 }
 
 typedef ResultSessionSettle = bool;

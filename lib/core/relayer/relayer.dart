@@ -179,10 +179,10 @@ class Relayer with IEvents implements IRelayer {
     logger.i({'type': "payload", 'direction': "incoming", 'payload': payload});
     if (isJsonRpcRequest(payload)) {
       if (!payload.method.endsWith(RELAYER_SUBSCRIBER_SUFFIX)) return;
-      final event =
-          (payload as JsonRpcRequest<RelayJsonRpcSubscriptionParams>).params;
+      final event = RelayJsonRpcSubscriptionParams.fromJson(
+          (payload as JsonRpcRequest).params as Map<String, dynamic>);
       final messageEvent = RelayerTypesMessageEvent(
-        topic: event!.data.topic,
+        topic: event.data.topic,
         message: event.data.message,
       );
       logger.d('Emitting Relayer Payload');
@@ -201,7 +201,11 @@ class Relayer with IEvents implements IRelayer {
   }
 
   _acknowledgePayload(payload) async {
-    final response = formatJsonRpcResult<bool>(id: payload.id, result: true);
+    final response = formatJsonRpcResult<bool>(
+      id: payload.id,
+      result: true,
+      resultToJson: (v) => v,
+    );
     await provider.connection.send(payload: response);
   }
 

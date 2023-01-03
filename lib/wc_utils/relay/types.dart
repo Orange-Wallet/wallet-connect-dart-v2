@@ -52,6 +52,7 @@ class RelayJsonRpcPublishParams {
   Map<String, dynamic> toJson() => _$RelayJsonRpcPublishParamsToJson(this);
 }
 
+@JsonSerializable()
 class RelayJsonRpcSubscriptionData {
   final String topic;
   final String message;
@@ -60,8 +61,14 @@ class RelayJsonRpcSubscriptionData {
     required this.topic,
     required this.message,
   });
+
+  factory RelayJsonRpcSubscriptionData.fromJson(Map<String, dynamic> json) =>
+      _$RelayJsonRpcSubscriptionDataFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayJsonRpcSubscriptionDataToJson(this);
 }
 
+@JsonSerializable()
 class RelayJsonRpcSubscriptionParams {
   final String id;
   final RelayJsonRpcSubscriptionData data;
@@ -70,6 +77,11 @@ class RelayJsonRpcSubscriptionParams {
     required this.id,
     required this.data,
   });
+
+  factory RelayJsonRpcSubscriptionParams.fromJson(Map<String, dynamic> json) =>
+      _$RelayJsonRpcSubscriptionParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayJsonRpcSubscriptionParamsToJson(this);
 }
 
 @JsonSerializable()

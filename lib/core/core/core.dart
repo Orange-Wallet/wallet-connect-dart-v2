@@ -3,6 +3,7 @@ import 'package:wallet_connect/core/core/constants.dart';
 import 'package:wallet_connect/core/core/types.dart';
 import 'package:wallet_connect/core/crypto/crypto.dart';
 import 'package:wallet_connect/core/expirer/expirer.dart';
+import 'package:wallet_connect/core/history/history.dart';
 import 'package:wallet_connect/core/history/types.dart';
 import 'package:wallet_connect/core/keychain/types.dart';
 import 'package:wallet_connect/core/crypto/types.dart';
@@ -11,7 +12,8 @@ import 'package:wallet_connect/core/pairing/pairing.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
-import 'package:wallet_connect/wc_utils/keyvaluestorage/types.dart';
+import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/keyvaluestorage.dart';
+import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/heartbeat.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
@@ -72,15 +74,14 @@ class Core with IEvents implements ICore {
     IExpirer? expirer,
     IRelayer? relayer,
     IPairing? pairing,
+    IKeyValueStorage? storage,
   })  : logger = logger ?? Logger(),
         heartbeat = heartbeat ?? HeartBeat(),
         events = EventSubject() {
     crypto = crypto ?? Crypto(core: this, logger: logger);
-    //   history = new JsonRpcHistory(this, logger);
+    history = history ?? JsonRpcHistory(core: this, logger: logger);
     expirer = expirer ?? Expirer(core: this, logger: logger);
-    //   storage = opts?.storage
-    //     ? opts.storage
-    //     : new KeyValueStorage({ ...CORE_STORAGE_OPTIONS, ...opts?.storageOptions });
+    storage = storage ?? KeyValueStorage(database: CoreStorageOptions.database);
     relayer = relayer ??
         Relayer(
           core: this,
@@ -94,14 +95,14 @@ class Core with IEvents implements ICore {
   // ---------- Public ----------------------------------------------- //
 
   @override
-  start() async {
+  Future<void> start() async {
     if (_initialized) return;
     await _initialize();
   }
 
   // ---------- Private ----------------------------------------------- //
 
-  _initialize() async {
+  Future<void> _initialize() async {
     logger.i('Initialized');
     try {
       await crypto.init();

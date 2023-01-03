@@ -10,7 +10,7 @@ import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
-class Store<K, V extends HiveObject> implements IStore<K, V> {
+class Store<K, V> implements IStore<K, V> {
   @override
   final Map<K, V> map;
   final version = STORE_STORAGE_VERSION;
@@ -34,6 +34,12 @@ class Store<K, V extends HiveObject> implements IStore<K, V> {
   @override
   final String name;
 
+  @override
+  final dynamic Function(V) toJson;
+
+  @override
+  final V Function(Object?) fromJson;
+
   /**
    * @param {ICore} core Core
    * @param {Logger} logger Logger
@@ -46,6 +52,8 @@ class Store<K, V extends HiveObject> implements IStore<K, V> {
     Logger? logger,
     required this.name,
     String? storagePrefix,
+    required this.fromJson,
+    required this.toJson,
   })  : logger = logger ?? Logger(),
         storagePrefix = storagePrefix ?? CORE_STORAGE_PREFIX,
         map = {};
@@ -140,12 +148,12 @@ class Store<K, V extends HiveObject> implements IStore<K, V> {
 
   // ---------- Private ----------------------------------------------- //
 
-  _setDataStore(List<V> values) async {
-    await core.storage.setItem<List<V>>(storageKey, values);
+  void _setDataStore(List<dynamic> values) async {
+    await core.storage.setItem<List<dynamic>>(storageKey, values);
   }
 
-  _getDataStore() async {
-    final value = await core.storage.getItem<List<V>>(storageKey);
+  Future<List<dynamic>?> _getDataStore() async {
+    final value = await core.storage.getItem<List<dynamic>>(storageKey);
     return value;
   }
 
@@ -162,15 +170,14 @@ class Store<K, V extends HiveObject> implements IStore<K, V> {
     return value;
   }
 
-  _persist() async {
-    await _setDataStore(values);
+  _persist() {
+    _setDataStore(values.map((e) => toJson(e)).toList());
   }
 
   _restore() async {
     try {
       final persisted = await _getDataStore();
-      if (persisted == null) return;
-      if (!persisted.length) return;
+      if (persisted?.isEmpty ?? true) return;
       if (map.isNotEmpty) {
         final error = getInternalError(
           InternalErrorKey.RESTORE_WILL_OVERRIDE,
@@ -179,7 +186,7 @@ class Store<K, V extends HiveObject> implements IStore<K, V> {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      cached = persisted;
+      cached = persisted?.map((e) => fromJson(e)).toList() ?? [];
       logger.d('Successfully Restored value for ${name}');
       logger.i({'type': "method", 'method': "restore", 'value': values});
     } catch (e) {

@@ -1,14 +1,17 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core/types.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
+part 'types.g.dart';
+
+@JsonSerializable()
 class JsonRpcRecord {
   final int id;
   final String topic;
-  final RequestArguments request;
+  final Map<String, dynamic> request;
   final String? chainId;
-  final JsonRpcResponse? response;
+  final Map<String, dynamic>? response;
 
   JsonRpcRecord({
     required this.id,
@@ -17,11 +20,32 @@ class JsonRpcRecord {
     this.chainId,
     this.response,
   });
+
+  factory JsonRpcRecord.fromJson(Map<String, dynamic> json) =>
+      _$JsonRpcRecordFromJson(json);
+
+  Map<String, dynamic> toJson() => _$JsonRpcRecordToJson(this);
+
+  JsonRpcRecord copyWith({
+    int? id,
+    String? topic,
+    Map<String, dynamic>? request,
+    String? chainId,
+    Map<String, dynamic>? response,
+  }) {
+    return JsonRpcRecord(
+      id: id ?? this.id,
+      topic: topic ?? this.topic,
+      request: request ?? this.request,
+      chainId: chainId ?? this.chainId,
+      response: response ?? this.response,
+    );
+  }
 }
 
 class RequestEvent {
   final String topic;
-  final JsonRpcRequest request;
+  final Map<String, dynamic> request;
   final String? chainId;
 
   RequestEvent({
@@ -33,8 +57,6 @@ class RequestEvent {
 
 abstract class IJsonRpcHistory with IEvents {
   Map<int, JsonRpcRecord> get records;
-
-  String get context;
 
   int get size;
 
@@ -52,20 +74,20 @@ abstract class IJsonRpcHistory with IEvents {
 
   void set({
     required String topic,
-    required JsonRpcRequest request,
+    required Map<String, dynamic> request,
     String? chainId,
   });
 
-  Future<JsonRpcRecord> get({
+  JsonRpcRecord get({
     required String topic,
     required int id,
   });
 
-  Future<void> resolve(JsonRpcResponse response);
+  void resolve(Map<String, dynamic> response);
 
   void delete({required String topic, int? id});
 
-  Future<bool> exists({
+  bool exists({
     required String topic,
     required int id,
   });

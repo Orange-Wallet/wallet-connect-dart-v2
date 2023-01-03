@@ -20,6 +20,9 @@ class ProposalTypesBaseRequiredNamespace {
   factory ProposalTypesBaseRequiredNamespace.fromJson(
           Map<String, dynamic> json) =>
       _$ProposalTypesBaseRequiredNamespaceFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ProposalTypesBaseRequiredNamespaceToJson(this);
 }
 
 @JsonSerializable()
@@ -36,6 +39,9 @@ class ProposalTypesRequiredNamespace
 
   factory ProposalTypesRequiredNamespace.fromJson(Map<String, dynamic> json) =>
       _$ProposalTypesRequiredNamespaceFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$ProposalTypesRequiredNamespaceToJson(this);
 }
 
 typedef ProposalTypesRequiredNamespaces
@@ -69,6 +75,8 @@ class ProposalTypesRequestStruct {
 
   factory ProposalTypesRequestStruct.fromJson(Map<String, dynamic> json) =>
       _$ProposalTypesRequestStructFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProposalTypesRequestStructToJson(this);
 }
 
 @JsonSerializable()

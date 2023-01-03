@@ -14,6 +14,7 @@ import 'package:wallet_connect/core/store/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/utils/uri.dart';
 import 'package:wallet_connect/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
@@ -21,8 +22,6 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
-
-import '../../utils/misc.dart';
 
 class Pairing with IEvents implements IPairing {
   @override
@@ -57,6 +56,9 @@ class Pairing with IEvents implements IPairing {
           logger: logger,
           name: PAIRING_CONTEXT,
           storagePrefix: CORE_STORAGE_PREFIX,
+          fromJson: (v) =>
+              PairingTypesStruct.fromJson(v as Map<String, dynamic>),
+          toJson: (v) => v.toJson(),
         );
 
   @override
@@ -154,8 +156,8 @@ class Pairing with IEvents implements IPairing {
     _isInitialized();
     await _isValidPairingTopic(topic);
     if (pairings.keys.contains(topic)) {
-      final id =
-          await _sendRequest(topic, PairingRpcMethod.WC_PAIRING_PING, {});
+      final id = await _sendRequest(
+          topic, PairingRpcMethod.WC_PAIRING_PING, {}, (_) => {});
       final completer = Completer<void>();
       events.once(engineEvent(EngineTypesEvent.PAIRING_PING, id), null,
           (event, _) {
@@ -197,6 +199,7 @@ class Pairing with IEvents implements IPairing {
         topic,
         PairingRpcMethod.WC_PAIRING_DELETE,
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
+        (e) => e.toJson(),
       );
       await _deletePairing(topic: topic);
     }
@@ -208,15 +211,19 @@ class Pairing with IEvents implements IPairing {
     String topic,
     PairingRpcMethod method,
     T params,
+    Object? Function(T)? paramsToJson,
   ) async {
-    final payload =
-        formatJsonRpcRequest<T>(method: method.value, params: params);
+    final payload = formatJsonRpcRequest<T>(
+      method: method.value,
+      params: params,
+      paramsToJson: paramsToJson,
+    );
     final message = await core.crypto.encode(
       topic: topic,
       payload: payload.toJson(),
     );
     final opts = getPairingRpcOptions(method).req;
-    core.history.set(topic: topic, request: payload);
+    core.history.set(topic: topic, request: payload.toJson());
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     return payload.id;
   }
@@ -225,17 +232,23 @@ class Pairing with IEvents implements IPairing {
     int id,
     String topic,
     T result,
+    Object? Function(T) resultToJson,
   ) async {
-    final payload = formatJsonRpcResult<T>(id: id, result: result);
+    final payload = formatJsonRpcResult<T>(
+      id: id,
+      result: result,
+      resultToJson: resultToJson,
+    );
     final message = await core.crypto.encode(
       topic: topic,
       payload: payload.toJson(),
     );
-    final record = await core.history.get(topic: topic, id: id);
-    final opts =
-        getPairingRpcOptions(record.request.method.pairingRpcMethod).res;
+    final record = core.history.get(topic: topic, id: id);
+    final opts = getPairingRpcOptions(
+            (record.request['method'] as String).pairingRpcMethod)
+        .res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
-    await core.history.resolve(payload);
+    core.history.resolve(payload.toJson());
   }
 
   Future<void> _sendError(int id, String topic, dynamic error) async {
@@ -244,11 +257,12 @@ class Pairing with IEvents implements IPairing {
       topic: topic,
       payload: payload.toJson(),
     );
-    final record = await core.history.get(topic: topic, id: id);
-    final opts =
-        getPairingRpcOptions(record.request.method.pairingRpcMethod).res;
+    final record = core.history.get(topic: topic, id: id);
+    final opts = getPairingRpcOptions(
+            (record.request['method'] as String).pairingRpcMethod)
+        .res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
-    await core.history.resolve(payload);
+    core.history.resolve(payload.toJson());
   }
 
   _deletePairing({
@@ -301,7 +315,7 @@ class Pairing with IEvents implements IPairing {
           core.history.set(topic: topic, request: payload);
           _onRelayEventRequest(topic: topic, payload: payload);
         } else if (isJsonRpcResponse(payload)) {
-          await core.history.resolve(payload);
+          core.history.resolve(payload);
           _onRelayEventResponse(topic: topic, payload: payload);
         }
       }
@@ -328,8 +342,8 @@ class Pairing with IEvents implements IPairing {
     required String topic,
     required JsonRpcResponse payload,
   }) async {
-    final record = await core.history.get(topic: topic, id: payload.id);
-    final resMethod = record.request.method;
+    final record = core.history.get(topic: topic, id: payload.id);
+    final resMethod = record.request['method'] as String;
 
     switch (resMethod) {
       case "wc_pairingPing":
@@ -345,7 +359,7 @@ class Pairing with IEvents implements IPairing {
   }) async {
     try {
       _isValidPairingTopic(topic);
-      await _sendResult<bool>(id, topic, true);
+      await _sendResult<bool>(id, topic, true, (v) => v);
       events.emitData(
           EngineTypesEvent.PAIRING_PING.value, {'id': id, 'topic': topic});
     } catch (err) {
@@ -377,7 +391,7 @@ class Pairing with IEvents implements IPairing {
     try {
       _isValidPairingTopic(topic);
       // RPC request needs to happen before deletion as it utilises pairing encryption
-      await _sendResult<bool>(id, topic, true);
+      await _sendResult<bool>(id, topic, true, (v) => v);
       await _deletePairing(topic: topic);
       events.emitData("pairing_delete", {id, topic});
     } catch (err) {

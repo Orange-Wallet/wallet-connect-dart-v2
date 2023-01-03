@@ -20,6 +20,8 @@ class SessionTypesBaseNamespace {
 
   factory SessionTypesBaseNamespace.fromJson(Map<String, dynamic> json) =>
       _$SessionTypesBaseNamespaceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionTypesBaseNamespaceToJson(this);
 }
 
 @JsonSerializable()
@@ -35,6 +37,9 @@ class SessionTypesNamespace extends SessionTypesBaseNamespace {
 
   factory SessionTypesNamespace.fromJson(Map<String, dynamic> json) =>
       _$SessionTypesNamespaceFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$SessionTypesNamespaceToJson(this);
 }
 
 typedef SessionTypesNamespaces = Map<String, SessionTypesNamespace>;
@@ -52,6 +57,8 @@ class SessionTypesPublicKeyMetadata {
   factory SessionTypesPublicKeyMetadata.fromJson(Map<String, dynamic> json) =>
       _$SessionTypesPublicKeyMetadataFromJson(json);
 
+  Map<String, dynamic> toJson() => _$SessionTypesPublicKeyMetadataToJson(this);
+
   SessionTypesPublicKeyMetadata copyWith({
     String? publicKey,
     Metadata? metadata,
@@ -63,6 +70,7 @@ class SessionTypesPublicKeyMetadata {
   }
 }
 
+@JsonSerializable()
 class SessionTypesStruct {
   final String topic;
   final RelayerTypesProtocolOptions relay;
@@ -85,6 +93,11 @@ class SessionTypesStruct {
     required this.self,
     required this.peer,
   });
+
+  factory SessionTypesStruct.fromJson(Map<String, dynamic> json) =>
+      _$SessionTypesStructFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionTypesStructToJson(this);
 
   SessionTypesStruct copyWith({
     String? topic,
