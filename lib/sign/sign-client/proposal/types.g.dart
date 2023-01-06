@@ -41,13 +41,23 @@ ProposalTypesRequiredNamespace _$ProposalTypesRequiredNamespaceFromJson(
     );
 
 Map<String, dynamic> _$ProposalTypesRequiredNamespaceToJson(
-        ProposalTypesRequiredNamespace instance) =>
-    <String, dynamic>{
-      'chains': instance.chains,
-      'methods': instance.methods,
-      'events': instance.events,
-      'extension': instance.extension,
-    };
+    ProposalTypesRequiredNamespace instance) {
+  final val = <String, dynamic>{
+    'chains': instance.chains,
+    'methods': instance.methods,
+    'events': instance.events,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'extension', instance.extension?.map((e) => e.toJson()).toList());
+  return val;
+}
 
 ProposalTypesProposer _$ProposalTypesProposerFromJson(
         Map<String, dynamic> json) =>
@@ -60,7 +70,7 @@ Map<String, dynamic> _$ProposalTypesProposerToJson(
         ProposalTypesProposer instance) =>
     <String, dynamic>{
       'publicKey': instance.publicKey,
-      'metadata': instance.metadata,
+      'metadata': instance.metadata.toJson(),
     };
 
 ProposalTypesRequestStruct _$ProposalTypesRequestStructFromJson(
@@ -82,9 +92,10 @@ ProposalTypesRequestStruct _$ProposalTypesRequestStructFromJson(
 Map<String, dynamic> _$ProposalTypesRequestStructToJson(
         ProposalTypesRequestStruct instance) =>
     <String, dynamic>{
-      'relays': instance.relays,
-      'proposer': instance.proposer,
-      'requiredNamespaces': instance.requiredNamespaces,
+      'relays': instance.relays.map((e) => e.toJson()).toList(),
+      'proposer': instance.proposer.toJson(),
+      'requiredNamespaces':
+          instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
     };
 
 ProposalTypesStruct _$ProposalTypesStructFromJson(Map<String, dynamic> json) =>
@@ -105,13 +116,22 @@ ProposalTypesStruct _$ProposalTypesStructFromJson(Map<String, dynamic> json) =>
       pairingTopic: json['pairingTopic'] as String?,
     );
 
-Map<String, dynamic> _$ProposalTypesStructToJson(
-        ProposalTypesStruct instance) =>
-    <String, dynamic>{
-      'relays': instance.relays,
-      'proposer': instance.proposer,
-      'requiredNamespaces': instance.requiredNamespaces,
-      'id': instance.id,
-      'expiry': instance.expiry,
-      'pairingTopic': instance.pairingTopic,
-    };
+Map<String, dynamic> _$ProposalTypesStructToJson(ProposalTypesStruct instance) {
+  final val = <String, dynamic>{
+    'relays': instance.relays.map((e) => e.toJson()).toList(),
+    'proposer': instance.proposer.toJson(),
+    'requiredNamespaces':
+        instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
+    'id': instance.id,
+    'expiry': instance.expiry,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('pairingTopic', instance.pairingTopic);
+  return val;
+}

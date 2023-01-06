@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:logger/logger.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
@@ -10,9 +11,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../provider/types.dart';
 import '../utils/url.dart';
 
-typedef Events = void Function(String name, [dynamic data]);
-
-class WsConnection with IEvents implements IJsonRpcConnection {
+class WsConnection with Events implements IJsonRpcConnection {
   @override
   final EventSubject events;
 
@@ -52,6 +51,7 @@ class WsConnection with IEvents implements IJsonRpcConnection {
   Future<void> send({required JsonRpcPayload payload, dynamic context}) async {
     socket ??= await _register();
     try {
+      Logger().i('SEND ${payload.toJson()}');
       socket!.sink.add(jsonEncode(payload.toJson()));
     } catch (e) {
       _onError(id: payload.id, e: e);
@@ -84,25 +84,28 @@ class WsConnection with IEvents implements IJsonRpcConnection {
     this.url = url;
     registering = true;
 
-    final _socket = WebSocketChannel.connect(Uri.parse(url));
-    try {
-      await _socket.stream.first;
-      return _onOpen(_socket);
-    } catch (e) {
-      return _emitError(e);
-    }
-  }
-
-  _onOpen(WebSocketChannel socket) {
-    socket.stream.listen(
+    final webSocket = WebSocketChannel.connect(Uri.parse(url));
+    Logger().i('URL $url');
+    webSocket.stream.listen(
       (event) {
         _onPayload(event);
       },
-      onDone: () => _onClose(),
+      onError: (e) {
+        Logger().e('ERROR $e');
+        throw _emitError(e);
+      },
+      onDone: () {
+        _onClose();
+      },
     );
+    return _onOpen(webSocket);
+  }
+
+  WebSocketChannel _onOpen(WebSocketChannel socket) {
     this.socket = socket;
     registering = false;
     events.emitData("open");
+    return socket;
   }
 
   _onClose() {
@@ -113,18 +116,15 @@ class WsConnection with IEvents implements IJsonRpcConnection {
 
   _onPayload(dynamic data) {
     if (data == null) return;
-
-    final payload = JsonRpcResult.fromJson(
-      data is String ? jsonDecode(data) : data,
-      (v) => v,
-    );
+    Logger().i('PAYLOAD $data');
+    final payload = data is String ? jsonDecode(data) : data;
     events.emitData("payload", payload);
   }
 
   _onError({required int id, required Object e}) {
     final error = _parseError(e: WCException(e.toString()));
     final payload = formatJsonRpcError(id: id, error: error.message);
-    events.emitData("payload", payload);
+    events.emitData("payload", payload.toJson());
   }
 
   _parseError({required WCException e, String? url}) {

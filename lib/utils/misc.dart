@@ -1,7 +1,7 @@
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
-const SDK_TYPE = "dart";
+const SDK_TYPE = "js";
 
 // -- rpcUrl ----------------------------------------------//
 
@@ -14,13 +14,13 @@ String getJavascriptOS() {
   //   return [os, info.name, info.version].join("-");
   // }
   // return [os, info.version].join("-");
-  return "unknown"; // TODO: Remove
+  return "darwin-16.14.0"; // TODO: Remove
 }
 
 getJavascriptID() {
   // final env = getEnvironment();
   // return env === ENV_MAP.browser ? [env, getLocation()?.host || "unknown"].join(":") : env;
-  return "unknown"; // TODO: Remove
+  return "node"; // TODO: Remove
 }
 
 String formatUA(String protocol, int version, String sdkVersion) {
@@ -34,7 +34,7 @@ String formatUA(String protocol, int version, String sdkVersion) {
   ].join("/");
 }
 
-formatRelayRpcUrl({
+String formatRelayRpcUrl({
   required String protocol,
   required int version,
   required String auth,
@@ -45,7 +45,11 @@ formatRelayRpcUrl({
   final uri = Uri.parse(relayUrl);
   final queryParams = Uri.splitQueryString(uri.query);
   final ua = formatUA(protocol, version, sdkVersion);
-  final newQueryParams = {'auth': auth, 'ua': ua, 'projectId': projectId ?? ''};
+  final newQueryParams = {
+    'auth': auth,
+    if (projectId != null) 'projectId': projectId,
+    'ua': ua,
+  };
   queryParams.addAll(newQueryParams);
   return uri.replace(queryParameters: queryParams).toString();
 }

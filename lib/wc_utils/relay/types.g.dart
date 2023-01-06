@@ -29,14 +29,23 @@ RelayJsonRpcPublishParams _$RelayJsonRpcPublishParamsFromJson(
     );
 
 Map<String, dynamic> _$RelayJsonRpcPublishParamsToJson(
-        RelayJsonRpcPublishParams instance) =>
-    <String, dynamic>{
-      'topic': instance.topic,
-      'message': instance.message,
-      'ttl': instance.ttl,
-      'prompt': instance.prompt,
-      'tag': instance.tag,
-    };
+    RelayJsonRpcPublishParams instance) {
+  final val = <String, dynamic>{
+    'topic': instance.topic,
+    'message': instance.message,
+    'ttl': instance.ttl,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('prompt', instance.prompt);
+  writeNotNull('tag', instance.tag);
+  return val;
+}
 
 RelayJsonRpcSubscriptionData _$RelayJsonRpcSubscriptionDataFromJson(
         Map<String, dynamic> json) =>
@@ -64,7 +73,7 @@ Map<String, dynamic> _$RelayJsonRpcSubscriptionParamsToJson(
         RelayJsonRpcSubscriptionParams instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'data': instance.data,
+      'data': instance.data.toJson(),
     };
 
 RelayJsonRpcUnsubscribeParams _$RelayJsonRpcUnsubscribeParamsFromJson(

@@ -1,12 +1,16 @@
 import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
+import 'dart:math' as math;
 
 import 'package:convert/convert.dart';
-import 'package:cryptography/dart.dart';
+import 'package:cryptography/cryptography.dart' as crypto;
+import 'package:flutter/foundation.dart';
+import 'package:pointycastle/digests/sha256.dart';
+import 'package:pointycastle/key_derivators/hkdf.dart';
+import 'package:pointycastle/pointycastle.dart' as pc;
 import 'package:wallet_connect/core/crypto/types.dart';
-import 'package:cryptography/cryptography.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:x25519/x25519.dart' as curve;
+import 'package:yx_tool/yx_crypto.dart';
 
 const TYPE_0 = 0;
 const TYPE_1 = 1;
@@ -17,15 +21,15 @@ const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
 
 Future<CryptoTypesKeyPair> generateKeyPair() async {
-  final keyPair = await const DartX25519().newKeyPair();
+  final keyPair = curve.generateKeyPair();
   return CryptoTypesKeyPair(
-    privateKey: hex.encode((await keyPair.extractPrivateKeyBytes())),
-    publicKey: hex.encode((await keyPair.extractPublicKey()).bytes),
+    privateKey: hex.encode(keyPair.privateKey),
+    publicKey: hex.encode(keyPair.publicKey),
   );
 }
 
 List<int> randomBytes(int length) {
-  final random = Random.secure();
+  final random = math.Random.secure();
   return List<int>.generate(length, (i) => random.nextInt(256));
 }
 
@@ -35,28 +39,39 @@ String generateRandomBytes32() {
 }
 
 Future<String> deriveSymKey(String privateKeyA, String publicKeyB) async {
-  const type = KeyPairType.x25519;
   final privateKeyBytes = hex.decode(privateKeyA);
   final publicKeyBytes = hex.decode(publicKeyB);
-  final publicKey = SimplePublicKey(publicKeyBytes, type: type);
-  final keyPair =
-      SimpleKeyPairData(privateKeyBytes, publicKey: publicKey, type: type);
-  final sharedKey = await Cryptography.instance.x25519().sharedSecretKey(
-        keyPair: keyPair,
-        remotePublicKey: publicKey,
-      );
-  final hkdf = Hkdf(hmac: Hmac(Sha256()), outputLength: KEY_LENGTH);
-  final symKey = await hkdf.deriveKey(secretKey: sharedKey);
-  return hex.encode(await symKey.extractBytes());
+  // final sharedKey = await crypto.X25519().sharedSecretKey(
+  //       keyPair: crypto.SimpleKeyPair(
+  //         privateKeyBytes,
+  //       ),
+  //       remotePublicKey: remotePublicKey,
+  //     );
+
+  final sharedKey = curve.X25519(privateKeyBytes, publicKeyBytes);
+  var okm = Uint8List(KEY_LENGTH);
+  final hkdfX = HKDFKeyDerivator(SHA256Digest())
+    ..init(pc.HkdfParameters(sharedKey, KEY_LENGTH));
+  hkdfX.deriveKey(null, 0, okm, 0);
+
+  // final hkdf = DartHkdf(
+  //   hmac: DartHmac(DartSha256()),
+  //   outputLength: KEY_LENGTH,
+  // );
+
+  // final symKey = await hkdf.deriveKey(
+  //     secretKey: await crypto.SecretKeyData.random(length: 32).extract());
+  // return hex.encode(await symKey.extractBytes());
+  return hex.encode(okm);
 }
 
 Future<String> hashKey(String key) async {
-  final result = (await Sha256().hash(hex.decode(key))).bytes;
+  final result = (await crypto.Sha256().hash(hex.decode(key))).bytes;
   return hex.encode(result);
 }
 
 Future<String> hashMessage(String message) async {
-  final result = (await Sha256().hash(utf8.encode(message))).bytes;
+  final result = (await crypto.Sha256().hash(utf8.encode(message))).bytes;
   return hex.encode(result);
 }
 
@@ -85,9 +100,14 @@ Future<String> encrypt({
 
   final dIV =
       Uint8List.fromList(iv != null ? hex.decode(iv) : randomBytes(IV_LENGTH));
-  final box = await Chacha20.poly1305Aead().encrypt(utf8.encode(message),
-      secretKey: SecretKey(hex.decode(symKey)), nonce: dIV);
-  final sealed = Uint8List.fromList(box.cipherText);
+  // final box = await crypto.Chacha20.poly1305Aead().encrypt(utf8.encode(message),
+  //     secretKey: crypto.SecretKey(hex.decode(symKey)), nonce: dIV);
+  // final sealed = Uint8List.fromList(box.cipherText);
+  final box = AEADChaCha20Poly1305.withIV(
+    Uint8List.fromList(hex.decode(symKey)),
+    dIV,
+  );
+  final sealed = box.encrypt(Uint8List.fromList(utf8.encode(message)));
   return serialize(
     type: typeByte,
     sealed: sealed,
@@ -102,16 +122,22 @@ Future<String> decrypt({
 }) async {
   final decoded = deserialize(encoded);
   try {
-    final secretKey = SecretKey(hex.decode(symKey));
-    final mac = await Chacha20.poly1305Aead()
-        .macAlgorithm
-        .calculateMac(decoded.sealed, secretKey: secretKey, nonce: decoded.iv);
-    final message = await Chacha20.poly1305Aead().decrypt(
-      SecretBox(decoded.sealed, nonce: decoded.iv, mac: mac),
-      secretKey: secretKey,
+    // final secretKey = crypto.SecretKey(hex.decode(symKey));
+    // final mac = await crypto.Chacha20.poly1305Aead()
+    //     .macAlgorithm
+    //     .calculateMac(decoded.sealed, secretKey: secretKey, nonce: decoded.iv);
+    // final message = await crypto.Chacha20.poly1305Aead().decrypt(
+    //   crypto.SecretBox(decoded.sealed, nonce: decoded.iv, mac: mac),
+    //   secretKey: secretKey,
+    // );
+    final box = AEADChaCha20Poly1305.withIV(
+      Uint8List.fromList(hex.decode(symKey)),
+      decoded.iv,
     );
+    final message = box.decrypt(decoded.sealed);
     return utf8.decode(message);
-  } catch (e) {
+  } catch (e, trace) {
+    debugPrint('ERROR $e, $trace');
     throw WCException("Failed to decrypt");
   }
 }
@@ -133,7 +159,7 @@ String serialize({
 }
 
 CryptoTypesEncodingParams deserialize(String encoded) {
-  final bytes = base64Decode(encoded);
+  final bytes = Uint8List.fromList(base64.decode(encoded));
   final type = bytes.sublist(ZERO_INDEX, TYPE_LENGTH);
   final slice1 = TYPE_LENGTH;
   if (decodeTypeByte(type) == TYPE_1) {

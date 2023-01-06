@@ -59,6 +59,8 @@ class ProposalTypesProposer {
 
   factory ProposalTypesProposer.fromJson(Map<String, dynamic> json) =>
       _$ProposalTypesProposerFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProposalTypesProposerToJson(this);
 }
 
 @JsonSerializable()
@@ -97,6 +99,7 @@ class ProposalTypesStruct extends ProposalTypesRequestStruct {
   factory ProposalTypesStruct.fromJson(Map<String, dynamic> json) =>
       _$ProposalTypesStructFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$ProposalTypesStructToJson(this);
 }
 

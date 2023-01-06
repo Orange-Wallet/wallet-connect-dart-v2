@@ -14,7 +14,7 @@ class CryptoTypesKeyPair {
   final String privateKey;
   final String publicKey;
 
-  CryptoTypesKeyPair({
+  const CryptoTypesKeyPair({
     required this.privateKey,
     required this.publicKey,
   });

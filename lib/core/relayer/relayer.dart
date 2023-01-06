@@ -23,7 +23,7 @@ import 'package:wallet_connect/wc_utils/jsonrpc/ws-connection/ws.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';
 
-class Relayer with IEvents implements IRelayer {
+class Relayer with Events implements IRelayer {
   final String protocol = "wc";
   final int version = 2;
 
@@ -84,8 +84,9 @@ class Relayer with IEvents implements IRelayer {
     logger.i('Initialized');
     _provider = await _createProvider();
     await Future.wait([
-      // messages.init(),
-      provider.connect(), subscriber.init(),
+      messages.init(),
+      provider.connect(),
+      subscriber.init(),
     ]);
     _registerEventListeners();
     _initialized = true;
@@ -168,19 +169,28 @@ class Relayer with IEvents implements IRelayer {
     await messages.set(messageEvent.topic, messageEvent.message);
   }
 
-  _shouldIgnoreMessageEvent(RelayerTypesMessageEvent messageEvent) async {
+  Future<bool> _shouldIgnoreMessageEvent(
+      RelayerTypesMessageEvent messageEvent) async {
     if (!(await subscriber.isSubscribed(messageEvent.topic))) return true;
-    final exists = messages.has(messageEvent.topic, messageEvent.message);
+    final exists = await messages.has(messageEvent.topic, messageEvent.message);
     return exists;
   }
 
   _onProviderPayload(dynamic payload) async {
     logger.d('Incoming Relay Payload');
-    logger.i({'type': "payload", 'direction': "incoming", 'payload': payload});
+    logger.i({
+      'type': "payload",
+      'direction': "incoming",
+      'payload': payload,
+    });
     if (isJsonRpcRequest(payload)) {
-      if (!payload.method.endsWith(RELAYER_SUBSCRIBER_SUFFIX)) return;
-      final event = RelayJsonRpcSubscriptionParams.fromJson(
-          (payload as JsonRpcRequest).params as Map<String, dynamic>);
+      final payloadObj = JsonRpcRequest.fromJson(
+        payload,
+        (v) =>
+            RelayJsonRpcSubscriptionParams.fromJson(v as Map<String, dynamic>),
+      );
+      if (!payloadObj.method.endsWith(RELAYER_SUBSCRIBER_SUFFIX)) return;
+      final event = payloadObj.params!;
       final messageEvent = RelayerTypesMessageEvent(
         topic: event.data.topic,
         message: event.data.message,
@@ -189,7 +199,7 @@ class Relayer with IEvents implements IRelayer {
       logger.i(
           {'type': "event", 'event': event.id, 'messageEvent': messageEvent});
       events.emitData(event.id, messageEvent);
-      await _acknowledgePayload(payload);
+      await _acknowledgePayload<RelayJsonRpcSubscriptionParams>(payloadObj);
       await _onMessageEvent(messageEvent);
     }
   }
@@ -200,7 +210,7 @@ class Relayer with IEvents implements IRelayer {
     await _recordMessageEvent(messageEvent);
   }
 
-  _acknowledgePayload(payload) async {
+  _acknowledgePayload<T>(JsonRpcRequest<T> payload) async {
     final response = formatJsonRpcResult<bool>(
       id: payload.id,
       result: true,

@@ -19,5 +19,5 @@ Map<String, dynamic> _$PendingRequestTypesStructToJson(
     <String, dynamic>{
       'topic': instance.topic,
       'id': instance.id,
-      'params': instance.params,
+      'params': instance.params.toJson(),
     };

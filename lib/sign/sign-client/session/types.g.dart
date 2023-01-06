@@ -41,13 +41,23 @@ SessionTypesNamespace _$SessionTypesNamespaceFromJson(
     );
 
 Map<String, dynamic> _$SessionTypesNamespaceToJson(
-        SessionTypesNamespace instance) =>
-    <String, dynamic>{
-      'accounts': instance.accounts,
-      'methods': instance.methods,
-      'events': instance.events,
-      'extension': instance.extension,
-    };
+    SessionTypesNamespace instance) {
+  final val = <String, dynamic>{
+    'accounts': instance.accounts,
+    'methods': instance.methods,
+    'events': instance.events,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'extension', instance.extension?.map((e) => e.toJson()).toList());
+  return val;
+}
 
 SessionTypesPublicKeyMetadata _$SessionTypesPublicKeyMetadataFromJson(
         Map<String, dynamic> json) =>
@@ -60,7 +70,7 @@ Map<String, dynamic> _$SessionTypesPublicKeyMetadataToJson(
         SessionTypesPublicKeyMetadata instance) =>
     <String, dynamic>{
       'publicKey': instance.publicKey,
-      'metadata': instance.metadata,
+      'metadata': instance.metadata.toJson(),
     };
 
 SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
@@ -86,15 +96,25 @@ SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
           json['peer'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SessionTypesStructToJson(SessionTypesStruct instance) =>
-    <String, dynamic>{
-      'topic': instance.topic,
-      'relay': instance.relay,
-      'expiry': instance.expiry,
-      'acknowledged': instance.acknowledged,
-      'controller': instance.controller,
-      'namespaces': instance.namespaces,
-      'requiredNamespaces': instance.requiredNamespaces,
-      'self': instance.self,
-      'peer': instance.peer,
-    };
+Map<String, dynamic> _$SessionTypesStructToJson(SessionTypesStruct instance) {
+  final val = <String, dynamic>{
+    'topic': instance.topic,
+    'relay': instance.relay.toJson(),
+    'expiry': instance.expiry,
+    'acknowledged': instance.acknowledged,
+    'controller': instance.controller,
+    'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('requiredNamespaces',
+      instance.requiredNamespaces?.map((k, e) => MapEntry(k, e.toJson())));
+  val['self'] = instance.self.toJson();
+  val['peer'] = instance.peer.toJson();
+  return val;
+}

@@ -15,11 +15,20 @@ JsonRpcRecord _$JsonRpcRecordFromJson(Map<String, dynamic> json) =>
       response: json['response'] as Map<String, dynamic>?,
     );
 
-Map<String, dynamic> _$JsonRpcRecordToJson(JsonRpcRecord instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'topic': instance.topic,
-      'request': instance.request,
-      'chainId': instance.chainId,
-      'response': instance.response,
-    };
+Map<String, dynamic> _$JsonRpcRecordToJson(JsonRpcRecord instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'topic': instance.topic,
+    'request': instance.request,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('chainId', instance.chainId);
+  writeNotNull('response', instance.response);
+  return val;
+}

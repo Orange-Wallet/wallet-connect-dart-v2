@@ -100,15 +100,18 @@ ErrorObject? isValidExtension(
   dynamic namespace,
   String method,
 ) {
-  if ((namespace is SessionTypesNamespace &&
-          (namespace.extension?.isEmpty ?? true)) ||
-      (namespace is ProposalTypesRequiredNamespace &&
-          (namespace.extension?.isEmpty ?? true))) {
-    final error = getInternalError(
-      InternalErrorKey.MISSING_OR_INVALID,
-      context: '$method extension should be an array of namespaces, or omitted',
-    );
-    return ErrorObject(message: error.message, code: error.code);
+  if (namespace.extension != null) {
+    if ((namespace is SessionTypesNamespace &&
+            (namespace.extension!.isEmpty)) ||
+        (namespace is ProposalTypesRequiredNamespace &&
+            (namespace.extension!.isEmpty))) {
+      final error = getInternalError(
+        InternalErrorKey.MISSING_OR_INVALID,
+        context:
+            '$method extension should be an array of namespaces, or omitted',
+      );
+      return ErrorObject(message: error.message, code: error.code);
+    }
   }
 
   return null;

@@ -16,7 +16,7 @@ import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-class SignClient with IEvents implements ISignClient {
+class SignClient with Events implements ISignClient {
   final String protocol = SIGN_CLIENT_PROTOCOL;
   final int version = SIGN_CLIENT_VERSION;
 
@@ -54,9 +54,9 @@ class SignClient with IEvents implements ISignClient {
               projectId: projectId,
               relayUrl: relayUrl,
             ),
-        logger = logger ?? Logger() {
+        logger = logger ??
+            Logger(printer: PrefixPrinter(PrettyPrinter(colors: false))) {
     engine = Engine(client: this);
-
     session = Session(core: this.core, logger: logger);
     proposal = Proposal(core: this.core, logger: logger);
     pendingRequest = PendingRequest(core: this.core, logger: logger);

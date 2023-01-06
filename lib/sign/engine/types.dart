@@ -172,6 +172,8 @@ class SessionEmitEvent {
 
   factory SessionEmitEvent.fromJson(Map<String, dynamic> json) =>
       _$SessionEmitEventFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionEmitEventToJson(this);
 }
 
 enum EngineTypesEvent {

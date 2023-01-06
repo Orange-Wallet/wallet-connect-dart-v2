@@ -97,7 +97,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
       chainId: chainId,
     );
     records[record.id] = record;
-    events.emit(HistoryEvents.created, record);
+    events.emitData(HistoryEvents.created, record);
   }
 
   @override
@@ -110,7 +110,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
     if (record.response != null) return;
     record = record.copyWith(response: response);
     records[record.id] = record;
-    events.emit(HistoryEvents.updated, record);
+    events.emitData(HistoryEvents.updated, record);
   }
 
   @override
@@ -137,7 +137,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
       if (record.topic == topic) {
         if (id != null && record.id != id) return;
         records.remove(record.id);
-        events.emit(HistoryEvents.deleted, record);
+        events.emitData(HistoryEvents.deleted, record);
       }
     });
   }
@@ -182,7 +182,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
 
   _persist() async {
     await _setJsonRpcRecords(values);
-    events.emit(HistoryEvents.sync);
+    events.emitData(HistoryEvents.sync);
   }
 
   _restore() async {

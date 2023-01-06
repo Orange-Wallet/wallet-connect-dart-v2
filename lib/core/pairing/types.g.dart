@@ -18,11 +18,20 @@ PairingTypesStruct _$PairingTypesStructFromJson(Map<String, dynamic> json) =>
           : Metadata.fromJson(json['peerMetadata'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PairingTypesStructToJson(PairingTypesStruct instance) =>
-    <String, dynamic>{
-      'topic': instance.topic,
-      'expiry': instance.expiry,
-      'relay': instance.relay,
-      'active': instance.active,
-      'peerMetadata': instance.peerMetadata,
-    };
+Map<String, dynamic> _$PairingTypesStructToJson(PairingTypesStruct instance) {
+  final val = <String, dynamic>{
+    'topic': instance.topic,
+    'expiry': instance.expiry,
+    'relay': instance.relay.toJson(),
+    'active': instance.active,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('peerMetadata', instance.peerMetadata?.toJson());
+  return val;
+}

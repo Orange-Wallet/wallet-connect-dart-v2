@@ -17,7 +17,7 @@ RpcSessionRequestParams _$RpcSessionRequestParamsFromJson(
 Map<String, dynamic> _$RpcSessionRequestParamsToJson(
         RpcSessionRequestParams instance) =>
     <String, dynamic>{
-      'request': instance.request,
+      'request': instance.request.toJson(),
       'chainId': instance.chainId,
     };
 
@@ -31,7 +31,7 @@ RpcSessionEventParams _$RpcSessionEventParamsFromJson(
 Map<String, dynamic> _$RpcSessionEventParamsToJson(
         RpcSessionEventParams instance) =>
     <String, dynamic>{
-      'event': instance.event,
+      'event': instance.event.toJson(),
       'chainId': instance.chainId,
     };
 
@@ -47,7 +47,32 @@ RpcSessionUpdateParams _$RpcSessionUpdateParamsFromJson(
 Map<String, dynamic> _$RpcSessionUpdateParamsToJson(
         RpcSessionUpdateParams instance) =>
     <String, dynamic>{
-      'namespaces': instance.namespaces,
+      'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
+    };
+
+RpcSessionProposeParams _$RpcSessionProposeParamsFromJson(
+        Map<String, dynamic> json) =>
+    RpcSessionProposeParams(
+      relays: (json['relays'] as List<dynamic>)
+          .map((e) =>
+              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      requiredNamespaces:
+          (json['requiredNamespaces'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k,
+            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+      ),
+      proposer: ProposalTypesProposer.fromJson(
+          json['proposer'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$RpcSessionProposeParamsToJson(
+        RpcSessionProposeParams instance) =>
+    <String, dynamic>{
+      'relays': instance.relays.map((e) => e.toJson()).toList(),
+      'requiredNamespaces':
+          instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
+      'proposer': instance.proposer.toJson(),
     };
 
 ResultSessionPropose _$ResultSessionProposeFromJson(
@@ -61,6 +86,6 @@ ResultSessionPropose _$ResultSessionProposeFromJson(
 Map<String, dynamic> _$ResultSessionProposeToJson(
         ResultSessionPropose instance) =>
     <String, dynamic>{
-      'relay': instance.relay,
+      'relay': instance.relay.toJson(),
       'responderPublicKey': instance.responderPublicKey,
     };

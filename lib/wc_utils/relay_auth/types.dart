@@ -1,5 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'types.g.dart';
+
+@JsonSerializable()
 class IridiumJWTHeader {
   final String alg;
   final String typ;
@@ -8,8 +12,14 @@ class IridiumJWTHeader {
     this.alg = "EdDSA",
     this.typ = "JWT",
   });
+
+  factory IridiumJWTHeader.fromJson(Map<String, dynamic> json) =>
+      _$IridiumJWTHeaderFromJson(json);
+
+  Map<String, dynamic> toJson() => _$IridiumJWTHeaderToJson(this);
 }
 
+@JsonSerializable()
 class IridiumJWTPayload {
   final String iss;
   final String sub;
@@ -24,6 +34,11 @@ class IridiumJWTPayload {
     required this.iat,
     required this.exp,
   });
+
+  factory IridiumJWTPayload.fromJson(Map<String, dynamic> json) =>
+      _$IridiumJWTPayloadFromJson(json);
+
+  Map<String, dynamic> toJson() => _$IridiumJWTPayloadToJson(this);
 }
 
 class IridiumJWTData {
@@ -37,11 +52,15 @@ class IridiumJWTData {
 }
 
 class RelayAuthKeyPair {
+  final List<int> privateKeyBytes;
   final String privateKey;
+  final List<int> publicKeyBytes;
   final String publicKey;
 
   RelayAuthKeyPair({
+    required this.privateKeyBytes,
     required this.privateKey,
+    required this.publicKeyBytes,
     required this.publicKey,
   });
 }

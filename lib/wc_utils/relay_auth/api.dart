@@ -1,23 +1,44 @@
 import 'package:convert/convert.dart';
-import 'package:cryptography/cryptography.dart';
-import 'package:cryptography/dart.dart';
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:flutter/foundation.dart';
-import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/constants.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/types.dart';
 
 Future<RelayAuthKeyPair> generateKeyPair([Uint8List? seed]) async {
-  seed ??= Uint8List.fromList(randomBytes(KEY_PAIR_SEED_LENGTH));
-  final keyPair = await DartEd25519().newKeyPairFromSeed(seed);
+  // seed ??= Uint8List.fromList(randomBytes(KEY_PAIR_SEED_LENGTH));
+  ed.PrivateKey privateKey;
+  ed.PublicKey publicKey;
+  if (seed == null) {
+    final keyPair = ed.generateKey();
+    privateKey = keyPair.privateKey;
+    publicKey = keyPair.publicKey;
+  } else {
+    privateKey = ed.newKeyFromSeed(seed);
+    publicKey = ed.public(privateKey);
+  }
+
   return RelayAuthKeyPair(
-    privateKey: hex.encode((await keyPair.extractPrivateKeyBytes())),
-    publicKey: hex.encode((await keyPair.extractPublicKey()).bytes),
+    privateKeyBytes: privateKey.bytes,
+    privateKey: hex.encode(privateKey.bytes),
+    publicKeyBytes: publicKey.bytes,
+    publicKey: hex.encode(publicKey.bytes),
   );
+
+  // NW
+  // final kP = await bc.Ed25519().newKeyPair();
+  // final pvtKey = await kP.extractPrivateKeyBytes();
+  // final pbcKey = (await kP.extractPublicKey()).bytes;
+  // return RelayAuthKeyPair(
+  //   privateKeyBytes: pvtKey,
+  //   privateKey: hex.encode(pvtKey),
+  //   publicKeyBytes: pbcKey,
+  //   publicKey: hex.encode(pbcKey),
+  // );
 }
 
-signJWT({
+Future<String> signJWT({
   required String sub,
   required String aud,
   required int ttl,
@@ -32,14 +53,14 @@ signJWT({
       IridiumJWTPayload(iss: iss, sub: sub, aud: aud, iat: iat, exp: exp);
   final data = encodeData(IridiumJWTData(header: header, payload: payload));
 
-  const type = KeyPairType.ed25519;
-  final privateKeyBytes = hex.decode(keyPair.privateKey);
-  final publicKeyBytes = hex.decode(keyPair.publicKey);
-  final publicKey = SimplePublicKey(publicKeyBytes, type: type);
-  final simpleKeyPair =
-      SimpleKeyPairData(privateKeyBytes, publicKey: publicKey, type: type);
-  final signature = Uint8List.fromList(
-      (await DartEd25519().sign(data, keyPair: simpleKeyPair)).bytes);
+  // const type = KeyPairType.ed25519;
+  // final privateKeyBytes = hex.decode(keyPair.privateKey);
+  // final publicKeyBytes = hex.decode(keyPair.publicKey);
+  // final publicKey = SimplePublicKey(publicKeyBytes, type: type);
+  // final simpleKeyPair =
+  //     SimpleKeyPairData(privateKeyBytes, publicKey: publicKey, type: type);
+  final signature =
+      ed.sign(ed.PrivateKey(hex.decode(keyPair.privateKey)), data);
   return encodeJWT(IridiumJWTSigned(
     header: header,
     payload: payload,
@@ -54,10 +75,11 @@ Future<bool> verifyJWT(String jwt) {
     throw WCException("JWT must use EdDSA algorithm");
   }
   final publicKey = decodeIss(decoded.payload.iss);
-  const type = KeyPairType.ed25519;
-  final signature = Signature(
-    decoded.signature,
-    publicKey: SimplePublicKey(publicKey, type: type),
-  );
-  return DartEd25519().verify(decoded.data, signature: signature);
+  // const type = KeyPairType.ed25519;
+  // final signature = Signature(
+  //   decoded.signature,
+  //   publicKey: SimplePublicKey(publicKey, type: type),
+  // );
+  return Future.value(
+      ed.verify(ed.PublicKey(publicKey), decoded.data, decoded.signature));
 }

@@ -82,7 +82,7 @@ class SessionTypesStruct {
   final SessionTypesPublicKeyMetadata self;
   final SessionTypesPublicKeyMetadata peer;
 
-  SessionTypesStruct({
+  const SessionTypesStruct({
     required this.topic,
     required this.relay,
     required this.expiry,

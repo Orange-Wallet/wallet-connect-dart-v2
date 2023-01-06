@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:wallet_connect/wallet_connect.dart';
+export 'relay_auth/relay_auth_test.dart';
 
 void main() {
   test('some test', () {});

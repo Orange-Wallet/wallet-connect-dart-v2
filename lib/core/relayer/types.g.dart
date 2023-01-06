@@ -14,8 +14,17 @@ RelayerTypesProtocolOptions _$RelayerTypesProtocolOptionsFromJson(
     );
 
 Map<String, dynamic> _$RelayerTypesProtocolOptionsToJson(
-        RelayerTypesProtocolOptions instance) =>
-    <String, dynamic>{
-      'protocol': instance.protocol,
-      'data': instance.data,
-    };
+    RelayerTypesProtocolOptions instance) {
+  final val = <String, dynamic>{
+    'protocol': instance.protocol,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('data', instance.data);
+  return val;
+}

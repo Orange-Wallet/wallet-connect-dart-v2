@@ -18,7 +18,7 @@ class Metadata {
   final String url;
   final List<String> icons;
 
-  Metadata({
+  const Metadata({
     required this.name,
     required this.description,
     required this.url,

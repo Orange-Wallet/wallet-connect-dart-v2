@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';
 
 const DB_NAME = "walletconnect.db";
@@ -18,12 +19,14 @@ class KeyValueStorage implements IKeyValueStorage {
     if (database == ":memory:") {
       _inMemory = true;
     }
+    _data = {};
 
     _databaseInitialize();
   }
 
   Future<void> _databaseInitialize() async {
     try {
+      await Hive.initFlutter();
       _box = await Hive.openBox(_dbName);
       _box.keys.forEach((key) {
         _data[key] = _box.get(key);

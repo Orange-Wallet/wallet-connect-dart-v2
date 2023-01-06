@@ -4,7 +4,7 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
 
-class HeartBeat with IEvents implements IHeartBeat {
+class HeartBeat with Events implements IHeartBeat {
   static HeartBeat get instance {
     final heartbeat = HeartBeat();
     heartbeat.init();

@@ -2,17 +2,30 @@ import 'package:eventify/eventify.dart';
 
 typedef EventsCallback = void Function(Event event);
 
-mixin IEvents {
+abstract class IEvents {
   EventSubject get events;
 
+  Listener on(String event, EventsCallback callback);
+
+  Listener once(String event, EventsCallback callback);
+
+  void off(Listener? listener);
+
+  void removeListener(String eventName, EventsCallback callback);
+}
+
+mixin Events implements IEvents {
+  @override
+  EventSubject get events;
+  @override
   Listener on(String event, EventsCallback callback) =>
       events.on(event, null, (event, _) => callback(event));
-
+  @override
   Listener once(String event, EventsCallback callback) =>
       events.once(event, null, (event, _) => callback(event));
-
+  @override
   void off(Listener? listener) => events.off(listener);
-
+  @override
   void removeListener(String eventName, EventsCallback callback) =>
       events.removeListener(eventName, (event, _) => callback(event));
 }

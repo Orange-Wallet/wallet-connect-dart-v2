@@ -14,7 +14,7 @@ class RelayerTypesProtocolOptions {
   final String protocol;
   final String? data;
 
-  RelayerTypesProtocolOptions({
+  const RelayerTypesProtocolOptions({
     required this.protocol,
     this.data,
   });

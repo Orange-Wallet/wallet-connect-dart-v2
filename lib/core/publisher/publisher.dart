@@ -94,7 +94,11 @@ class Publisher implements IPublisher {
       paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
-    logger.i({'type': "message", 'direction': "outgoing", 'request': request});
+    logger.i({
+      'type': "message",
+      'direction': "outgoing",
+      'request': request.toJson(),
+    });
     return relayer.provider.request(request: request);
   }
 

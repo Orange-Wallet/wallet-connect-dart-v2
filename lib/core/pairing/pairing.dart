@@ -23,7 +23,7 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-class Pairing with IEvents implements IPairing {
+class Pairing with Events implements IPairing {
   @override
   final String name = PAIRING_CONTEXT;
   final String version = PAIRING_STORAGE_VERSION;
@@ -324,15 +324,16 @@ class Pairing with IEvents implements IPairing {
 
   _onRelayEventRequest({
     required String topic,
-    required JsonRpcRequest payload,
+    required Map<String, dynamic> payload,
   }) {
-    final reqMethod = payload.method;
+    final int id = payload['id'];
+    final String reqMethod = payload['method'];
 
     switch (reqMethod) {
       case "wc_pairingPing":
-        return _onPairingPingRequest(topic: topic, id: payload.id);
+        return _onPairingPingRequest(topic: topic, id: id);
       case "wc_pairingDelete":
-        return _onPairingDeleteRequest(topic: topic, id: payload.id);
+        return _onPairingDeleteRequest(topic: topic, id: id);
       default:
         return _onUnknownRpcMethodRequest(topic: topic, payload: payload);
     }
@@ -340,10 +341,11 @@ class Pairing with IEvents implements IPairing {
 
   _onRelayEventResponse({
     required String topic,
-    required JsonRpcResponse payload,
+    required Map<String, dynamic> payload,
   }) async {
-    final record = core.history.get(topic: topic, id: payload.id);
-    final resMethod = record.request['method'] as String;
+    final int id = payload['id'];
+    final record = core.history.get(topic: topic, id: id);
+    final String resMethod = record.request['method'];
 
     switch (resMethod) {
       case "wc_pairingPing":
@@ -370,16 +372,22 @@ class Pairing with IEvents implements IPairing {
 
   _onPairingPingResponse({
     required String topic,
-    required JsonRpcPayload payload,
+    required Map<String, dynamic> payload,
   }) async {
+    final int id = payload['id'];
     // put at the end of the stack to avoid a race condition
     // where pairing_ping listener is not yet _initialized
     Timer(const Duration(milliseconds: 500), () {
       if (isJsonRpcResult(payload)) {
-        events.emitData(engineEvent(EngineTypesEvent.PAIRING_PING, payload.id));
+        events.emitData(engineEvent(
+          EngineTypesEvent.PAIRING_PING,
+          id,
+        ));
       } else if (isJsonRpcError(payload)) {
-        events.emitData(engineEvent(EngineTypesEvent.PAIRING_PING, payload.id),
-            (payload as JsonRpcError).error);
+        events.emitData(
+          engineEvent(EngineTypesEvent.PAIRING_PING, id),
+          JsonRpcError.fromJson(payload).error,
+        );
       }
     });
   }
@@ -402,17 +410,21 @@ class Pairing with IEvents implements IPairing {
 
   _onUnknownRpcMethodRequest({
     required String topic,
-    required JsonRpcRequest payload,
+    required Map<String, dynamic> payload,
   }) async {
+    final int id = payload['id'];
+    final String method = payload['method'];
     try {
       // Ignore if the implementing client has registered this method as known.
-      if (registeredMethods.contains(payload.method)) return;
-      final error = getSdkError(SdkErrorKey.WC_METHOD_UNSUPPORTED,
-          context: payload.method);
-      await _sendError(payload.id, topic, error);
+      if (registeredMethods.contains(method)) return;
+      final error = getSdkError(
+        SdkErrorKey.WC_METHOD_UNSUPPORTED,
+        context: method,
+      );
+      await _sendError(id, topic, error);
       logger.e(error);
     } catch (err) {
-      await _sendError(payload.id, topic, err);
+      await _sendError(id, topic, err);
       logger.e(err);
     }
   }
@@ -443,10 +455,10 @@ class Pairing with IEvents implements IPairing {
 
   // ---------- Validation Helpers ----------------------------------- //
 
-  _isValidPair(params) {
-    if (!isValidUrl(params.uri)) {
+  _isValidPair(String uri) {
+    if (!isValidUrl(uri)) {
       final error = getInternalError(InternalErrorKey.MISSING_OR_INVALID,
-          context: 'pair() uri: ${params.uri}');
+          context: 'pair() uri: ${uri}');
       throw WCException(error.message);
     }
   }

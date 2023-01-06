@@ -9,7 +9,7 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 
-class Expirer with IEvents implements IExpirer {
+class Expirer with Events implements IExpirer {
   Map<String, ExpirerTypesExpiration> expirations;
 
   @override
@@ -173,10 +173,10 @@ class Expirer with IEvents implements IExpirer {
     return expiration;
   }
 
-  void _checkExpiry(String target, ExpirerTypesExpiration expiration) {
+  bool _checkExpiry(String target, ExpirerTypesExpiration expiration) {
     final msToTimeout =
         expiration.expiry * 1000 - DateTime.now().millisecondsSinceEpoch;
-    if (msToTimeout <= 0) _expire(target, expiration);
+    return (msToTimeout <= 0);
   }
 
   void _expire(String target, ExpirerTypesExpiration expiration) {
@@ -190,8 +190,12 @@ class Expirer with IEvents implements IExpirer {
   }
 
   void _checkExpirations() {
-    expirations
-        .forEach((target, expiration) => _checkExpiry(target, expiration));
+    expirations.entries
+        .where((e) => _checkExpiry(e.key, e.value))
+        .toList()
+        .forEach((e) {
+      _expire(e.key, e.value);
+    });
   }
 
   void _registerEventListeners() {

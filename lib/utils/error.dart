@@ -1,6 +1,5 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
 // Constants

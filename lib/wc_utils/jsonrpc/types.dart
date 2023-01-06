@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/utils/validator.dart';
 
-part 'types.g.dart';
-
 class JsonRpcProviderMessage<T> {
   final String type;
   final T data;
@@ -10,11 +8,9 @@ class JsonRpcProviderMessage<T> {
   JsonRpcProviderMessage({required this.type, required this.data});
 }
 
-@JsonSerializable(genericArgumentFactories: true)
 class RequestArguments<T> {
   final String method;
   final T? params;
-  @JsonKey(ignore: true)
   final Object? Function(T value)? paramsToJson;
 
   RequestArguments({
@@ -27,10 +23,18 @@ class RequestArguments<T> {
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) =>
-      _$RequestArgumentsFromJson(json, fromJsonT);
+      RequestArguments<T>(
+        method: json['method'] as String,
+        params: _$nullableGenericFromJson(json['params'], fromJsonT),
+      );
 
-  Map<String, dynamic> toJson() =>
-      _$RequestArgumentsToJson(this, paramsToJson ?? (_) => null);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'method': method,
+        'params': _$nullableGenericToJson(
+          params,
+          paramsToJson ?? (v) => v,
+        ),
+      };
 }
 
 abstract class JsonRpcPayload<T> {
@@ -60,16 +64,25 @@ class JsonRpcRequest<T> extends RequestArguments<T>
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) =>
-      _$JsonRpcRequestFromJson(json, fromJsonT);
+      JsonRpcRequest<T>(
+        id: json['id'] as int,
+        jsonrpc: json['jsonrpc'] as String,
+        method: json['method'] as String,
+        params: _$nullableGenericFromJson(json['params'], fromJsonT),
+      );
 
   @override
-  Map<String, dynamic> toJson() =>
-      _$JsonRpcRequestToJson(this, super.paramsToJson ?? (_) => null);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'jsonrpc': jsonrpc,
+        'method': method,
+        'params':
+            _$nullableGenericToJson(params, super.paramsToJson ?? (v) => v),
+      };
 }
 
 abstract class JsonRpcResponse<T> implements JsonRpcPayload<T> {}
 
-@JsonSerializable(genericArgumentFactories: true)
 class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
   @override
   final int id;
@@ -90,14 +103,23 @@ class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
   ) =>
-      _$JsonRpcResultFromJson(json, fromJsonT);
+      JsonRpcResult<T>(
+        id: json['id'] as int,
+        jsonrpc: json['jsonrpc'] as String,
+        result: _$nullableGenericFromJson(json['result'], fromJsonT),
+      );
 
   @override
-  Map<String, dynamic> toJson() =>
-      _$JsonRpcResultToJson(this, resultToJson ?? (_) => null);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'jsonrpc': jsonrpc,
+        'result': _$nullableGenericToJson(
+          result,
+          resultToJson ?? (v) => v,
+        ),
+      };
 }
 
-@JsonSerializable()
 class JsonRpcError implements JsonRpcResponse<ErrorResponse> {
   @override
   final int id;
@@ -111,29 +133,38 @@ class JsonRpcError implements JsonRpcResponse<ErrorResponse> {
     this.error,
   });
 
-  factory JsonRpcError.fromJson(Map<String, dynamic> json) =>
-      _$JsonRpcErrorFromJson(json);
+  factory JsonRpcError.fromJson(Map<String, dynamic> json) => JsonRpcError(
+        id: json['id'] as int,
+        jsonrpc: json['jsonrpc'] as String,
+        error: json['error'] == null
+            ? null
+            : ErrorResponse.fromJson(json['error'] as Map<String, dynamic>),
+      );
 
   @override
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'jsonrpc': jsonrpc,
-      'error': error?.toJson(),
-    };
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'jsonrpc': jsonrpc,
+        'error': error?.toJson(),
+      };
 }
 
-@JsonSerializable()
 class ErrorResponse extends ErrorObject {
   final String? data;
 
   const ErrorResponse({required super.code, required super.message, this.data});
 
-  factory ErrorResponse.fromJson(Map<String, dynamic> json) =>
-      _$ErrorResponseFromJson(json);
+  factory ErrorResponse.fromJson(Map<String, dynamic> json) => ErrorResponse(
+        code: json['code'] as int,
+        message: json['message'] as String,
+        data: json['data'] as String?,
+      );
 
-  Map<String, dynamic> toJson() => _$ErrorResponseToJson(this);
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'code': code,
+        'message': message,
+        'data': data,
+      };
 
   ErrorResponse copyWith({
     int? code,
@@ -151,3 +182,15 @@ class ErrorResponse extends ErrorObject {
   String toString() =>
       'ErrorResponse(code: $code, message: $message, data: $data)';
 }
+
+T? _$nullableGenericFromJson<T>(
+  Object? input,
+  T Function(Object? json) fromJson,
+) =>
+    input == null ? null : fromJson(input);
+
+Object? _$nullableGenericToJson<T>(
+  T? input,
+  Object? Function(T value) toJson,
+) =>
+    input == null ? null : toJson(input);

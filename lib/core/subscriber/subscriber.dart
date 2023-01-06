@@ -16,7 +16,7 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';
 
-class Subscriber with IEvents implements ISubscriber {
+class Subscriber with Events implements ISubscriber {
   final Map<String, SubscriberTypesActive> subscriptions;
 
   final ISubscriberTopicMap topicMap;
@@ -224,7 +224,8 @@ class Subscriber with IEvents implements ISubscriber {
       'direction': "outgoing",
       'request': request.toJson(),
     });
-    return relayer.provider.request(request: request);
+    return relayer.provider
+        .request<RelayJsonRpcSubscribeParams>(request: request);
   }
 
   _rpcUnsubscribe(String topic, String id, RelayerTypesProtocolOptions relay) {
@@ -238,7 +239,11 @@ class Subscriber with IEvents implements ISubscriber {
       paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
-    logger.i({'type': "payload", 'direction': "outgoing", 'request': request});
+    logger.i({
+      'type': "payload",
+      'direction': "outgoing",
+      'request': request.toJson()
+    });
     return relayer.provider.request(request: request);
   }
 

@@ -18,7 +18,7 @@ abstract class IMessageTracker {
 
   MessageRecord get(String topic);
 
-  bool has(String topic, String message);
+  Future<bool> has(String topic, String message);
 
   Future<void> del(String topic);
 }

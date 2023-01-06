@@ -3,17 +3,18 @@ import 'dart:convert';
 import 'package:bs58/bs58.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect/wc_utils/relay_auth/base64.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/constants.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/types.dart';
 
 // ---------- JSON ----------------------------------------------- //
 
 dynamic decodeJSON(String str) {
-  return jsonDecode(utf8.decode(base64Decode(str)));
+  return jsonDecode(utf8.decode(B64urlEncRfc7515.decode(str)));
 }
 
-String encodeJSON(dynamic val) {
-  return base64Encode(utf8.encode(jsonEncode(val)));
+String encodeJSON(Object val) {
+  return B64urlEncRfc7515.encode(utf8.encode(jsonEncode(val)));
 }
 
 // ---------- Issuer ----------------------------------------------- //
@@ -52,19 +53,19 @@ Uint8List decodeIss(String issuer) {
 // ---------- Signature ----------------------------------------------- //
 
 String encodeSig(Uint8List bytes) {
-  return base64Encode(bytes);
+  return B64urlEncRfc7515.encode(bytes);
 }
 
 Uint8List decodeSig(String encoded) {
-  return base64Decode(encoded);
+  return Uint8List.fromList(B64urlEncRfc7515.decode(encoded));
 }
 
 // ---------- Data ----------------------------------------------- //
 
 Uint8List encodeData(IridiumJWTData params) {
   return Uint8List.fromList(utf8.encode([
-    encodeJSON(params.header),
-    encodeJSON(params.payload)
+    encodeJSON(params.header.toJson()),
+    encodeJSON(params.payload.toJson())
   ].join(JWT_DELIMITER)));
 }
 
@@ -79,16 +80,16 @@ IridiumJWTData decodeData(Uint8List data) {
 
 String encodeJWT(IridiumJWTSigned params) {
   return [
-    encodeJSON(params.header),
-    encodeJSON(params.payload),
+    encodeJSON(params.header.toJson()),
+    encodeJSON(params.payload.toJson()),
     encodeSig(params.signature),
   ].join(JWT_DELIMITER);
 }
 
 IridiumJWTDecoded decodeJWT(String jwt) {
   final params = jwt.split(JWT_DELIMITER);
-  final header = decodeJSON(params[0]);
-  final payload = decodeJSON(params[1]);
+  final header = IridiumJWTHeader.fromJson(decodeJSON(params[0]));
+  final payload = IridiumJWTPayload.fromJson(decodeJSON(params[1]));
   final signature = decodeSig(params[2]);
   final data =
       Uint8List.fromList(utf8.encode(params.sublist(0, 2).join(JWT_DELIMITER)));

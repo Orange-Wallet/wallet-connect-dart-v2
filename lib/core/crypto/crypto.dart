@@ -37,7 +37,7 @@ class Crypto implements ICrypto {
   bool _initialized = false;
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       await keychain.init();
       _initialized = true;
@@ -61,14 +61,14 @@ class Crypto implements ICrypto {
   }
 
   @override
-  generateKeyPair() async {
+  Future<String> generateKeyPair() async {
     _isInitialized();
     final keyPair = await utils.generateKeyPair();
     return _setPrivateKey(keyPair.publicKey, keyPair.privateKey);
   }
 
   @override
-  signJWT(aud) async {
+  Future<String> signJWT(aud) async {
     _isInitialized();
     final seed = await _getClientSeed();
     final keyPair = await relay_auth.generateKeyPair(seed);

@@ -18,7 +18,7 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/heartbeat.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
 
-class Core with IEvents implements ICore {
+class Core with Events implements ICore {
   @override
   final String protocol = CORE_PROTOCOL;
 
@@ -44,7 +44,8 @@ class Core with IEvents implements ICore {
   final IHeartBeat heartbeat;
 
   @override
-  late final ICrypto crypto;
+  ICrypto get crypto => _crypto!;
+  ICrypto? _crypto;
 
   @override
   late final IRelayer relayer;
@@ -78,18 +79,19 @@ class Core with IEvents implements ICore {
   })  : logger = logger ?? Logger(),
         heartbeat = heartbeat ?? HeartBeat(),
         events = EventSubject() {
-    crypto = crypto ?? Crypto(core: this, logger: logger);
-    history = history ?? JsonRpcHistory(core: this, logger: logger);
-    expirer = expirer ?? Expirer(core: this, logger: logger);
-    storage = storage ?? KeyValueStorage(database: CoreStorageOptions.database);
-    relayer = relayer ??
+    _crypto = crypto ?? Crypto(core: this, logger: logger);
+    this.history = history ?? JsonRpcHistory(core: this, logger: logger);
+    this.expirer = expirer ?? Expirer(core: this, logger: logger);
+    this.storage =
+        storage ?? KeyValueStorage(database: CoreStorageOptions.database);
+    this.relayer = relayer ??
         Relayer(
           core: this,
           logger: logger,
           relayUrl: relayUrl,
           projectId: projectId,
         );
-    pairing = pairing ?? Pairing(core: this, logger: logger);
+    this.pairing = pairing ?? Pairing(core: this, logger: logger);
   }
 
   // ---------- Public ----------------------------------------------- //
@@ -113,11 +115,11 @@ class Core with IEvents implements ICore {
       await pairing.init();
       _initialized = true;
       logger.i('Core Initilization Success');
-    } catch (error) {
+    } catch (error, trace) {
       logger.w(
           'Core Initilization Failure at epoch ${DateTime.now().millisecondsSinceEpoch}',
           error);
-      logger.e(error.toString());
+      logger.e(trace.toString());
       rethrow;
     }
   }

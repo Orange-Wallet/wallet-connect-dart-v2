@@ -23,9 +23,9 @@ SessionSettleRequestParams _$SessionSettleRequestParamsFromJson(
 Map<String, dynamic> _$SessionSettleRequestParamsToJson(
         SessionSettleRequestParams instance) =>
     <String, dynamic>{
-      'relay': instance.relay,
-      'controller': instance.controller,
-      'namespaces': instance.namespaces,
+      'relay': instance.relay.toJson(),
+      'controller': instance.controller.toJson(),
+      'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
       'expiry': instance.expiry,
     };
 
@@ -50,10 +50,11 @@ SessionSettleParams _$SessionSettleParamsFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SessionSettleParamsToJson(
         SessionSettleParams instance) =>
     <String, dynamic>{
-      'relay': instance.relay,
-      'controller': instance.controller,
-      'namespaces': instance.namespaces,
-      'requiredNamespaces': instance.requiredNamespaces,
+      'relay': instance.relay.toJson(),
+      'controller': instance.controller.toJson(),
+      'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
+      'requiredNamespaces':
+          instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
       'expiry': instance.expiry,
     };
 
@@ -73,12 +74,22 @@ SessionConnectParams _$SessionConnectParamsFromJson(
     );
 
 Map<String, dynamic> _$SessionConnectParamsToJson(
-        SessionConnectParams instance) =>
-    <String, dynamic>{
-      'requiredNamespaces': instance.requiredNamespaces,
-      'pairingTopic': instance.pairingTopic,
-      'relays': instance.relays,
-    };
+    SessionConnectParams instance) {
+  final val = <String, dynamic>{
+    'requiredNamespaces':
+        instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('pairingTopic', instance.pairingTopic);
+  writeNotNull('relays', instance.relays?.map((e) => e.toJson()).toList());
+  return val;
+}
 
 SessionApproveParams _$SessionApproveParamsFromJson(
         Map<String, dynamic> json) =>
@@ -92,12 +103,21 @@ SessionApproveParams _$SessionApproveParamsFromJson(
     );
 
 Map<String, dynamic> _$SessionApproveParamsToJson(
-        SessionApproveParams instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'namespaces': instance.namespaces,
-      'relayProtocol': instance.relayProtocol,
-    };
+    SessionApproveParams instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('relayProtocol', instance.relayProtocol);
+  return val;
+}
 
 SessionRejectParams _$SessionRejectParamsFromJson(Map<String, dynamic> json) =>
     SessionRejectParams(
@@ -109,7 +129,7 @@ Map<String, dynamic> _$SessionRejectParamsToJson(
         SessionRejectParams instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'reason': instance.reason,
+      'reason': instance.reason.toJson(),
     };
 
 SessionUpdateParams _$SessionUpdateParamsFromJson(Map<String, dynamic> json) =>
@@ -125,7 +145,7 @@ Map<String, dynamic> _$SessionUpdateParamsToJson(
         SessionUpdateParams instance) =>
     <String, dynamic>{
       'topic': instance.topic,
-      'namespaces': instance.namespaces,
+      'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
     };
 
 SessionEmitEvent _$SessionEmitEventFromJson(Map<String, dynamic> json) =>
@@ -134,8 +154,17 @@ SessionEmitEvent _$SessionEmitEventFromJson(Map<String, dynamic> json) =>
       data: json['data'],
     );
 
-Map<String, dynamic> _$SessionEmitEventToJson(SessionEmitEvent instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'data': instance.data,
-    };
+Map<String, dynamic> _$SessionEmitEventToJson(SessionEmitEvent instance) {
+  final val = <String, dynamic>{
+    'name': instance.name,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('data', instance.data);
+  return val;
+}

@@ -16,7 +16,7 @@ class MessageTracker implements IMessageTracker {
   final String version = MESSAGES_STORAGE_VERSION;
 
   bool _initialized = false;
-  String _storagePrefix = CORE_STORAGE_PREFIX;
+  final _storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
   final Logger logger;
@@ -30,7 +30,7 @@ class MessageTracker implements IMessageTracker {
         messages = {};
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       logger.i('Initialized');
       try {
@@ -51,10 +51,10 @@ class MessageTracker implements IMessageTracker {
     }
   }
 
-  get storageKey => '_storagePrefix + version + "//" + name';
+  get storageKey => '$_storagePrefix$version//$name';
 
   @override
-  set(String topic, String message) async {
+  Future<String> set(String topic, String message) async {
     _isInitialized();
     final hash = await hashMessage(message);
     final msgs = messages[topic] ?? {};
@@ -68,13 +68,13 @@ class MessageTracker implements IMessageTracker {
   }
 
   @override
-  get(topic) {
+  Map<String, String> get(topic) {
     _isInitialized();
     return messages[topic] ?? {};
   }
 
   @override
-  has(topic, message) async {
+  Future<bool> has(topic, message) async {
     _isInitialized();
     final messages = get(topic);
     final hash = await hashMessage(message);
@@ -82,7 +82,7 @@ class MessageTracker implements IMessageTracker {
   }
 
   @override
-  del(topic) async {
+  Future<void> del(topic) async {
     _isInitialized();
     messages.remove(topic);
     await _persist();

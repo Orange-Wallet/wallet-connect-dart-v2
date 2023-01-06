@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
@@ -51,6 +52,40 @@ class RpcSessionUpdateParams {
 
   Map<String, dynamic> toJson() => _$RpcSessionUpdateParamsToJson(this);
 }
+
+@JsonSerializable()
+class RpcSessionProposeParams {
+  final List<RelayerTypesProtocolOptions> relays;
+  final ProposalTypesRequiredNamespaces requiredNamespaces;
+  final ProposalTypesProposer proposer;
+
+  RpcSessionProposeParams({
+    required this.relays,
+    required this.requiredNamespaces,
+    required this.proposer,
+  });
+
+  factory RpcSessionProposeParams.fromJson(Map<String, dynamic> json) =>
+      _$RpcSessionProposeParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RpcSessionProposeParamsToJson(this);
+}
+
+// @JsonSerializable()
+// class RpcSessionDeleteParams {
+//   final int code;
+//   final String message;
+
+//   RpcSessionDeleteParams({
+//     required this.code,
+//     required this.message,
+//   });
+
+//   factory RpcSessionDeleteParams.fromJson(Map<String, dynamic> json) =>
+//       _$RpcSessionDeleteParamsFromJson(json);
+
+//   Map<String, dynamic> toJson() => _$RpcSessionDeleteParamsToJson(this);
+// }
 
 // export interface RequestParams {
 //   wc_pairingDelete: {

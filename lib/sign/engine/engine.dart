@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
@@ -24,7 +25,7 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-class Engine with IEvents implements IEngine {
+class Engine with Events implements IEngine {
   final String name = ENGINE_CONTEXT;
 
   @override
@@ -182,12 +183,13 @@ class Engine with IEvents implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<SessionTypesStruct>();
-    final timer = completer.expirer();
+    // final timer = completer.expirer();
     events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId), null,
         (event, _) {
-      timer.cancel();
+      // timer.cancel();
+      print(event.eventData.toString());
       if (event.eventData is ErrorResponse) {
-        completer.completeError(event.eventData as ErrorResponse);
+        completer.completeError(event.eventData.toString());
       } else {
         completer.complete(client.session.get(sessionTopic));
       }
@@ -235,9 +237,10 @@ class Engine with IEvents implements IEngine {
       await client.core.pairing.activate(topic: pairingTopic);
     }
 
+    final data = await completer.future;
     return EngineTypesApproved(
       topic: sessionTopic,
-      acknowledged: (await completer.future).acknowledged,
+      acknowledged: data.acknowledged,
     );
   }
 
@@ -267,10 +270,10 @@ class Engine with IEvents implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<void>();
-    final timer = completer.expirer();
+    // final timer = completer.expirer();
     events.once(engineEvent(EngineTypesEvent.SESSION_UPDATE, id), null,
         (event, _) {
-      timer.cancel();
+      // timer.cancel();
       if (event.eventData is ErrorResponse) {
         completer.completeError(event.eventData as ErrorResponse);
       } else {
@@ -297,12 +300,12 @@ class Engine with IEvents implements IEngine {
       (v) => v,
     );
     final completer = Completer<void>();
-    final timer = completer.expirer();
+    // final timer = completer.expirer();
     events.once(
       engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
       null,
       (event, _) {
-        timer.cancel();
+        // timer.cancel();
         if (event.eventData is ErrorResponse) {
           completer.completeError(event.eventData as ErrorResponse);
         } else {
@@ -330,12 +333,12 @@ class Engine with IEvents implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<T>();
-    final timer = completer.expirer();
+    // final timer = completer.expirer();
     events.once(
       engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
       null,
       (event, _) {
-        timer.cancel();
+        // timer.cancel();
         if (event.eventData is ErrorResponse) {
           completer.completeError(event.eventData as ErrorResponse);
         } else {
@@ -383,12 +386,12 @@ class Engine with IEvents implements IEngine {
         (v) => v,
       );
       final completer = Completer<void>();
-      final timer = completer.expirer();
+      // final timer = completer.expirer();
       events.once(
         engineEvent(EngineTypesEvent.SESSION_PING, id),
         null,
         (event, _) {
-          timer.cancel();
+          // timer.cancel();
           if (event.eventData is ErrorResponse) {
             completer.completeError(event.eventData as ErrorResponse);
           } else {
@@ -499,7 +502,7 @@ class Engine with IEvents implements IEngine {
     client.core.expirer.set(topic, expiry);
   }
 
-  _setProposal(String id, ProposalTypesStruct proposal) async {
+  Future<void> _setProposal(String id, ProposalTypesStruct proposal) async {
     await client.proposal.set(id, proposal);
     client.core.expirer.set(id, proposal.expiry);
   }
@@ -614,6 +617,7 @@ class Engine with IEvents implements IEngine {
 
         final payload =
             await client.core.crypto.decode(topic: topic, encoded: message);
+        Logger().i('DECODED $payload');
         if (isJsonRpcRequest(payload)) {
           client.core.history.set(topic: topic, request: payload);
           _onRelayEventRequest(topic, payload);
@@ -627,9 +631,9 @@ class Engine with IEvents implements IEngine {
 
   Future<void> _onRelayEventRequest(
     String topic,
-    JsonRpcRequest payload,
+    Map<String, dynamic> payload,
   ) async {
-    final reqMethod = payload.method.jsonRpcMethod;
+    final reqMethod = (payload['method'] as String).jsonRpcMethod;
 
     switch (reqMethod) {
       case JsonRpcMethod.WC_SESSION_PROPOSE:
@@ -637,17 +641,17 @@ class Engine with IEvents implements IEngine {
       case JsonRpcMethod.WC_SESSION_SETTLE:
         return _onSessionSettleRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_REQUEST:
-      // return onSessionUpdateRequest(topic, payload);
+        return _onSessionRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_DELETE:
-      // return onSessionExtendRequest(topic, payload);
+        return _onSessionDeleteRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_PING:
-      // return onSessionPingRequest(topic, payload);
+        return _onSessionPingRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_EVENT:
-      // return onSessionDeleteRequest(topic, payload);
+        return _onSessionEventRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_UPDATE:
-      // return onSessionRequest(topic, payload);
+        return _onSessionUpdateRequest(topic, payload);
       case JsonRpcMethod.WC_SESSION_EXTEND:
-      // return onSessionEventRequest(topic, payload);
+        return _onSessionExtendRequest(topic, payload);
       default:
         return client.logger.i('Unsupported request method $reqMethod');
     }
@@ -655,9 +659,10 @@ class Engine with IEvents implements IEngine {
 
   Future<void> _onRelayEventResponse(
     String topic,
-    JsonRpcResponse payload,
+    Map<String, dynamic> payload,
   ) async {
-    final record = await client.core.history.get(topic: topic, id: payload.id);
+    final int id = payload['id'];
+    final record = client.core.history.get(topic: topic, id: id);
     final resMethod = (record.request['method'] as String).jsonRpcMethod;
 
     switch (resMethod) {
@@ -666,13 +671,13 @@ class Engine with IEvents implements IEngine {
       case JsonRpcMethod.WC_SESSION_SETTLE:
         return _onSessionSettleResponse(topic, payload);
       case JsonRpcMethod.WC_SESSION_UPDATE:
-      // return onSessionUpdateResponse(topic, payload);
+        return _onSessionUpdateResponse(topic, payload);
       case JsonRpcMethod.WC_SESSION_EXTEND:
-      // return onSessionExtendResponse(topic, payload);
+        return _onSessionExtendResponse(topic, payload);
       case JsonRpcMethod.WC_SESSION_PING:
-      // return onSessionPingResponse(topic, payload);
+        return _onSessionPingResponse(topic, payload);
       case JsonRpcMethod.WC_SESSION_REQUEST:
-      // return onSessionRequestResponse(topic, payload);
+        return _onSessionRequestResponse(topic, payload);
       default:
         return client.logger.i('Unsupported response method $resMethod');
     }
@@ -682,48 +687,60 @@ class Engine with IEvents implements IEngine {
 
   Future<void> _onSessionProposeRequest(
     String topic,
-    JsonRpcRequest payload,
+    Map<String, dynamic> payload,
   ) async {
+    final int id = payload['id'];
     try {
-      _isValidConnect(payload.params);
+      final request = JsonRpcRequest<RpcSessionProposeParams>.fromJson(
+        payload,
+        (json) =>
+            RpcSessionProposeParams.fromJson(json as Map<String, dynamic>),
+      );
+      _isValidConnect(SessionConnectParams(
+        requiredNamespaces: request.params!.requiredNamespaces,
+        relays: request.params!.relays,
+      ));
       final expiry = calcExpiry(ttl: FIVE_MINUTES);
       final proposal = ProposalTypesStruct(
-        id: payload.id,
+        id: request.id,
         expiry: expiry,
-        relays: payload.params.relays,
-        proposer: payload.params.proposer,
-        requiredNamespaces: payload.params.requiredNamespaces,
+        relays: request.params!.relays,
+        proposer: request.params!.proposer,
+        requiredNamespaces: request.params!.requiredNamespaces,
         pairingTopic: topic,
       );
-      await _setProposal(payload.id.toString(), proposal);
+      await _setProposal(request.id.toString(), proposal);
       client.events.emitData(
         SignClientTypesEvent.SESSION_PROPOSAL.value,
-        {'id': payload.id, 'params': proposal.toJson()},
+        {
+          'id': id,
+          'params': proposal.toJson(),
+        },
       );
     } catch (err) {
-      await _sendError(payload.id, topic, err);
+      await _sendError(id, topic, err);
       client.logger.e(err);
     }
   }
 
   Future<void> _onSessionProposeResponse(
     String topic,
-    JsonRpcResponse payload,
+    Map<String, dynamic> payload,
   ) async {
-    final id = payload.id;
+    final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
       final result = ResultSessionPropose.fromJson(
-          (payload as JsonRpcResult).result as Map<String, dynamic>);
+          payload['result'] as Map<String, dynamic>);
       client.logger.i({
         'type': "method",
         'method': "onSessionProposeResponse",
-        'result': result
+        'result': result.toJson(),
       });
       final proposal = client.proposal.get(id.toString());
       client.logger.i({
         'type': "method",
         'method': "onSessionProposeResponse",
-        'proposal': proposal
+        'proposal': proposal.toJson(),
       });
       final selfPublicKey = proposal.proposer.publicKey;
       client.logger.i({
@@ -759,194 +776,277 @@ class Engine with IEvents implements IEngine {
         id.toString(),
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
       );
+      final errorPayload = JsonRpcError.fromJson(payload);
       events.emitData(
         engineEvent(EngineTypesEvent.SESSION_CONNECT),
-        (payload as JsonRpcError).error,
+        errorPayload.error,
       );
     }
   }
 
   Future<void> _onSessionSettleRequest(
     String topic,
-    JsonRpcRequest payload,
+    Map<String, dynamic> payload,
   ) async {
+    final int id = payload['id'];
     try {
-      _isValidSessionSettleRequest(payload.params);
+      final request = JsonRpcRequest.fromJson(
+        payload,
+        (json) =>
+            SessionSettleRequestParams.fromJson(json as Map<String, dynamic>),
+      );
+      _isValidSessionSettleRequest(request.params!);
       final session = SessionTypesStruct(
         topic: topic,
-        relay: payload.params.relay,
-        expiry: payload.params.expiry,
-        namespaces: payload.params.namespaces,
+        relay: request.params!.relay,
+        expiry: request.params!.expiry,
+        namespaces: request.params!.namespaces,
         acknowledged: true,
-        controller: payload.params.controller.publicKey,
+        controller: request.params!.controller.publicKey,
         self: SessionTypesPublicKeyMetadata(
           publicKey: "",
           metadata: client.metadata,
         ),
         peer: SessionTypesPublicKeyMetadata(
-          publicKey: payload.params.controller.publicKey,
-          metadata: payload.params.controller.metadata,
+          publicKey: request.params!.controller.publicKey,
+          metadata: request.params!.controller.metadata,
         ),
         requiredNamespaces: null,
       );
-      await _sendResult<ResultSessionSettle>(payload.id, topic, true, (v) => v);
-      events.emitData(engineEvent(EngineTypesEvent.SESSION_CONNECT), session);
+      await _sendResult<ResultSessionSettle>(id, topic, true, (v) => v);
+      events.emitData(
+        engineEvent(EngineTypesEvent.SESSION_CONNECT),
+        session.toJson(),
+      );
     } catch (err) {
-      await _sendError(payload.id, topic, err);
+      await _sendError(id, topic, err);
       client.logger.e(err);
     }
   }
 
   Future<void> _onSessionSettleResponse(
     String topic,
-    JsonRpcResponse payload,
+    Map<String, dynamic> payload,
   ) async {
+    final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
       await client.session.update(
         topic,
         (session) => session.copyWith(acknowledged: true),
       );
-      events.emitData(
-          engineEvent(EngineTypesEvent.SESSION_APPROVE, payload.id), {});
+      events.emitData(engineEvent(EngineTypesEvent.SESSION_APPROVE, id));
     } else if (isJsonRpcError(payload)) {
-      await client.session
-          .delete(topic, getSdkError(SdkErrorKey.USER_DISCONNECTED));
+      await client.session.delete(
+        topic,
+        getSdkError(SdkErrorKey.USER_DISCONNECTED),
+      );
       events.emitData(
-        engineEvent(EngineTypesEvent.SESSION_APPROVE, payload.id),
-        (payload as JsonRpcError).error,
+        engineEvent(EngineTypesEvent.SESSION_APPROVE, id),
+        JsonRpcError.fromJson(payload).error,
       );
     }
   }
 
-  // private onSessionUpdateRequest: EnginePrivate["onSessionUpdateRequest"] = async (
-  //   topic,
-  //   payload,
-  // ) => {
-  //   final { params, id } = payload;
-  //   try {
-  //     _isValidUpdate({ topic, ...params });
-  //     await client.session.update(topic, { namespaces: params.namespaces });
-  //     await _sendResult<"wc_sessionUpdate">(id, topic, true);
-  //     client.events.emitData("session_update", { id, topic, params });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  Future<void> _onSessionUpdateRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
+    final params = RpcSessionUpdateParams.fromJson(payload['params']);
 
-  // private onSessionUpdateResponse: EnginePrivate["onSessionUpdateResponse"] = (_topic, payload) => {
-  //   final { id } = payload;
-  //   if (isJsonRpcResult(payload)) {
-  //     events.emitData(engineEvent("session_update", id), {});
-  //   } else if (isJsonRpcError(payload)) {
-  //     events.emitData(engineEvent("session_update", id), { error: payload.e });
-  //   }
-  // };
+    try {
+      _isValidUpdate(SessionUpdateParams(
+        topic: topic,
+        namespaces: params.namespaces,
+      ));
+      await client.session.update(
+        topic,
+        (session) => session.copyWith(namespaces: params.namespaces),
+      );
+      await _sendResult(id, topic, true, (v) => v);
+      client.events.emitData("session_update", {
+        'id': id,
+        'topic': topic,
+        'params': params.toJson(),
+      });
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
 
-  // private onSessionExtendRequest: EnginePrivate["onSessionExtendRequest"] = async (
-  //   topic,
-  //   payload,
-  // ) => {
-  //   final { id } = payload;
-  //   try {
-  //     _isValidExtend({ topic });
-  //     await _setExpiry(topic, calcExpiry(SESSION_EXPIRY));
-  //     await _sendResult<"wc_sessionExtend">(id, topic, true);
-  //     client.events.emitData("session_extend", { id, topic });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  void _onSessionUpdateResponse(
+    String topic,
+    Map<String, dynamic> payload,
+  ) {
+    final int id = payload['id'];
+    if (isJsonRpcResult(payload)) {
+      events.emitData(engineEvent(EngineTypesEvent.SESSION_UPDATE, id));
+    } else if (isJsonRpcError(payload)) {
+      events.emitData(
+        engineEvent(EngineTypesEvent.SESSION_UPDATE, id),
+        JsonRpcError.fromJson(payload).error,
+      );
+    }
+  }
 
-  // private onSessionExtendResponse: EnginePrivate["onSessionExtendResponse"] = (_topic, payload) => {
-  //   final { id } = payload;
-  //   if (isJsonRpcResult(payload)) {
-  //     events.emitData(engineEvent("session_extend", id), {});
-  //   } else if (isJsonRpcError(payload)) {
-  //     events.emitData(engineEvent("session_extend", id), { error: payload.e });
-  //   }
-  // };
+  Future<void> _onSessionExtendRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
+    try {
+      _isValidExtend(topic);
+      await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
+      await _sendResult(id, topic, true, (v) => v);
+      client.events.emitData(SignClientTypesEvent.SESSION_EXTEND.value, {
+        'id': id,
+        'topic': topic,
+      });
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
 
-  // private onSessionPingRequest: EnginePrivate["onSessionPingRequest"] = async (topic, payload) => {
-  //   final { id } = payload;
-  //   try {
-  //     _isValidPing({ topic });
-  //     await _sendResult<"wc_sessionPing">(id, topic, true);
-  //     client.events.emitData("session_ping", { id, topic });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  void _onSessionExtendResponse(
+    String topic,
+    Map<String, dynamic> payload,
+  ) {
+    final int id = payload['id'];
+    if (isJsonRpcResult(payload)) {
+      events.emitData(engineEvent(EngineTypesEvent.SESSION_EXTEND, id));
+    } else if (isJsonRpcError(payload)) {
+      events.emitData(
+        engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
+        JsonRpcError.fromJson(payload).error,
+      );
+    }
+  }
 
-  // private onSessionPingResponse: EnginePrivate["onSessionPingResponse"] = (_topic, payload) => {
-  //   final { id } = payload;
-  //   // put at the end of the stack to avoid a race condition
-  //   // where session_ping listener is not yet _initialized
-  //   setTimeout(() => {
-  //     if (isJsonRpcResult(payload)) {
-  //       events.emitData(engineEvent("session_ping", id), {});
-  //     } else if (isJsonRpcError(payload)) {
-  //       events.emitData(engineEvent("session_ping", id), { error: payload.e });
-  //     }
-  //   }, 500);
-  // };
+  Future<void> _onSessionPingRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
+    try {
+      _isValidPing(topic);
+      await _sendResult<bool>(id, topic, true, (v) => v);
+      client.events.emitData(SignClientTypesEvent.SESSION_PING.value, {
+        'id': id,
+        'topic': topic,
+      });
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
 
-  // private onSessionDeleteRequest: EnginePrivate["onSessionDeleteRequest"] = async (
-  //   topic,
-  //   payload,
-  // ) => {
-  //   final { id } = payload;
-  //   try {
-  //     _isValidDisconnect({ topic, reason: payload.params });
-  //     // RPC request needs to happen before deletion as it utalises session encryption
-  //     await _sendResult<"wc_sessionDelete">(id, topic, true);
-  //     await _deleteSession(topic);
-  //     client.events.emitData("session_delete", { id, topic });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  void _onSessionPingResponse(
+    String topic,
+    Map<String, dynamic> payload,
+  ) {
+    final int id = payload['id'];
+    // put at the end of the stack to avoid a race condition
+    // where session_ping listener is not yet _initialized
+    Timer(const Duration(milliseconds: 500), () {
+      if (isJsonRpcResult(payload)) {
+        events.emitData(engineEvent(EngineTypesEvent.SESSION_PING, id));
+      } else if (isJsonRpcError(payload)) {
+        events.emitData(
+          engineEvent(EngineTypesEvent.SESSION_PING, id),
+          JsonRpcError.fromJson(payload).error,
+        );
+      }
+    });
+  }
 
-  // private onSessionRequest: EnginePrivate["onSessionRequest"] = async (topic, payload) => {
-  //   final { id, params } = payload;
-  //   try {
-  //     _isValidRequest({ topic, ...params });
-  //     await setPendingSessionRequest({ id, topic, params });
-  //     client.events.emitData("session_request", { id, topic, params });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  Future<void> _onSessionDeleteRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
 
-  // private onSessionRequestResponse: EnginePrivate["onSessionRequestResponse"] = (
-  //   _topic,
-  //   payload,
-  // ) => {
-  //   final { id } = payload;
-  //   if (isJsonRpcResult(payload)) {
-  //     events.emitData(engineEvent("session_request", id), { result: payload.result });
-  //   } else if (isJsonRpcError(payload)) {
-  //     events.emitData(engineEvent("session_request", id), { error: payload.e });
-  //   }
-  // };
+    try {
+      _isValidDisconnect(topic);
+      // RPC request needs to happen before deletion as it utalises session encryption
+      await _sendResult<bool>(id, topic, true, (v) => v);
+      await _deleteSession(topic);
+      client.events.emitData(SignClientTypesEvent.SESSION_DELETE.value, {
+        'id': id,
+        'topic': topic,
+      });
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
 
-  // private onSessionEventRequest: EnginePrivate["onSessionEventRequest"] = async (
-  //   topic,
-  //   payload,
-  // ) => {
-  //   final { id, params } = payload;
-  //   try {
-  //     _isValidEmit({ topic, ...params });
-  //     client.events.emitData("session_event", { id, topic, params });
-  //   } catch (err: any) {
-  //     await _sendError(id, topic, err);
-  //     client.logger.e(err);
-  //   }
-  // };
+  Future<void> _onSessionRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
+    final params = RpcSessionRequestParams.fromJson(payload['params']);
+
+    try {
+      _isValidRequest(SessionRequestParams(
+        topic: topic,
+        request: params.request,
+        chainId: params.chainId,
+      ));
+      final pendingRequest = PendingRequestTypesStruct(topic, id, params);
+      await setPendingSessionRequest(pendingRequest);
+      client.events.emitData(
+        SignClientTypesEvent.SESSION_REQUEST.value,
+        pendingRequest.toJson(),
+      );
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
+
+  void _onSessionRequestResponse(
+    String topic,
+    Map<String, dynamic> payload,
+  ) {
+    final int id = payload['id'];
+    if (isJsonRpcResult(payload)) {
+      events.emitData(
+        engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
+        payload['result'],
+      );
+    } else if (isJsonRpcError(payload)) {
+      events.emitData(
+        engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
+        JsonRpcError.fromJson(payload).error,
+      );
+    }
+  }
+
+  Future<void> _onSessionEventRequest(
+    String topic,
+    Map<String, dynamic> payload,
+  ) async {
+    final int id = payload['id'];
+    final params = RpcSessionEventParams.fromJson(payload['params']);
+    try {
+      _isValidEmit(SessionEmitParams(
+        topic: topic,
+        event: params.event,
+        chainId: params.chainId,
+      ));
+      client.events.emitData(SignClientTypesEvent.SESSION_REQUEST.value, {
+        'id': id,
+        'topic': topic,
+        'params': params.toJson(),
+      });
+    } catch (err) {
+      await _sendError(id, topic, err);
+      client.logger.e(err);
+    }
+  }
 
   // ---------- Expirer Events ---------------------------------------- //
 
@@ -1076,7 +1176,7 @@ class Engine with IEvents implements IEngine {
     }
   }
 
-  _isValidApprove(SessionApproveParams params) async {
+  Future<void> _isValidApprove(SessionApproveParams params) async {
     final id = params.id;
     final namespaces = params.namespaces;
     final relayProtocol = params.relayProtocol;
@@ -1097,7 +1197,7 @@ class Engine with IEvents implements IEngine {
     }
   }
 
-  _isValidReject(SessionRejectParams params) async {
+  Future<void> _isValidReject(SessionRejectParams params) async {
     await _isValidProposalId(params.id);
     if (!isValidErrorReason(params.reason)) {
       final error = getInternalError(
@@ -1108,7 +1208,7 @@ class Engine with IEvents implements IEngine {
     }
   }
 
-  _isValidSessionSettleRequest(SessionSettleRequestParams params) {
+  void _isValidSessionSettleRequest(SessionSettleRequestParams params) {
     if (!isValidRelay(params.relay)) {
       final error = getInternalError(
         InternalErrorKey.MISSING_OR_INVALID,
@@ -1133,7 +1233,7 @@ class Engine with IEvents implements IEngine {
     }
   }
 
-  _isValidUpdate(SessionUpdateParams params) async {
+  Future<void> _isValidUpdate(SessionUpdateParams params) async {
     await _isValidSessionTopic(params.topic);
     final session = client.session.get(params.topic);
     final validNamespacesError =
@@ -1151,11 +1251,11 @@ class Engine with IEvents implements IEngine {
     }
   }
 
-  _isValidExtend(String topic) async {
+  Future<void> _isValidExtend(String topic) async {
     await _isValidSessionTopic(topic);
   }
 
-  _isValidRequest(SessionRequestParams params) async {
+  Future<void> _isValidRequest(SessionRequestParams params) async {
     final topic = params.topic;
     final request = params.request;
     final chainId = params.chainId;
