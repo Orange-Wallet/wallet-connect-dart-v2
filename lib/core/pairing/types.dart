@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
 
@@ -12,7 +13,7 @@ class PairingTypesStruct {
   final int expiry;
   final RelayerTypesProtocolOptions relay;
   final bool active;
-  final Metadata? peerMetadata;
+  final AppMetadata? peerMetadata;
 
   PairingTypesStruct({
     required this.topic,
@@ -32,7 +33,7 @@ class PairingTypesStruct {
     int? expiry,
     RelayerTypesProtocolOptions? relay,
     bool? active,
-    Metadata? peerMetadata,
+    AppMetadata? peerMetadata,
   }) {
     return PairingTypesStruct(
       topic: topic ?? this.topic,
@@ -160,7 +161,7 @@ abstract class IPairing {
 
   // for either to update the metadata of an existing pairing.
   Future<void> updateMetadata(
-      {required String topic, required Metadata metadata});
+      {required String topic, required AppMetadata metadata});
 
   // query pairings
   List<PairingTypesStruct> getPairings();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/client.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';
@@ -40,7 +40,7 @@ class _ExampleAppState extends State<ExampleApp> {
       signClient = await SignClient.init(
         projectId: "73801621aec60dfaa2197c7640c15858",
         relayUrl: "wss://relay.walletconnect.com",
-        metadata: Metadata(
+        metadata: AppMetadata(
           name: 'Wallet',
           description: 'Wallet for WalletConnect',
           url: 'https://walletconnect.com/',

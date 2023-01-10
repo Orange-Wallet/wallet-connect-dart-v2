@@ -1,7 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/core.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/core.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
 import 'package:wallet_connect/sign/engine/engine.dart';
@@ -24,7 +25,7 @@ class SignClient with Events implements ISignClient {
   @override
   final String name;
   @override
-  final Metadata metadata;
+  final AppMetadata metadata;
 
   @override
   final ICore core;
@@ -71,7 +72,7 @@ class SignClient with Events implements ISignClient {
     String? name,
     required String projectId,
     String? relayUrl,
-    Metadata? metadata,
+    AppMetadata? metadata,
     ICore? core,
     Level? logLevel,
     String? database,
@@ -80,7 +81,7 @@ class SignClient with Events implements ISignClient {
       name: name,
       projectId: projectId,
       relayUrl: relayUrl,
-      metadata: metadata ?? Metadata.empty(),
+      metadata: metadata ?? AppMetadata.empty(),
       core: core,
       logLevel: logLevel,
       database: database,

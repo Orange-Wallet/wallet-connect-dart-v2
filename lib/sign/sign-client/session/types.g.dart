@@ -63,7 +63,7 @@ SessionTypesPublicKeyMetadata _$SessionTypesPublicKeyMetadataFromJson(
         Map<String, dynamic> json) =>
     SessionTypesPublicKeyMetadata(
       publicKey: json['publicKey'] as String,
-      metadata: Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
+      metadata: AppMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SessionTypesPublicKeyMetadataToJson(

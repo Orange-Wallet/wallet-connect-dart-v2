@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 part 'types.g.dart';

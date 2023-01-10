@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/constants.dart';
+import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/subscriber/constants.dart';

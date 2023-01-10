@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
@@ -80,7 +81,7 @@ typedef SessionTypesNamespaces = Map<String, SessionTypesNamespace>;
 @JsonSerializable()
 class SessionTypesPublicKeyMetadata {
   final String publicKey;
-  final Metadata metadata;
+  final AppMetadata metadata;
 
   SessionTypesPublicKeyMetadata({
     required this.publicKey,
@@ -94,7 +95,7 @@ class SessionTypesPublicKeyMetadata {
 
   SessionTypesPublicKeyMetadata copyWith({
     String? publicKey,
-    Metadata? metadata,
+    AppMetadata? metadata,
   }) {
     return SessionTypesPublicKeyMetadata(
       publicKey: publicKey ?? this.publicKey,

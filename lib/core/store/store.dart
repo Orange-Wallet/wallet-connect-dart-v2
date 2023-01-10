@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 
-import 'package:wallet_connect/core/core/constants.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/constants.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/store/constants.dart';
 import 'package:wallet_connect/core/store/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';

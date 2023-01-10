@@ -63,7 +63,7 @@ ProposalTypesProposer _$ProposalTypesProposerFromJson(
         Map<String, dynamic> json) =>
     ProposalTypesProposer(
       publicKey: json['publicKey'] as String,
-      metadata: Metadata.fromJson(json['metadata'] as Map<String, dynamic>),
+      metadata: AppMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ProposalTypesProposerToJson(

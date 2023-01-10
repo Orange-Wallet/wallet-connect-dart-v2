@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/crypto/constants.dart';
 import 'package:wallet_connect/core/crypto/types.dart';
 import 'package:wallet_connect/core/keychain/keychain.dart';

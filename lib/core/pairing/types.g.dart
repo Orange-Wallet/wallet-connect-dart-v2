@@ -15,7 +15,7 @@ PairingTypesStruct _$PairingTypesStructFromJson(Map<String, dynamic> json) =>
       active: json['active'] as bool,
       peerMetadata: json['peerMetadata'] == null
           ? null
-          : Metadata.fromJson(json['peerMetadata'] as Map<String, dynamic>),
+          : AppMetadata.fromJson(json['peerMetadata'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PairingTypesStructToJson(PairingTypesStruct instance) {

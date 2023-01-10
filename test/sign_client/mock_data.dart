@@ -1,4 +1,5 @@
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
@@ -15,7 +16,7 @@ const TEST_WEBHOOK_ENDPOINT = "https://webhook-push-test.walletconnect.com/";
 const TEST_PROJECT_ID = "";
 
 const TEST_SIGN_CLIENT_NAME_A = "client_a";
-const TEST_APP_METADATA_A = Metadata(
+const TEST_APP_METADATA_A = AppMetadata(
   name: "App A (Proposer)",
   description: "Description of Proposer App run by client A",
   url: "https://walletconnect.com",
@@ -23,7 +24,7 @@ const TEST_APP_METADATA_A = Metadata(
 );
 
 const TEST_SIGN_CLIENT_NAME_B = "client_b";
-const TEST_APP_METADATA_B = Metadata(
+const TEST_APP_METADATA_B = AppMetadata(
   name: "App B (Responder)",
   description: "Description of Responder App run by client B",
   url: "https://walletconnect.com",

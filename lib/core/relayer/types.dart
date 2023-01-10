@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
 
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/messages/types.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
 import 'package:wallet_connect/core/subscriber/types.dart';

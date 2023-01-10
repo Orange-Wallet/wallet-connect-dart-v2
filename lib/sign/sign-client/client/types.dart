@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
@@ -49,7 +50,7 @@ extension SignClientTypesEventExtStr on String {
 
 abstract class ISignClient with IEvents {
   String get name;
-  Metadata get metadata;
+  AppMetadata get metadata;
 
   ICore get core;
   Logger get logger;

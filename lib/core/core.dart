@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/constants.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/constants.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/crypto/crypto.dart';
 import 'package:wallet_connect/core/expirer/expirer.dart';
 import 'package:wallet_connect/core/history/history.dart';
@@ -44,8 +44,7 @@ class Core with Events implements ICore {
   final IHeartBeat heartbeat;
 
   @override
-  ICrypto get crypto => _crypto!;
-  ICrypto? _crypto;
+  late final ICrypto crypto;
 
   @override
   late final IRelayer relayer;
@@ -80,7 +79,7 @@ class Core with Events implements ICore {
   })  : logger = logger ?? Logger(),
         heartbeat = heartbeat ?? HeartBeat(),
         events = EventSubject() {
-    _crypto = crypto ?? Crypto(core: this, logger: logger);
+    this.crypto = crypto ?? Crypto(core: this, logger: logger);
     this.history = history ?? JsonRpcHistory(core: this, logger: logger);
     this.expirer = expirer ?? Expirer(core: this, logger: logger);
     this.storage = storage ??

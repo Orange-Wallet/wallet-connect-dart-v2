@@ -1,4 +1,5 @@
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/crypto/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
@@ -33,7 +34,7 @@ const TEST_RELAY_OPTIONS = RelayerTypesProtocolOptions(
   data: null,
 );
 
-const TEST_SESSION_METADATA = Metadata(
+const TEST_SESSION_METADATA = AppMetadata(
   name: "My App",
   description: "App that requests wallet signature",
   url: "http://myapp.com",

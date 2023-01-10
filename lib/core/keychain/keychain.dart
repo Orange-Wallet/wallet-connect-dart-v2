@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/core/constants.dart';
-import 'package:wallet_connect/core/core/types.dart';
+import 'package:wallet_connect/core/constants.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/keychain/constants.dart';
 import 'package:wallet_connect/core/keychain/types.dart';
 import 'package:wallet_connect/utils/error.dart';
