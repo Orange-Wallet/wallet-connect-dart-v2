@@ -10,7 +10,7 @@ PairingTypesStruct _$PairingTypesStructFromJson(Map<String, dynamic> json) =>
     PairingTypesStruct(
       topic: json['topic'] as String,
       expiry: json['expiry'] as int,
-      relay: RelayerTypesProtocolOptions.fromJson(
+      relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
       active: json['active'] as bool,
       peerMetadata: json['peerMetadata'] == null

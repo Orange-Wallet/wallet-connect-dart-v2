@@ -1,10 +1,11 @@
 import 'package:logger/logger.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 
 class PublisherTypesParams {
   final String topic;
   final String message;
-  final RelayerTypesPublishOptions opts;
+  final RelayerPublishOptions opts;
 
   PublisherTypesParams({
     required this.topic,
@@ -21,6 +22,6 @@ abstract class IPublisher {
   Future<void> publish({
     required String topic,
     required String message,
-    RelayerTypesPublishOptions? opts,
+    RelayerPublishOptions? opts,
   });
 }

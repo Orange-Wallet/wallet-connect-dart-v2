@@ -13,12 +13,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
   switch (method) {
     case JsonRpcMethod.WC_SESSION_PROPOSE:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
           tag: 1100,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
           tag: 1101,
@@ -26,12 +26,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_SETTLE:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
           tag: 1102,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
           tag: 1103,
@@ -39,12 +39,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_REQUEST:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1104,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1105,
@@ -52,12 +52,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_DELETE:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1106,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1107,
@@ -65,12 +65,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_PING:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
           tag: 1108,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
           tag: 1109,
@@ -78,12 +78,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_EVENT:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
           tag: 1110,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
           tag: 1111,
@@ -91,12 +91,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_UPDATE:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1112,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
           tag: 1113,
@@ -104,12 +104,12 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
       );
     case JsonRpcMethod.WC_SESSION_EXTEND:
       return PairingJsonRpcOptions(
-        req: RelayerTypesPublishOptions(
+        req: RelayerPublishOptions(
           ttl: THIRTY_SECONDS,
           prompt: false,
           tag: 1114,
         ),
-        res: RelayerTypesPublishOptions(
+        res: RelayerPublishOptions(
           ttl: THIRTY_SECONDS,
           prompt: false,
           tag: 1115,

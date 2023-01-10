@@ -5,9 +5,9 @@ import 'package:wallet_connect/wc_utils/relay/types.dart';
 
 const RELAYER_DEFAULT_PROTOCOL = "irn";
 
-RelayerTypesProtocolOptions getRelayProtocolName(dynamic opts) {
+RelayerProtocolOptions getRelayProtocolName(dynamic opts) {
   return opts?.relay ??
-      RelayerTypesProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL);
+      RelayerProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL);
 }
 
 RelayJsonRpcMethods getRelayProtocolApi(String protocol) {

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/subscriber/constants.dart';
 import 'package:wallet_connect/core/subscriber/types.dart';
@@ -79,7 +79,7 @@ class Subscriber with Events implements ISubscriber {
   @override
   Future<String> subscribe(
     String topic, {
-    RelayerTypesSubscribeOptions? opts,
+    RelayerSubscribeOptions? opts,
   }) async {
     _isInitialized();
     logger.d('Subscribing Topic');
@@ -111,7 +111,7 @@ class Subscriber with Events implements ISubscriber {
   @override
   Future<void> unsubscribe(
     String topic, {
-    RelayerTypesUnsubscribeOptions? opts,
+    RelayerUnsubscribeOptions? opts,
   }) async {
     _isInitialized();
     if (opts?.id != null) {
@@ -175,7 +175,7 @@ class Subscriber with Events implements ISubscriber {
 
   _unsubscribeByTopic(
     String topic, {
-    RelayerTypesUnsubscribeOptions? opts,
+    RelayerUnsubscribeOptions? opts,
   }) async {
     final ids = topicMap.get(topic);
     await Future.wait(ids.map((id) => _unsubscribeById(topic, id, opts: opts)));
@@ -184,7 +184,7 @@ class Subscriber with Events implements ISubscriber {
   _unsubscribeById(
     String topic,
     String id, {
-    RelayerTypesUnsubscribeOptions? opts,
+    RelayerUnsubscribeOptions? opts,
   }) async {
     logger.d('Unsubscribing Topic');
     logger.i({
@@ -211,7 +211,7 @@ class Subscriber with Events implements ISubscriber {
     }
   }
 
-  _rpcSubscribe(String topic, RelayerTypesProtocolOptions relay) {
+  _rpcSubscribe(String topic, RelayerProtocolOptions relay) {
     final api = getRelayProtocolApi(relay.protocol);
     final request = RequestArguments<RelayJsonRpcSubscribeParams>(
       method: api.subscribe,
@@ -228,7 +228,7 @@ class Subscriber with Events implements ISubscriber {
         .request<RelayJsonRpcSubscribeParams>(request: request);
   }
 
-  _rpcUnsubscribe(String topic, String id, RelayerTypesProtocolOptions relay) {
+  _rpcUnsubscribe(String topic, String id, RelayerProtocolOptions relay) {
     final api = getRelayProtocolApi(relay.protocol);
     final request = RequestArguments<RelayJsonRpcUnsubscribeParams>(
       method: api.unsubscribe,

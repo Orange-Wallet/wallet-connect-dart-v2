@@ -11,7 +11,7 @@ part 'types.g.dart';
 class PairingTypesStruct {
   final String topic;
   final int expiry;
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
   final bool active;
   final AppMetadata? peerMetadata;
 
@@ -31,7 +31,7 @@ class PairingTypesStruct {
   PairingTypesStruct copyWith({
     String? topic,
     int? expiry,
-    RelayerTypesProtocolOptions? relay,
+    RelayerProtocolOptions? relay,
     bool? active,
     AppMetadata? peerMetadata,
   }) {
@@ -95,8 +95,8 @@ extension PairingRpcMethodExtStr on String {
 }
 
 class PairingJsonRpcOptions {
-  final RelayerTypesPublishOptions req;
-  final RelayerTypesPublishOptions res;
+  final RelayerPublishOptions req;
+  final RelayerPublishOptions res;
 
   PairingJsonRpcOptions({required this.req, required this.res});
 }

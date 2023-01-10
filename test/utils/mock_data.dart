@@ -29,7 +29,7 @@ const TEST_HASHED_KEY =
 const TEST_SYM_KEY =
     "0653ca620c7b4990392e1c53c4a51c14a2840cd20f0f1524cf435b17b6fe988c";
 
-const TEST_RELAY_OPTIONS = RelayerTypesProtocolOptions(
+const TEST_RELAY_OPTIONS = RelayerProtocolOptions(
   protocol: "irn",
   data: null,
 );

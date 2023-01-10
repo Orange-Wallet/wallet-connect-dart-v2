@@ -3,7 +3,7 @@ import 'package:wallet_connect/core/crypto/types.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/history/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
 import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';

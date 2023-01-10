@@ -88,8 +88,7 @@ class Pairing with Events implements IPairing {
     final symKey = generateRandomBytes32();
     final topic = await core.crypto.setSymKey(symKey: symKey);
     final expiry = calcExpiry(ttl: FIVE_MINUTES);
-    final relay =
-        RelayerTypesProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL);
+    final relay = RelayerProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL);
     final pairing = PairingTypesStruct(
       topic: topic,
       expiry: expiry,
@@ -130,7 +129,7 @@ class Pairing with Events implements IPairing {
         .setSymKey(symKey: uriParams.symKey, overrideTopic: uriParams.topic);
     await core.relayer.subscribe(
       topic: uriParams.topic,
-      opts: RelayerTypesSubscribeOptions(relay: uriParams.relay),
+      opts: RelayerSubscribeOptions(relay: uriParams.relay),
     );
     core.expirer.set(uriParams.topic, expiry);
 
@@ -300,8 +299,8 @@ class Pairing with Events implements IPairing {
 
   _registerRelayerEvents() {
     core.relayer.on(RelayerEvents.message, (event) async {
-      if (event.eventData is RelayerTypesMessageEvent) {
-        final eventData = event.eventData as RelayerTypesMessageEvent;
+      if (event.eventData is RelayerMessageEvent) {
+        final eventData = event.eventData as RelayerMessageEvent;
         final topic = eventData.topic;
         final message = eventData.message;
 

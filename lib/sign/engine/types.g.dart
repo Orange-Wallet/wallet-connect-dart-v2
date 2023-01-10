@@ -9,8 +9,7 @@ part of 'types.dart';
 SessionSettleRequestParams _$SessionSettleRequestParamsFromJson(
         Map<String, dynamic> json) =>
     SessionSettleRequestParams(
-      RelayerTypesProtocolOptions.fromJson(
-          json['relay'] as Map<String, dynamic>),
+      RelayerProtocolOptions.fromJson(json['relay'] as Map<String, dynamic>),
       SessionTypesPublicKeyMetadata.fromJson(
           json['controller'] as Map<String, dynamic>),
       (json['namespaces'] as Map<String, dynamic>).map(
@@ -31,7 +30,7 @@ Map<String, dynamic> _$SessionSettleRequestParamsToJson(
 
 SessionSettleParams _$SessionSettleParamsFromJson(Map<String, dynamic> json) =>
     SessionSettleParams(
-      relay: RelayerTypesProtocolOptions.fromJson(
+      relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
       controller: SessionTypesPublicKeyMetadata.fromJson(
           json['controller'] as Map<String, dynamic>),
@@ -68,8 +67,8 @@ SessionConnectParams _$SessionConnectParamsFromJson(
       ),
       pairingTopic: json['pairingTopic'] as String?,
       relays: (json['relays'] as List<dynamic>?)
-          ?.map((e) =>
-              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          ?.map(
+              (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

@@ -1,6 +1,7 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/publisher/constants.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/relay.dart';
@@ -31,7 +32,7 @@ class Publisher implements IPublisher {
   Future<void> publish({
     required String topic,
     required String message,
-    RelayerTypesPublishOptions? opts,
+    RelayerPublishOptions? opts,
   }) async {
     logger.d('Publishing Payload');
     logger.i({
@@ -47,7 +48,7 @@ class Publisher implements IPublisher {
       final params = PublisherTypesParams(
         topic: topic,
         message: message,
-        opts: RelayerTypesPublishOptions(
+        opts: RelayerPublishOptions(
           ttl: ttl,
           relay: relay,
           prompt: prompt,
@@ -77,7 +78,7 @@ class Publisher implements IPublisher {
     String topic,
     String message,
     int ttl,
-    RelayerTypesProtocolOptions relay,
+    RelayerProtocolOptions relay,
     bool? prompt,
     int? tag,
   ) {

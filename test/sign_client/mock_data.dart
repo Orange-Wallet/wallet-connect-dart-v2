@@ -32,7 +32,7 @@ const TEST_APP_METADATA_B = AppMetadata(
 );
 
 const TEST_RELAY_PROTOCOL = "irn";
-const TEST_RELAY_OPTIONS = RelayerTypesProtocolOptions(
+const TEST_RELAY_OPTIONS = RelayerProtocolOptions(
   protocol: TEST_RELAY_PROTOCOL,
 );
 

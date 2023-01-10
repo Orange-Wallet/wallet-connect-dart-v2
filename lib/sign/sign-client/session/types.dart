@@ -119,7 +119,7 @@ class SessionTypesPublicKeyMetadata {
 @JsonSerializable()
 class SessionTypesStruct {
   final String topic;
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
   final int expiry;
   final bool acknowledged;
   final String controller;
@@ -147,7 +147,7 @@ class SessionTypesStruct {
 
   SessionTypesStruct copyWith({
     String? topic,
-    RelayerTypesProtocolOptions? relay,
+    RelayerProtocolOptions? relay,
     int? expiry,
     bool? acknowledged,
     String? controller,

@@ -55,7 +55,7 @@ class RpcSessionUpdateParams {
 
 @JsonSerializable()
 class RpcSessionProposeParams {
-  final List<RelayerTypesProtocolOptions> relays;
+  final List<RelayerProtocolOptions> relays;
   final ProposalTypesRequiredNamespaces requiredNamespaces;
   final ProposalTypesProposer proposer;
 
@@ -140,7 +140,7 @@ typedef ResultPairingPing = bool;
 
 @JsonSerializable()
 class ResultSessionPropose {
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
   final String responderPublicKey;
 
   ResultSessionPropose({

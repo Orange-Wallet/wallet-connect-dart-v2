@@ -7,6 +7,7 @@ import 'package:wallet_connect/core/messages/types.dart';
 import 'package:wallet_connect/core/publisher/publisher.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/subscriber/constants.dart';
 import 'package:wallet_connect/core/subscriber/subscriber.dart';
@@ -102,18 +103,18 @@ class Relayer with Events implements IRelayer {
   publish({
     required String topic,
     required String message,
-    RelayerTypesPublishOptions? opts,
+    RelayerPublishOptions? opts,
   }) async {
     _isInitialized();
     await publisher.publish(topic: topic, message: message, opts: opts);
     await _recordMessageEvent(
-        RelayerTypesMessageEvent(message: message, topic: topic));
+        RelayerMessageEvent(message: message, topic: topic));
   }
 
   @override
   subscribe({
     required String topic,
-    RelayerTypesSubscribeOptions? opts,
+    RelayerSubscribeOptions? opts,
   }) async {
     _isInitialized();
     final id = await subscriber.subscribe(topic, opts: opts);
@@ -123,7 +124,7 @@ class Relayer with Events implements IRelayer {
   @override
   unsubscribe({
     required String topic,
-    RelayerTypesUnsubscribeOptions? opts,
+    RelayerUnsubscribeOptions? opts,
   }) async {
     _isInitialized();
     await subscriber.unsubscribe(topic, opts: opts);
@@ -165,12 +166,12 @@ class Relayer with Events implements IRelayer {
     );
   }
 
-  _recordMessageEvent(RelayerTypesMessageEvent messageEvent) async {
+  _recordMessageEvent(RelayerMessageEvent messageEvent) async {
     await messages.set(messageEvent.topic, messageEvent.message);
   }
 
   Future<bool> _shouldIgnoreMessageEvent(
-      RelayerTypesMessageEvent messageEvent) async {
+      RelayerMessageEvent messageEvent) async {
     if (!(await subscriber.isSubscribed(messageEvent.topic))) return true;
     final exists = await messages.has(messageEvent.topic, messageEvent.message);
     return exists;
@@ -191,7 +192,7 @@ class Relayer with Events implements IRelayer {
       );
       if (!payloadObj.method.endsWith(RELAYER_SUBSCRIBER_SUFFIX)) return;
       final event = payloadObj.params!;
-      final messageEvent = RelayerTypesMessageEvent(
+      final messageEvent = RelayerMessageEvent(
         topic: event.data.topic,
         message: event.data.message,
       );
@@ -204,7 +205,7 @@ class Relayer with Events implements IRelayer {
     }
   }
 
-  _onMessageEvent(RelayerTypesMessageEvent messageEvent) async {
+  _onMessageEvent(RelayerMessageEvent messageEvent) async {
     if (await _shouldIgnoreMessageEvent(messageEvent)) return;
     events.emitData(RelayerEvents.message, messageEvent);
     await _recordMessageEvent(messageEvent);

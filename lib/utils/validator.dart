@@ -332,12 +332,12 @@ ErrorObject? isValidNamespaces(
   return error;
 }
 
-bool isValidRelay(RelayerTypesProtocolOptions input) {
+bool isValidRelay(RelayerProtocolOptions input) {
   return input.protocol.isNotEmpty;
 }
 
 bool isValidRelays(
-  List<RelayerTypesProtocolOptions>? input,
+  List<RelayerProtocolOptions>? input,
   bool optional,
 ) {
   bool valid = false;

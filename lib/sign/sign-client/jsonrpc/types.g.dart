@@ -54,8 +54,8 @@ RpcSessionProposeParams _$RpcSessionProposeParamsFromJson(
         Map<String, dynamic> json) =>
     RpcSessionProposeParams(
       relays: (json['relays'] as List<dynamic>)
-          .map((e) =>
-              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          .map(
+              (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
@@ -78,7 +78,7 @@ Map<String, dynamic> _$RpcSessionProposeParamsToJson(
 ResultSessionPropose _$ResultSessionProposeFromJson(
         Map<String, dynamic> json) =>
     ResultSessionPropose(
-      relay: RelayerTypesProtocolOptions.fromJson(
+      relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
       responderPublicKey: json['responderPublicKey'] as String,
     );

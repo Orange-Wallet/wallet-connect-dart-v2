@@ -6,15 +6,15 @@ part of 'types.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RelayerTypesProtocolOptions _$RelayerTypesProtocolOptionsFromJson(
+RelayerProtocolOptions _$RelayerTypesProtocolOptionsFromJson(
         Map<String, dynamic> json) =>
-    RelayerTypesProtocolOptions(
+    RelayerProtocolOptions(
       protocol: json['protocol'] as String,
       data: json['data'] as String?,
     );
 
 Map<String, dynamic> _$RelayerTypesProtocolOptionsToJson(
-    RelayerTypesProtocolOptions instance) {
+    RelayerProtocolOptions instance) {
   final val = <String, dynamic>{
     'protocol': instance.protocol,
   };

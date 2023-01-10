@@ -3,7 +3,7 @@ import 'package:wallet_connect/sign/engine/types.dart';
 
 // -- uri -------------------------------------------------- //
 
-RelayerTypesProtocolOptions parseRelayParams({
+RelayerProtocolOptions parseRelayParams({
   required Map<String, dynamic> params,
   String delimiter = "-",
 }) {
@@ -16,7 +16,7 @@ RelayerTypesProtocolOptions parseRelayParams({
       relay[name] = value;
     }
   });
-  return RelayerTypesProtocolOptions.fromJson(relay);
+  return RelayerProtocolOptions.fromJson(relay);
 }
 
 EngineTypesUriParameters parseUri(String str) {
@@ -36,7 +36,7 @@ EngineTypesUriParameters parseUri(String str) {
 }
 
 Map<String, dynamic> formatRelayParams({
-  required RelayerTypesProtocolOptions relay,
+  required RelayerProtocolOptions relay,
   String delimiter = "-",
 }) {
   final prefix = "relay";

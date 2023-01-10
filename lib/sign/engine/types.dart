@@ -16,7 +16,7 @@ class EngineTypesUriParameters {
   final int version;
   final String topic;
   final String symKey;
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
 
   EngineTypesUriParameters({
     required this.protocol,
@@ -29,7 +29,7 @@ class EngineTypesUriParameters {
 
 @JsonSerializable()
 class SessionSettleRequestParams {
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
   final SessionTypesPublicKeyMetadata controller;
   final SessionTypesNamespaces namespaces;
   final int expiry;
@@ -47,7 +47,7 @@ class SessionSettleRequestParams {
 
 @JsonSerializable()
 class SessionSettleParams {
-  final RelayerTypesProtocolOptions relay;
+  final RelayerProtocolOptions relay;
   final SessionTypesPublicKeyMetadata controller;
   final SessionTypesNamespaces namespaces;
   final ProposalTypesRequiredNamespaces requiredNamespaces;
@@ -71,7 +71,7 @@ class SessionSettleParams {
 class SessionConnectParams {
   final ProposalTypesRequiredNamespaces requiredNamespaces;
   final String? pairingTopic;
-  final List<RelayerTypesProtocolOptions>? relays;
+  final List<RelayerProtocolOptions>? relays;
 
   SessionConnectParams({
     required this.requiredNamespaces,

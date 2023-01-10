@@ -77,7 +77,7 @@ class Engine with Events implements IEngine {
     final proposal = ProposalTypesRequestStruct(
       requiredNamespaces: params.requiredNamespaces,
       relays: params.relays ??
-          [RelayerTypesProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL)],
+          [RelayerProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL)],
       proposer: ProposalTypesProposer(
         publicKey: publicKey,
         metadata: client.metadata,
@@ -168,7 +168,7 @@ class Engine with Events implements IEngine {
       peerPublicKey: peerPublicKey,
     );
     final sessionSettle = SessionSettleParams(
-      relay: RelayerTypesProtocolOptions(protocol: relayProtocol ?? "irn"),
+      relay: RelayerProtocolOptions(protocol: relayProtocol ?? "irn"),
       namespaces: namespaces,
       requiredNamespaces: requiredNamespaces,
       controller: SessionTypesPublicKeyMetadata(
@@ -224,7 +224,7 @@ class Engine with Events implements IEngine {
         id,
         pairingTopic,
         ResultSessionPropose(
-          relay: RelayerTypesProtocolOptions(
+          relay: RelayerProtocolOptions(
             protocol: relayProtocol ?? "irn",
           ),
           responderPublicKey: selfPublicKey,
@@ -609,9 +609,9 @@ class Engine with Events implements IEngine {
 
   _registerRelayerEvents() {
     client.core.relayer.on(RelayerEvents.message, (event) async {
-      if (event.eventData is RelayerTypesMessageEvent) {
-        final topic = (event.eventData as RelayerTypesMessageEvent).topic;
-        final message = (event.eventData as RelayerTypesMessageEvent).message;
+      if (event.eventData is RelayerMessageEvent) {
+        final topic = (event.eventData as RelayerMessageEvent).topic;
+        final message = (event.eventData as RelayerMessageEvent).message;
 
         // messages of certain types should be ignored as they are handled by their respective SDKs
         if (ignoredPayloadTypes

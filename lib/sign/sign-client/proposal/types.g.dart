@@ -77,8 +77,8 @@ ProposalTypesRequestStruct _$ProposalTypesRequestStructFromJson(
         Map<String, dynamic> json) =>
     ProposalTypesRequestStruct(
       relays: (json['relays'] as List<dynamic>)
-          .map((e) =>
-              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          .map(
+              (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
       proposer: ProposalTypesProposer.fromJson(
           json['proposer'] as Map<String, dynamic>),
@@ -103,8 +103,8 @@ ProposalTypesStruct _$ProposalTypesStructFromJson(Map<String, dynamic> json) =>
       id: json['id'] as int,
       expiry: json['expiry'] as int,
       relays: (json['relays'] as List<dynamic>)
-          .map((e) =>
-              RelayerTypesProtocolOptions.fromJson(e as Map<String, dynamic>))
+          .map(
+              (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
       proposer: ProposalTypesProposer.fromJson(
           json['proposer'] as Map<String, dynamic>),

@@ -76,7 +76,7 @@ Map<String, dynamic> _$SessionTypesPublicKeyMetadataToJson(
 SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
     SessionTypesStruct(
       topic: json['topic'] as String,
-      relay: RelayerTypesProtocolOptions.fromJson(
+      relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
       expiry: json['expiry'] as int,
       acknowledged: json['acknowledged'] as bool,

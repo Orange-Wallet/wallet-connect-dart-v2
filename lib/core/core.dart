@@ -1,22 +1,22 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/crypto/crypto.dart';
+import 'package:wallet_connect/core/crypto/types.dart';
 import 'package:wallet_connect/core/expirer/expirer.dart';
+import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/history/history.dart';
 import 'package:wallet_connect/core/history/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/keychain/types.dart';
-import 'package:wallet_connect/core/crypto/types.dart';
-import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/pairing/pairing.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/relayer.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
-import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/keyvaluestorage.dart';
-import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/heartbeat.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
+import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/keyvaluestorage.dart';
+import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';
 
 class Core with Events implements ICore {
   @override

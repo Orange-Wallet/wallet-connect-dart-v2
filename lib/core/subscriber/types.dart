@@ -2,11 +2,11 @@ import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-class SubscriberTypesParams extends RelayerTypesSubscribeOptions {
+class SubscriberTypesParams extends RelayerSubscribeOptions {
   final String topic;
 
   SubscriberTypesParams({
-    required RelayerTypesProtocolOptions relay,
+    required RelayerProtocolOptions relay,
     required this.topic,
   }) : super(relay: relay);
 }
@@ -16,7 +16,7 @@ class SubscriberTypesActive extends SubscriberTypesParams {
 
   SubscriberTypesActive({
     required this.id,
-    required RelayerTypesProtocolOptions relay,
+    required RelayerProtocolOptions relay,
     required String topic,
   }) : super(relay: relay, topic: topic);
 }
@@ -26,7 +26,7 @@ class SubscriberEventsDeleted extends SubscriberTypesActive {
 
   SubscriberEventsDeleted({
     required String id,
-    required RelayerTypesProtocolOptions relay,
+    required RelayerProtocolOptions relay,
     required String topic,
     required this.reason,
   }) : super(id: id, relay: relay, topic: topic);
@@ -61,12 +61,12 @@ abstract class ISubscriber with IEvents {
 
   Future<String> subscribe(
     String topic, {
-    RelayerTypesSubscribeOptions? opts,
+    RelayerSubscribeOptions? opts,
   });
 
   Future<void> unsubscribe(
     String topic, {
-    RelayerTypesUnsubscribeOptions? opts,
+    RelayerUnsubscribeOptions? opts,
   });
 
   Future<bool> isSubscribed(String topic);

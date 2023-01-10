@@ -96,7 +96,7 @@ class ProposalTypesProposer {
 
 @JsonSerializable()
 class ProposalTypesRequestStruct {
-  final List<RelayerTypesProtocolOptions> relays;
+  final List<RelayerProtocolOptions> relays;
   final ProposalTypesProposer proposer;
   final ProposalTypesRequiredNamespaces requiredNamespaces;
 
