@@ -84,8 +84,9 @@ class WsConnection with Events implements IJsonRpcConnection {
     this.url = url;
     registering = true;
 
+    Logger().i('URL_STR ${url}');
+    Logger().i('URL ${Uri.parse(url)}');
     final webSocket = WebSocketChannel.connect(Uri.parse(url));
-    Logger().i('URL $url');
     webSocket.stream.listen(
       (event) {
         _onPayload(event);

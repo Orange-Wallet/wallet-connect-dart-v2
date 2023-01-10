@@ -36,18 +36,18 @@ class _ExampleAppState extends State<ExampleApp> {
   late final SignClient signClient;
 
   init() async {
-    signClient = SignClient(
-      projectId: "73801621aec60dfaa2197c7640c15858",
-      relayUrl: "wss://relay.walletconnect.com",
-      metadata: Metadata(
-        name: 'Wallet',
-        description: 'Wallet for WalletConnect',
-        url: 'https://walletconnect.com/',
-        icons: ['https://avatars.githubusercontent.com/u/37784886'],
-      ),
-    );
     try {
-      await signClient.init();
+      signClient = await SignClient.init(
+        projectId: "73801621aec60dfaa2197c7640c15858",
+        relayUrl: "wss://relay.walletconnect.com",
+        metadata: Metadata(
+          name: 'Wallet',
+          description: 'Wallet for WalletConnect',
+          url: 'https://walletconnect.com/',
+          icons: ['https://avatars.githubusercontent.com/u/37784886'],
+        ),
+      );
+
       signClient.on(SignClientTypesEvent.SESSION_PROPOSAL.value, (event) async {
         print('HALLA SESSION_PROPOSAL ${event.eventData}');
         await Future.delayed(const Duration(seconds: 3));

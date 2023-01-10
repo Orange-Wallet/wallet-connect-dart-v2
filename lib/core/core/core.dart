@@ -76,14 +76,17 @@ class Core with Events implements ICore {
     IRelayer? relayer,
     IPairing? pairing,
     IKeyValueStorage? storage,
+    String? database,
   })  : logger = logger ?? Logger(),
         heartbeat = heartbeat ?? HeartBeat(),
         events = EventSubject() {
     _crypto = crypto ?? Crypto(core: this, logger: logger);
     this.history = history ?? JsonRpcHistory(core: this, logger: logger);
     this.expirer = expirer ?? Expirer(core: this, logger: logger);
-    this.storage =
-        storage ?? KeyValueStorage(database: CoreStorageOptions.database);
+    this.storage = storage ??
+        KeyValueStorage(
+          database: database ?? CoreStorageOptions.database,
+        );
     this.relayer = relayer ??
         Relayer(
           core: this,

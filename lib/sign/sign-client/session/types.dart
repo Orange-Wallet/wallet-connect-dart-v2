@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:wallet_connect/core/core/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
@@ -12,7 +14,7 @@ class SessionTypesBaseNamespace {
   final List<String> methods;
   final List<String> events;
 
-  SessionTypesBaseNamespace({
+  const SessionTypesBaseNamespace({
     required this.accounts,
     required this.methods,
     required this.events,
@@ -22,13 +24,26 @@ class SessionTypesBaseNamespace {
       _$SessionTypesBaseNamespaceFromJson(json);
 
   Map<String, dynamic> toJson() => _$SessionTypesBaseNamespaceToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SessionTypesBaseNamespace &&
+        listEquals(other.accounts, accounts) &&
+        listEquals(other.methods, methods) &&
+        listEquals(other.events, events);
+  }
+
+  @override
+  int get hashCode => accounts.hashCode ^ methods.hashCode ^ events.hashCode;
 }
 
 @JsonSerializable()
 class SessionTypesNamespace extends SessionTypesBaseNamespace {
   final List<SessionTypesBaseNamespace>? extension;
 
-  SessionTypesNamespace({
+  const SessionTypesNamespace({
     required super.accounts,
     required super.methods,
     required super.events,
@@ -40,6 +55,24 @@ class SessionTypesNamespace extends SessionTypesBaseNamespace {
 
   @override
   Map<String, dynamic> toJson() => _$SessionTypesNamespaceToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SessionTypesNamespace &&
+        listEquals(other.accounts, accounts) &&
+        listEquals(other.methods, methods) &&
+        listEquals(other.events, events) &&
+        listEquals(other.extension, extension);
+  }
+
+  @override
+  int get hashCode =>
+      accounts.hashCode ^
+      methods.hashCode ^
+      events.hashCode ^
+      extension.hashCode;
 }
 
 typedef SessionTypesNamespaces = Map<String, SessionTypesNamespace>;
@@ -68,6 +101,18 @@ class SessionTypesPublicKeyMetadata {
       metadata: metadata ?? this.metadata,
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SessionTypesPublicKeyMetadata &&
+        other.publicKey == publicKey &&
+        other.metadata == metadata;
+  }
+
+  @override
+  int get hashCode => publicKey.hashCode ^ metadata.hashCode;
 }
 
 @JsonSerializable()

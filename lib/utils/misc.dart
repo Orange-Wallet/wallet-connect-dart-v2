@@ -45,9 +45,9 @@ String formatRelayRpcUrl({
   final uri = Uri.parse(relayUrl);
   final queryParams = Uri.splitQueryString(uri.query);
   final ua = formatUA(protocol, version, sdkVersion);
-  final newQueryParams = {
+  final Map<String, String> newQueryParams = {
     'auth': auth,
-    if (projectId != null) 'projectId': projectId,
+    if (projectId?.isNotEmpty ?? false) 'projectId': projectId!,
     'ua': ua,
   };
   queryParams.addAll(newQueryParams);

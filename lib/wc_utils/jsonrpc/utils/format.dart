@@ -67,8 +67,8 @@ ErrorResponse formatErrorMessage({dynamic error, String? data}) {
   if (data != null) {
     _error = _error!.copyWith(data: data);
   }
-  if (isReservedErrorCode(error.code)) {
-    _error = getErrorByCode(error.code);
+  if (isReservedErrorCode(_error!.code)) {
+    _error = getErrorByCode(_error.code);
   }
-  return _error!;
+  return _error;
 }

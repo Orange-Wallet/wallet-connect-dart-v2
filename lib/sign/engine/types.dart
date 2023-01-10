@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';
@@ -238,27 +239,34 @@ extension JsonRpcMethodExt on JsonRpcMethod {
 }
 
 extension JsonRpcMethodExtStr on String {
-  JsonRpcMethod get jsonRpcMethod {
-    return _jsonRpcMethodMap.entries
-        .where((element) => element.value == this)
-        .first
-        .key;
+  JsonRpcMethod? get jsonRpcMethod {
+    try {
+      return _jsonRpcMethodMap.entries
+          .where((element) => element.value == this)
+          .first
+          .key;
+    } catch (e) {
+      return null;
+    }
   }
 }
 
 class EngineTypesConnection {
   final String? uri;
-  final dynamic approval;
+  final Future<SessionTypesStruct>? approval;
 
-  EngineTypesConnection({
+  const EngineTypesConnection({
     this.uri,
     this.approval,
   });
+
+  @override
+  String toString() => 'EngineTypesConnection(uri: $uri, approval: $approval)';
 }
 
 class EngineTypesApproved {
   final String topic;
-  final bool acknowledged;
+  final Future<SessionTypesStruct> acknowledged;
 
   EngineTypesApproved({
     required this.topic,
@@ -291,7 +299,10 @@ abstract class IEngine {
 
   Future<void> emit(SessionEmitParams params);
 
-  Future<void> disconnect(String topic);
+  Future<void> disconnect({
+    required String topic,
+    ErrorResponse? reason,
+  });
 
   List<SessionTypesStruct> find(params);
 

@@ -36,4 +36,17 @@ class WCException implements Exception {
   final String? message;
 
   WCException([this.message]);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is WCException && other.message == message;
+  }
+
+  @override
+  int get hashCode => message.hashCode;
+
+  @override
+  String toString() => 'WCException(message: $message)';
 }

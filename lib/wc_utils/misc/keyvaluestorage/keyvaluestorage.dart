@@ -26,19 +26,21 @@ class KeyValueStorage implements IKeyValueStorage {
 
   Future<void> _databaseInitialize() async {
     try {
-      await Hive.initFlutter();
-      _box = await Hive.openBox(_dbName);
-      _box.keys.forEach((key) {
-        _data[key] = _box.get(key);
-      });
-      _boxSubscription?.cancel();
-      _boxSubscription = _box.watch().listen((event) {
-        if (event.deleted) {
-          _data.remove(event.key);
-        } else {
-          _data[event.key] = event.value;
-        }
-      });
+      if (!_inMemory) {
+        await Hive.initFlutter();
+        _box = await Hive.openBox(_dbName);
+        _box.keys.forEach((key) {
+          _data[key] = _box.get(key);
+        });
+        _boxSubscription?.cancel();
+        _boxSubscription = _box.watch().listen((event) {
+          if (event.deleted) {
+            _data.remove(event.key);
+          } else {
+            _data[event.key] = event.value;
+          }
+        });
+      }
       _initialized = true;
     } catch (e) {
       rethrow;

@@ -401,7 +401,10 @@ class Pairing with Events implements IPairing {
       // RPC request needs to happen before deletion as it utilises pairing encryption
       await _sendResult<bool>(id, topic, true, (v) => v);
       await _deletePairing(topic: topic);
-      events.emitData("pairing_delete", {id, topic});
+      events.emitData("pairing_delete", {
+        'id': id,
+        'topic': topic,
+      });
     } catch (err) {
       await _sendError(id, topic, err);
       logger.e(err);

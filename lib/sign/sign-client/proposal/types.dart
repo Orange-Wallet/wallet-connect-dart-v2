@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:wallet_connect/core/core/types.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/core/store/types.dart';
@@ -11,7 +13,7 @@ class ProposalTypesBaseRequiredNamespace {
   final List<String> methods;
   final List<String> events;
 
-  ProposalTypesBaseRequiredNamespace({
+  const ProposalTypesBaseRequiredNamespace({
     required this.chains,
     required this.methods,
     required this.events,
@@ -23,6 +25,19 @@ class ProposalTypesBaseRequiredNamespace {
 
   Map<String, dynamic> toJson() =>
       _$ProposalTypesBaseRequiredNamespaceToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ProposalTypesBaseRequiredNamespace &&
+        listEquals(other.chains, chains) &&
+        listEquals(other.methods, methods) &&
+        listEquals(other.events, events);
+  }
+
+  @override
+  int get hashCode => chains.hashCode ^ methods.hashCode ^ events.hashCode;
 }
 
 @JsonSerializable()
@@ -30,7 +45,7 @@ class ProposalTypesRequiredNamespace
     extends ProposalTypesBaseRequiredNamespace {
   final List<ProposalTypesBaseRequiredNamespace>? extension;
 
-  ProposalTypesRequiredNamespace({
+  const ProposalTypesRequiredNamespace({
     required super.chains,
     required super.methods,
     required super.events,
@@ -42,6 +57,21 @@ class ProposalTypesRequiredNamespace
 
   @override
   Map<String, dynamic> toJson() => _$ProposalTypesRequiredNamespaceToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ProposalTypesRequiredNamespace &&
+        listEquals(other.chains, chains) &&
+        listEquals(other.methods, methods) &&
+        listEquals(other.events, events) &&
+        listEquals(other.extension, extension);
+  }
+
+  @override
+  int get hashCode =>
+      chains.hashCode ^ methods.hashCode ^ events.hashCode ^ extension.hashCode;
 }
 
 typedef ProposalTypesRequiredNamespaces

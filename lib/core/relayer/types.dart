@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
+
 import 'package:wallet_connect/core/core/types.dart';
 import 'package:wallet_connect/core/messages/types.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
@@ -23,6 +24,18 @@ class RelayerTypesProtocolOptions {
       _$RelayerTypesProtocolOptionsFromJson(json);
 
   Map<String, dynamic> toJson() => _$RelayerTypesProtocolOptionsToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is RelayerTypesProtocolOptions &&
+        other.protocol == protocol &&
+        other.data == data;
+  }
+
+  @override
+  int get hashCode => protocol.hashCode ^ data.hashCode;
 }
 
 class RelayerTypesPublishOptions {

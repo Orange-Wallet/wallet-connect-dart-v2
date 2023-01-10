@@ -5,6 +5,7 @@ import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 enum SignClientTypesEvent {
@@ -77,7 +78,10 @@ abstract class ISignClient with IEvents {
 
   Future<void> emit(SessionEmitParams params);
 
-  Future<void> disconnect(String topic);
+  Future<void> disconnect({
+    required String topic,
+    ErrorResponse? reason,
+  });
 
   List<SessionTypesStruct> find(params);
 

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core/core.dart';
 import 'package:wallet_connect/core/core/types.dart';
@@ -40,30 +41,52 @@ class SignClient with Events implements ISignClient {
   @override
   late final IPendingRequest pendingRequest;
 
-  SignClient({
+  SignClient._({
     String? name,
     required String projectId,
-    required String relayUrl,
+    String? relayUrl,
     required this.metadata,
     ICore? core,
-    Logger? logger,
+    Level? logLevel,
+    String? database,
   })  : name = name ?? SignClientDefault.name,
         events = EventSubject(),
         core = core ??
             Core(
               projectId: projectId,
               relayUrl: relayUrl,
+              database: database,
             ),
-        logger = logger ??
-            Logger(printer: PrefixPrinter(PrettyPrinter(colors: false))) {
+        logger = Logger(
+          printer: PrefixPrinter(PrettyPrinter(colors: false)),
+          level: logLevel ?? Level.info,
+        ) {
     engine = Engine(client: this);
     session = Session(core: this.core, logger: logger);
     proposal = Proposal(core: this.core, logger: logger);
     pendingRequest = PendingRequest(core: this.core, logger: logger);
   }
 
-  Future<void> init() async {
-    await _initialize();
+  static Future<SignClient> init({
+    String? name,
+    required String projectId,
+    String? relayUrl,
+    Metadata? metadata,
+    ICore? core,
+    Level? logLevel,
+    String? database,
+  }) async {
+    final client = SignClient._(
+      name: name,
+      projectId: projectId,
+      relayUrl: relayUrl,
+      metadata: metadata ?? Metadata.empty(),
+      core: core,
+      logLevel: logLevel,
+      database: database,
+    );
+    await client._initialize();
+    return client;
   }
 
   // constructor(opts?: SignClientTypes.Options) {
@@ -212,9 +235,15 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<void> disconnect(String topic) async {
+  Future<void> disconnect({
+    required String topic,
+    ErrorResponse? reason,
+  }) async {
     try {
-      return await engine.disconnect(topic);
+      return await engine.disconnect(
+        topic: topic,
+        reason: reason,
+      );
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;

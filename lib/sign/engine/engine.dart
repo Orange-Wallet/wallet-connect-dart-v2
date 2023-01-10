@@ -89,6 +89,7 @@ class Engine with Events implements IEngine {
       engineEvent(EngineTypesEvent.SESSION_CONNECT),
       null,
       (event, _) async {
+        print('XTEST_SESSION_CONNECT ${event.eventName} ${event.eventData}');
         if (event.eventData is ErrorResponse) {
           completer.completeError(event.eventData.toString());
         } else if (event.eventData is SessionTypesStruct) {
@@ -136,7 +137,7 @@ class Engine with Events implements IEngine {
     );
     return EngineTypesConnection(
       uri: uri,
-      approval: await completer.future,
+      approval: completer.future,
     );
   }
 
@@ -187,7 +188,7 @@ class Engine with Events implements IEngine {
     events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId), null,
         (event, _) {
       // timer.cancel();
-      print(event.eventData.toString());
+      print('XTEST_APPROVE ${event.eventData}');
       if (event.eventData is ErrorResponse) {
         completer.completeError(event.eventData.toString());
       } else {
@@ -237,10 +238,10 @@ class Engine with Events implements IEngine {
       await client.core.pairing.activate(topic: pairingTopic);
     }
 
-    final data = await completer.future;
+    // final data = await completer.future;
     return EngineTypesApproved(
       topic: sessionTopic,
-      acknowledged: data.acknowledged,
+      acknowledged: completer.future,
     );
   }
 
@@ -421,14 +422,17 @@ class Engine with Events implements IEngine {
   }
 
   @override
-  Future<void> disconnect(String topic) async {
+  Future<void> disconnect({
+    required String topic,
+    ErrorResponse? reason,
+  }) async {
     _isInitialized();
     await _isValidDisconnect(topic);
     if (client.session.keys.contains(topic)) {
       await _sendRequest<ErrorResponse>(
         topic,
         JsonRpcMethod.WC_SESSION_DELETE,
-        getSdkError(SdkErrorKey.USER_DISCONNECTED),
+        reason ?? getSdkError(SdkErrorKey.USER_DISCONNECTED),
         (v) => v.toJson(),
       );
       await _deleteSession(topic);
@@ -556,7 +560,7 @@ class Engine with Events implements IEngine {
     );
     final record = client.core.history.get(topic: topic, id: id);
     final opts =
-        getEngineRpcOptions((record.request['method'] as String).jsonRpcMethod)
+        getEngineRpcOptions((record.request['method'] as String).jsonRpcMethod!)
             .res;
     // await is intentionally omitted to speed up performance
     client.core.relayer.publish(topic: topic, message: message, opts: opts);
@@ -571,7 +575,7 @@ class Engine with Events implements IEngine {
     );
     final record = client.core.history.get(topic: topic, id: id);
     final opts =
-        getEngineRpcOptions((record.request['method'] as String).jsonRpcMethod)
+        getEngineRpcOptions((record.request['method'] as String).jsonRpcMethod!)
             .res;
     // await is intentionally omitted to speed up performance
     client.core.relayer.publish(topic: topic, message: message, opts: opts);
@@ -814,9 +818,10 @@ class Engine with Events implements IEngine {
         requiredNamespaces: null,
       );
       await _sendResult<ResultSessionSettle>(id, topic, true, (v) => v);
+      print('XTEST_SESSION_SETTLE $payload');
       events.emitData(
         engineEvent(EngineTypesEvent.SESSION_CONNECT),
-        session.toJson(),
+        session,
       );
     } catch (err) {
       await _sendError(id, topic, err);
@@ -987,9 +992,9 @@ class Engine with Events implements IEngine {
     Map<String, dynamic> payload,
   ) async {
     final int id = payload['id'];
-    final params = RpcSessionRequestParams.fromJson(payload['params']);
 
     try {
+      final params = RpcSessionRequestParams.fromJson(payload['params']);
       _isValidRequest(SessionRequestParams(
         topic: topic,
         request: params.request,
