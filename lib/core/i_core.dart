@@ -1,5 +1,5 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/crypto/types.dart';
+import 'package:wallet_connect/core/crypto/i_crypto.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/history/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';

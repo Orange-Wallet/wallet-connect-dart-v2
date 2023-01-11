@@ -1,6 +1,6 @@
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/core/crypto/types.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
@@ -11,12 +11,12 @@ const TEST_PAIRING_TOPIC =
 const TEST_SESSION_TOPIC =
     "f5d3f03946b6a2a3b22661fae1385cd1639bfb6f6c070115699b0a2ec1decd8c";
 
-const TEST_KEY_PAIRS_A = CryptoTypesKeyPair(
+const TEST_KEY_PAIRS_A = CryptoKeyPair(
   privateKey:
       "1fb63fca5c6ac731246f2f069d3bc2454345d5208254aa8ea7bffc6d110c8862",
   publicKey: "ff7a7d5767c362b0a17ad92299ebdb7831dcbd9a56959c01368c7404543b3342",
 );
-const TEST_KEY_PAIRS_B = CryptoTypesKeyPair(
+const TEST_KEY_PAIRS_B = CryptoKeyPair(
   privateKey:
       "36bf507903537de91f5e573666eaa69b1fa313974f23b2b59645f20fea505854",
   publicKey: "590c2c627be7af08597091ff80dd41f7fa28acd10ef7191d7e830e116d3a186a",

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:wallet_connect/core/crypto/types.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
@@ -87,7 +87,7 @@ void main() async {
       final encoded = TEST_ENCODED_TYPE_1;
       final params = validateDecoding(
         encoded: encoded,
-        opts: CryptoTypesDecodeOptions(
+        opts: CryptoDecodeOptions(
           receiverPublicKey: TEST_PEER.publicKey,
         ),
       );

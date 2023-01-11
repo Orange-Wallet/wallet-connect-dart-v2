@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:pointycastle/key_derivators/hkdf.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
-import 'package:wallet_connect/core/crypto/types.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:x25519/x25519.dart' as curve;
 import 'package:yx_tool/yx_crypto.dart';
@@ -20,9 +20,9 @@ const TYPE_LENGTH = 1;
 const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
 
-Future<CryptoTypesKeyPair> generateKeyPair() async {
+Future<CryptoKeyPair> generateKeyPair() async {
   final keyPair = curve.generateKeyPair();
-  return CryptoTypesKeyPair(
+  return CryptoKeyPair(
     privateKey: hex.encode(keyPair.privateKey),
     publicKey: hex.encode(keyPair.publicKey),
   );
@@ -158,7 +158,7 @@ String serialize({
   return base64Encode([...type, ...iv, ...sealed]);
 }
 
-CryptoTypesEncodingParams deserialize(String encoded) {
+CryptoEncodingParams deserialize(String encoded) {
   final bytes = Uint8List.fromList(base64.decode(encoded));
   final type = bytes.sublist(ZERO_INDEX, TYPE_LENGTH);
   final slice1 = TYPE_LENGTH;
@@ -168,7 +168,7 @@ CryptoTypesEncodingParams deserialize(String encoded) {
     final senderPublicKey = bytes.sublist(slice1, slice2);
     final iv = bytes.sublist(slice2, slice3);
     final sealed = bytes.sublist(slice3);
-    return CryptoTypesEncodingParams(
+    return CryptoEncodingParams(
       type: type,
       sealed: sealed,
       iv: iv,
@@ -179,19 +179,19 @@ CryptoTypesEncodingParams deserialize(String encoded) {
   final slice2 = slice1 + IV_LENGTH;
   final iv = bytes.sublist(slice1, slice2);
   final sealed = bytes.sublist(slice2);
-  return CryptoTypesEncodingParams(
+  return CryptoEncodingParams(
     type: type,
     sealed: sealed,
     iv: iv,
   );
 }
 
-CryptoTypesEncodingValidation validateDecoding({
+CryptoEncodingValidation validateDecoding({
   required String encoded,
-  CryptoTypesDecodeOptions? opts,
+  CryptoDecodeOptions? opts,
 }) {
   final deserialized = deserialize(encoded);
-  return validateEncoding(CryptoTypesEncodeOptions(
+  return validateEncoding(CryptoEncodeOptions(
     type: decodeTypeByte(deserialized.type),
     senderPublicKey: deserialized.senderPublicKey != null
         ? hex.encode(deserialized.senderPublicKey!)
@@ -200,8 +200,7 @@ CryptoTypesEncodingValidation validateDecoding({
   ));
 }
 
-CryptoTypesEncodingValidation validateEncoding(
-    [CryptoTypesEncodeOptions? opts]) {
+CryptoEncodingValidation validateEncoding([CryptoEncodeOptions? opts]) {
   final type = opts?.type ?? TYPE_0;
   if (type == TYPE_1) {
     if (opts?.senderPublicKey == null) {
@@ -211,14 +210,14 @@ CryptoTypesEncodingValidation validateEncoding(
       throw WCException("missing receiver public key");
     }
   }
-  return CryptoTypesEncodingValidation(
+  return CryptoEncodingValidation(
     type: type,
     senderPublicKey: opts?.senderPublicKey,
     receiverPublicKey: opts?.receiverPublicKey,
   );
 }
 
-bool isTypeOneEnvelope(CryptoTypesEncodingValidation result) {
+bool isTypeOneEnvelope(CryptoEncodingValidation result) {
   return (result.type == TYPE_1 &&
       result.senderPublicKey != null &&
       result.receiverPublicKey != null);

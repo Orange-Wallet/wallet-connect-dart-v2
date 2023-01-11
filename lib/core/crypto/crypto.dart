@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/crypto/constants.dart';
-import 'package:wallet_connect/core/crypto/types.dart';
+import 'package:wallet_connect/core/crypto/i_crypto.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/keychain/keychain.dart';
 import 'package:wallet_connect/core/keychain/types.dart';
 import 'package:wallet_connect/utils/crypto.dart' as utils;
@@ -32,9 +33,10 @@ class Crypto implements ICrypto {
     Logger? logger,
     IKeyChain? keychain,
   })  : logger = logger ?? Logger(),
-        keychain = keychain ?? KeyChain(core: core);
+        keychain = keychain ?? KeyChain(core: core),
+        _initialized = false;
 
-  bool _initialized = false;
+  bool _initialized;
 
   @override
   Future<void> init() async {
@@ -120,7 +122,7 @@ class Crypto implements ICrypto {
   Future<String> encode({
     required String topic,
     required Object payload,
-    CryptoTypesEncodeOptions? opts,
+    CryptoEncodeOptions? opts,
   }) async {
     _isInitialized();
     final params = utils.validateEncoding(opts);
@@ -147,7 +149,7 @@ class Crypto implements ICrypto {
   Future<dynamic> decode({
     required String topic,
     required String encoded,
-    CryptoTypesDecodeOptions? opts,
+    CryptoDecodeOptions? opts,
   }) async {
     _isInitialized();
     final params = utils.validateDecoding(encoded: encoded, opts: opts);
@@ -194,12 +196,12 @@ class Crypto implements ICrypto {
     return Uint8List.fromList(hex.decode(seed));
   }
 
-  _getSymKey(String topic) {
+  String _getSymKey(String topic) {
     final symKey = keychain.get(topic);
     return symKey;
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);
