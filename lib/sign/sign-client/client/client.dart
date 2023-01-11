@@ -175,9 +175,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<bool> update(SessionUpdateParams params) async {
+  Future<EngineTypesAcknowledged> update(SessionUpdateParams params) async {
     try {
-      return await engine.update(params);
+      return engine.update(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -185,9 +185,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<bool> extend(String topic) async {
+  Future<EngineTypesAcknowledged> extend(String topic) async {
     try {
-      return await engine.extend(topic);
+      return engine.extend(topic);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;

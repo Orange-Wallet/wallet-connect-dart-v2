@@ -67,9 +67,9 @@ abstract class ISignClient with IEvents {
 
   Future<void> reject(SessionRejectParams params);
 
-  Future<bool> update(SessionUpdateParams params);
+  Future<EngineTypesAcknowledged> update(SessionUpdateParams params);
 
-  Future<bool> extend(String topic);
+  Future<EngineTypesAcknowledged> extend(String topic);
 
   Future<T> request<T>(SessionRequestParams params);
 

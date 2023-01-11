@@ -257,7 +257,7 @@ class Engine with Events implements IEngine {
   }
 
   @override
-  Future<bool> update(SessionUpdateParams params) async {
+  Future<EngineTypesAcknowledged> update(SessionUpdateParams params) async {
     _isInitialized();
     await _isValidUpdate(params);
     final id = await _sendRequest<RpcSessionUpdateParams>(
@@ -282,12 +282,11 @@ class Engine with Events implements IEngine {
       (session) => session.copyWith(namespaces: params.namespaces),
     );
 
-    await completer.future;
-    return completer.isCompleted;
+    return EngineTypesAcknowledged(acknowledged: completer.future);
   }
 
   @override
-  Future<bool> extend(String topic) async {
+  Future<EngineTypesAcknowledged> extend(String topic) async {
     _isInitialized();
     await _isValidExtend(topic);
     final id = await _sendRequest<Map<String, dynamic>>(
@@ -312,8 +311,7 @@ class Engine with Events implements IEngine {
     );
     await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
 
-    await completer.future;
-    return completer.isCompleted;
+    return EngineTypesAcknowledged(acknowledged: completer.future);
   }
 
   @override

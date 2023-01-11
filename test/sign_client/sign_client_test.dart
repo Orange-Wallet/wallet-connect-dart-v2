@@ -237,10 +237,11 @@ void main() {
             events: ["accountsChanged"],
           ),
         };
-        await clients.clientA.update(SessionUpdateParams(
+        final update = await clients.clientA.update(SessionUpdateParams(
           topic: topic,
           namespaces: namespacesAfter,
         ));
+        await update.acknowledged;
         final result = clients.clientA.session.get(topic).namespaces;
         expect(result, equals(namespacesAfter));
         await disconnectClients([clients.clientA, clients.clientB]);
@@ -260,8 +261,8 @@ void main() {
         // Fast-forward system time by 60 seconds after expiry was first set.
         // vi.setSystemTime(Date.now() + 60_000);
         await Future.delayed(const Duration(milliseconds: 500));
-        await clients.clientA.extend(topic);
-        // await acknowledged();
+        final extend = await clients.clientA.extend(topic);
+        await extend.acknowledged;
         final updatedExpiry = clients.clientA.session.get(topic).expiry;
         expect(updatedExpiry, greaterThan(prevExpiry));
         // vi.useRealTimers();
