@@ -51,7 +51,6 @@ class WsConnection with Events implements IJsonRpcConnection {
   Future<void> send({required JsonRpcPayload payload, dynamic context}) async {
     socket ??= await _register();
     try {
-      Logger().i('SEND ${payload.toJson()}');
       socket!.sink.add(jsonEncode(payload.toJson()));
     } catch (e) {
       _onError(id: payload.id, e: e);
@@ -84,15 +83,12 @@ class WsConnection with Events implements IJsonRpcConnection {
     this.url = url;
     registering = true;
 
-    Logger().i('URL_STR ${url}');
-    Logger().i('URL ${Uri.parse(url)}');
     final webSocket = WebSocketChannel.connect(Uri.parse(url));
     webSocket.stream.listen(
       (event) {
         _onPayload(event);
       },
       onError: (e) {
-        Logger().e('ERROR $e');
         throw _emitError(e);
       },
       onDone: () {
@@ -117,7 +113,6 @@ class WsConnection with Events implements IJsonRpcConnection {
 
   _onPayload(dynamic data) {
     if (data == null) return;
-    Logger().i('PAYLOAD $data');
     final payload = data is String ? jsonDecode(data) : data;
     events.emitData("payload", payload);
   }

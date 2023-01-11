@@ -40,7 +40,7 @@ class _ExampleAppState extends State<ExampleApp> {
       signClient = await SignClient.init(
         projectId: "73801621aec60dfaa2197c7640c15858",
         relayUrl: "wss://relay.walletconnect.com",
-        metadata: AppMetadata(
+        metadata: const AppMetadata(
           name: 'Wallet',
           description: 'Wallet for WalletConnect',
           url: 'https://walletconnect.com/',
@@ -49,7 +49,6 @@ class _ExampleAppState extends State<ExampleApp> {
       );
 
       signClient.on(SignClientTypesEvent.SESSION_PROPOSAL.value, (event) async {
-        print('HALLA SESSION_PROPOSAL ${event.eventData}');
         await Future.delayed(const Duration(seconds: 3));
         final eventData = (event.eventData as Map<String, dynamic>);
         final id = eventData['id'] as int;
@@ -59,7 +58,7 @@ class _ExampleAppState extends State<ExampleApp> {
         final data = await signClient.approve(SessionApproveParams(
           id: id,
           namespaces: {
-            'eip155': SessionTypesNamespace(
+            'eip155': const SessionTypesNamespace(
               accounts: ["eip155:1:0x2Ee331840018465bD7Fe74aA4E442b9EA407fBBE"],
               methods: [
                 "personal_sign",
@@ -79,21 +78,24 @@ class _ExampleAppState extends State<ExampleApp> {
             ),
           },
         ));
-        print('HALLA APPROVE ${data.topic} ${data.acknowledged}');
+        debugPrint('Example: APPROVE ${data.topic} ${data.acknowledged}');
       });
       signClient.on(SignClientTypesEvent.SESSION_PING.value, (event) {
-        print('HALLA SESSION_PING ${event.eventData}');
+        debugPrint('Example: SESSION_PING ${event.eventData}');
       });
       signClient.on(SignClientTypesEvent.SESSION_REQUEST.value, (event) {
-        print('HALLA SESSION_REQUEST ${event.eventData}');
+        debugPrint('Example: SESSION_REQUEST ${event.eventData}');
       });
       signClient.on(SignClientTypesEvent.SESSION_EVENT.value, (event) {
-        print('HALLA SESSION_EVENT ${event.eventData}');
+        debugPrint('Example: SESSION_EVENT ${event.eventData}');
       });
 
       await signClient.pair(
-          'wc:22153f76e25f3018558e7a5d7727ecb9d5807b0fca6e63aeef094bff8b44deaa@2?relay-protocol=irn&symKey=1a968a5b11cf091cce258710ee2c4291e71a6963b318b12a8b43005f065151a3');
-    } catch (e) {}
+        'wc:22153f76e25f3018558e7a5d7727ecb9d5807b0fca6e63aeef094bff8b44deaa@2?relay-protocol=irn&symKey=1a968a5b11cf091cce258710ee2c4291e71a6963b318b12a8b43005f065151a3',
+      );
+    } catch (e) {
+      debugPrint('ERROR $e');
+    }
   }
 
   @override
@@ -106,12 +108,12 @@ class _ExampleAppState extends State<ExampleApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wallet Connect'),
+        title: const Text('Wallet Connect'),
       ),
       body: Center(
         child: TextButton(
           onPressed: () {},
-          child: Text('START'),
+          child: const Text('START'),
         ),
       ),
     );

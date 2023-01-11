@@ -89,7 +89,6 @@ class Engine with Events implements IEngine {
       engineEvent(EngineTypesEvent.SESSION_CONNECT),
       null,
       (event, _) async {
-        print('XTEST_SESSION_CONNECT ${event.eventName} ${event.eventData}');
         if (event.eventData is ErrorResponse) {
           completer.completeError(event.eventData.toString());
         } else if (event.eventData is SessionTypesStruct) {
@@ -188,7 +187,6 @@ class Engine with Events implements IEngine {
     events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId), null,
         (event, _) {
       // timer.cancel();
-      print('XTEST_APPROVE ${event.eventData}');
       if (event.eventData is ErrorResponse) {
         completer.completeError(event.eventData.toString());
       } else {
@@ -621,7 +619,6 @@ class Engine with Events implements IEngine {
 
         final payload =
             await client.core.crypto.decode(topic: topic, encoded: message);
-        Logger().i('DECODED $payload');
         if (isJsonRpcRequest(payload)) {
           client.core.history.set(topic: topic, request: payload);
           _onRelayEventRequest(topic, payload);
@@ -818,7 +815,6 @@ class Engine with Events implements IEngine {
         requiredNamespaces: null,
       );
       await _sendResult<ResultSessionSettle>(id, topic, true, (v) => v);
-      print('XTEST_SESSION_SETTLE $payload');
       events.emitData(
         engineEvent(EngineTypesEvent.SESSION_CONNECT),
         session,
