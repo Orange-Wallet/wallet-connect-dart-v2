@@ -259,7 +259,7 @@ void main() {
         // vi.useFakeTimers();
         // Fast-forward system time by 60 seconds after expiry was first set.
         // vi.setSystemTime(Date.now() + 60_000);
-        await Future.delayed(const Duration(milliseconds: 200));
+        await Future.delayed(const Duration(milliseconds: 500));
         await clients.clientA.extend(topic);
         // await acknowledged();
         final updatedExpiry = clients.clientA.session.get(topic).expiry;

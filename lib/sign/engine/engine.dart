@@ -467,7 +467,7 @@ class Engine with Events implements IEngine {
       client.core.expirer.del(topic);
     }
     await Future.wait([
-      // client.session.delete(topic, getSdkError(SdkErrorKey.USER_DISCONNECTED)),
+      client.session.delete(topic, getSdkError(SdkErrorKey.USER_DISCONNECTED)),
       client.core.crypto.deleteKeyPair(publicKey: session.self.publicKey),
       client.core.crypto.deleteSymKey(topic: topic),
     ]);
