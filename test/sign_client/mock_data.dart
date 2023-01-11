@@ -1,10 +1,10 @@
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 
-const TEST_RELAY_URL = "ws://0.0.0.0:5555";
+const TEST_RELAY_URL =
+    String.fromEnvironment('TEST_RELAY_URL', defaultValue: "ws://0.0.0.0:5555");
 
 const TEST_RELAY_URL_US = "wss://us-east-1.relay.walletconnect.com";
 const TEST_RELAY_URL_EU = "wss://eu-central-1.relay.walletconnect.com";

@@ -308,7 +308,7 @@ Future<Clients> initTwoClients() async {
   final clientA = await SignClient.init(
     name: "clientA",
     logLevel: Level.debug,
-    relayUrl: "ws://100.77.81.92:8080",
+    relayUrl: TEST_RELAY_URL,
     projectId: TEST_PROJECT_ID,
     database: ":memory:",
     metadata: TEST_APP_METADATA_A,
@@ -317,7 +317,7 @@ Future<Clients> initTwoClients() async {
   final clientB = await SignClient.init(
     name: "clientB",
     logLevel: Level.debug,
-    relayUrl: "ws://100.77.81.92:8080",
+    relayUrl: TEST_RELAY_URL,
     projectId: TEST_PROJECT_ID,
     database: ":memory:",
     metadata: TEST_APP_METADATA_B,
