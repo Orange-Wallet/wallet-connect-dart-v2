@@ -8,7 +8,7 @@ RelayerProtocolOptions parseRelayParams({
   String delimiter = "-",
 }) {
   final Map<String, dynamic> relay = {};
-  final prefix = "relay" + delimiter;
+  final prefix = 'relay$delimiter';
   params.keys.forEach((key) {
     if (key.startsWith(prefix)) {
       final name = key.replaceFirst(prefix, "");

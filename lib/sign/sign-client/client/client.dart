@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core.dart';
 import 'package:wallet_connect/core/i_core.dart';

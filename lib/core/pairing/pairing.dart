@@ -461,7 +461,7 @@ class Pairing with Events implements IPairing {
   _isValidPair(String uri) {
     if (!isValidUrl(uri)) {
       final error = getInternalError(InternalErrorKey.MISSING_OR_INVALID,
-          context: 'pair() uri: ${uri}');
+          context: 'pair() uri: $uri');
       throw WCException(error.message);
     }
   }

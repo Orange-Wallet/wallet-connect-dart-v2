@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
@@ -17,7 +16,6 @@ import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
-import 'package:wallet_connect/utils/timeout_completer.dart';
 import 'package:wallet_connect/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';

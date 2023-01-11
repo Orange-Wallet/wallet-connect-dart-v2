@@ -18,8 +18,10 @@ class KeyChain implements IKeyChain {
   bool _initialized = false;
   final _storagePrefix = CORE_STORAGE_PREFIX;
 
+  @override
   final ICore core;
 
+  @override
   final Logger logger;
 
   KeyChain({

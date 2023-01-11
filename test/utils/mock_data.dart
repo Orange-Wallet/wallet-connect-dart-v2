@@ -1,6 +1,5 @@
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/crypto/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
@@ -43,17 +42,15 @@ const TEST_SESSION_METADATA = AppMetadata(
 
 const TEST_ETHEREUM_NAMESPACE = "eip155";
 
-const TEST_ETHEREUM_CHAIN_A = '${TEST_ETHEREUM_NAMESPACE}:1';
+const TEST_ETHEREUM_CHAIN_A = '$TEST_ETHEREUM_NAMESPACE:1';
 
-const TEST_ETHEREUM_CHAIN_B = '${TEST_ETHEREUM_NAMESPACE}:137';
+const TEST_ETHEREUM_CHAIN_B = '$TEST_ETHEREUM_NAMESPACE:137';
 
 const TEST_ETHEREUM_ADDRESS = ["0x1d85568eEAbad713fBB5293B45ea066e552A90De"];
 
-final TEST_ETHEREUM_ACCOUNT_A =
-    '${TEST_ETHEREUM_CHAIN_A}:${TEST_ETHEREUM_ADDRESS}';
+final TEST_ETHEREUM_ACCOUNT_A = '$TEST_ETHEREUM_CHAIN_A:$TEST_ETHEREUM_ADDRESS';
 
-final TEST_ETHEREUM_ACCOUNT_B =
-    '${TEST_ETHEREUM_CHAIN_B}:${TEST_ETHEREUM_ADDRESS}';
+final TEST_ETHEREUM_ACCOUNT_B = '$TEST_ETHEREUM_CHAIN_B:$TEST_ETHEREUM_ADDRESS';
 
 const TEST_CHAINS = [TEST_ETHEREUM_CHAIN_A, TEST_ETHEREUM_CHAIN_B];
 

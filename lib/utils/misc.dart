@@ -17,7 +17,7 @@ String getJavascriptOS() {
   return "darwin-16.14.0"; // TODO: Remove
 }
 
-getJavascriptID() {
+String getJavascriptID() {
   // final env = getEnvironment();
   // return env === ENV_MAP.browser ? [env, getLocation()?.host || "unknown"].join(":") : env;
   return "node"; // TODO: Remove

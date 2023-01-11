@@ -12,7 +12,7 @@ class MessageTracker implements IMessageTracker {
   Map<String, MessageRecord> messages;
   @override
   final String name = MESSAGES_CONTEXT;
-  @override
+
   final String version = MESSAGES_STORAGE_VERSION;
 
   bool _initialized = false;
@@ -39,11 +39,11 @@ class MessageTracker implements IMessageTracker {
           messages = msgs;
         }
 
-        logger.d('Successfully Restored records for ${name}');
+        logger.d('Successfully Restored records for $name');
         logger.i(
             {'type': "method", 'method': "restore", 'size': messages.length});
       } catch (e) {
-        logger.d('Failed to Restore records for ${name}');
+        logger.d('Failed to Restore records for $name');
         logger.e(e.toString());
       } finally {
         _initialized = true;

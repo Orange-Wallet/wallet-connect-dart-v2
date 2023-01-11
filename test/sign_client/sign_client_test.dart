@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
+import 'package:test/test.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/client.dart';
@@ -74,11 +74,11 @@ void main() {
           final reason = getSdkError(SdkErrorKey.USER_DISCONNECTED);
           await clients.clientA.disconnect(topic: topic, reason: reason);
           expect(() => clients.clientA.pairing.get(topic),
-              throwsA(WCException('No matching key. pairing: ${topic}')));
+              throwsA(WCException('No matching key. pairing: $topic')));
           expect(
             () => clients.clientA.ping(topic),
             throwsA(WCException(
-                'No matching key. session or pairing topic doesn\'t exist: ${topic}')),
+                'No matching key. session or pairing topic doesn\'t exist: $topic')),
           );
           await disconnectClients([clients.clientA, clients.clientB]);
         });
@@ -95,11 +95,11 @@ void main() {
           final reason = getSdkError(SdkErrorKey.USER_DISCONNECTED);
           await clients.clientA.disconnect(topic: topic, reason: reason);
           expect(() => clients.clientA.session.get(topic),
-              throwsA(WCException('No matching key. session: ${topic}')));
+              throwsA(WCException('No matching key. session: $topic')));
           expect(
             () => clients.clientA.ping(topic),
             throwsA(WCException(
-                'No matching key. session or pairing topic doesn\'t exist: ${topic}')),
+                'No matching key. session or pairing topic doesn\'t exist: $topic')),
           );
           await disconnectClients([clients.clientA, clients.clientB]);
         });
@@ -114,7 +114,7 @@ void main() {
         expect(
             () => clients.clientA.ping(fakeTopic),
             throwsA(WCException(
-              'No matching key. session or pairing topic doesn\'t exist: ${fakeTopic}',
+              'No matching key. session or pairing topic doesn\'t exist: $fakeTopic',
             )));
         await disconnectClients([clients.clientA, clients.clientB]);
       });

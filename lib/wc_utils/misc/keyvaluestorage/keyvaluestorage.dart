@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/types.dart';
 

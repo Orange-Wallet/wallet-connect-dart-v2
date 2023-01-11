@@ -2,7 +2,7 @@ const CORE_PROTOCOL = "wc";
 const CORE_VERSION = 2;
 const CORE_CONTEXT = "core";
 
-const CORE_STORAGE_PREFIX = '${CORE_PROTOCOL}@${CORE_VERSION}:${CORE_CONTEXT}:';
+const CORE_STORAGE_PREFIX = '$CORE_PROTOCOL@$CORE_VERSION:$CORE_CONTEXT:';
 
 class CoreDefault {
   CoreDefault._();

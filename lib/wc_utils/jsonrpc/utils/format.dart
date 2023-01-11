@@ -55,20 +55,20 @@ ErrorResponse formatErrorMessage({dynamic error, String? data}) {
   if (error == null) {
     return getError(INTERNAL_ERROR);
   }
-  ErrorResponse? _error;
+  ErrorResponse? errResponse;
   if (error is String) {
-    _error = getError(SERVER_ERROR).copyWith(
+    errResponse = getError(SERVER_ERROR).copyWith(
       message: error,
     );
   } else if (error is ErrorResponse) {
-    _error = error;
+    errResponse = error;
   }
 
   if (data != null) {
-    _error = _error!.copyWith(data: data);
+    errResponse = errResponse!.copyWith(data: data);
   }
-  if (isReservedErrorCode(_error!.code)) {
-    _error = getErrorByCode(_error.code);
+  if (isReservedErrorCode(errResponse!.code)) {
+    errResponse = getErrorByCode(errResponse.code);
   }
-  return _error;
+  return errResponse;
 }

@@ -1,13 +1,13 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/history/constants.dart';
 import 'package:wallet_connect/core/history/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-class JsonRpcHistory extends IJsonRpcHistory {
+class JsonRpcHistory with Events implements IJsonRpcHistory {
   @override
   Map<int, JsonRpcRecord> records = {};
 
@@ -173,7 +173,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
     if (record == null) {
       final error = getInternalError(
         InternalErrorKey.NO_MATCHING_KEY,
-        context: '${name}: ${id}',
+        context: '$name: ${id}',
       );
       throw WCException(error.message);
     }
@@ -198,10 +198,10 @@ class JsonRpcHistory extends IJsonRpcHistory {
         throw WCException(error.message);
       }
       cached = persisted;
-      logger.d('Successfully Restored records for ${name}');
+      logger.d('Successfully Restored records for $name');
       logger.i({'type': "method", 'method': "_restore", records: values});
     } catch (e) {
-      logger.d('Failed to Restore records for ${name}');
+      logger.d('Failed to Restore records for $name');
       logger.e(e.toString());
     }
   }
@@ -210,7 +210,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
     events.on(HistoryEvents.created, null, (event, _) {
       const eventName = HistoryEvents.created;
       final record = event.eventData as JsonRpcRecord;
-      logger.i('Emitting ${eventName}');
+      logger.i('Emitting $eventName');
       logger
           .d({'type': "event", 'event': eventName, 'record': record.toJson()});
       _persist();
@@ -218,7 +218,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
     events.on(HistoryEvents.updated, null, (event, _) {
       const eventName = HistoryEvents.updated;
       final record = event.eventData as JsonRpcRecord;
-      logger.i('Emitting ${eventName}');
+      logger.i('Emitting $eventName');
       logger
           .d({'type': "event", 'event': eventName, 'record': record.toJson()});
       _persist();
@@ -227,7 +227,7 @@ class JsonRpcHistory extends IJsonRpcHistory {
     events.on(HistoryEvents.deleted, null, (event, _) {
       const eventName = HistoryEvents.deleted;
       final record = event.eventData as JsonRpcRecord;
-      logger.i('Emitting ${eventName}');
+      logger.i('Emitting $eventName');
       logger
           .d({'type': "event", 'event': eventName, 'record': record.toJson()});
       _persist();

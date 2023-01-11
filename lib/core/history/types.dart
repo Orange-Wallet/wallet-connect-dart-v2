@@ -55,7 +55,7 @@ class RequestEvent {
   });
 }
 
-abstract class IJsonRpcHistory {
+abstract class IJsonRpcHistory with IEvents {
   Map<int, JsonRpcRecord> get records;
 
   int get size;

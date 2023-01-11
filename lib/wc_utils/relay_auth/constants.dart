@@ -1,5 +1,3 @@
-import 'package:wallet_connect/wc_utils/relay_auth/types.dart';
-
 // ---------- JWT ----------------------------------------------- //
 
 const JWT_IRIDIUM_ALG = "EdDSA";

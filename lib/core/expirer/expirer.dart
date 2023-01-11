@@ -1,8 +1,8 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -62,7 +62,7 @@ class Expirer with Events implements IExpirer {
   List<ExpirerTypesExpiration> get values => expirations.values.toList();
 
   @override
-  has(key) {
+  bool has(key) {
     try {
       final target = _formatTarget(key);
       final expiration = _getExpiration(target);
@@ -73,7 +73,7 @@ class Expirer with Events implements IExpirer {
   }
 
   @override
-  set(key, expiry) {
+  void set(key, expiry) {
     _isInitialized();
     final target = _formatTarget(key);
     final expiration = ExpirerTypesExpiration(target: target, expiry: expiry);
@@ -88,14 +88,14 @@ class Expirer with Events implements IExpirer {
   }
 
   @override
-  get(key) {
+  ExpirerTypesExpiration get(key) {
     _isInitialized();
     final target = _formatTarget(key);
     return _getExpiration(target);
   }
 
   @override
-  del(key) {
+  void del(key) {
     _isInitialized();
     final target = _formatTarget(key);
     final exists = has(target);
@@ -113,7 +113,7 @@ class Expirer with Events implements IExpirer {
 
   // ---------- Private ----------------------------------------------- //
 
-  _formatTarget(dynamic key) {
+  String _formatTarget(dynamic key) {
     if (key is String) {
       return formatTopicTarget(key);
     } else if (key is int) {
@@ -137,12 +137,12 @@ class Expirer with Events implements IExpirer {
     return expirations;
   }
 
-  _persist() async {
+  Future<void> _persist() async {
     await _setExpirations(values);
     events.emitData(ExpirerEvents.sync);
   }
 
-  _restore() async {
+  Future<void> _restore() async {
     try {
       final persisted = await _getExpirations();
       if (persisted?.isEmpty ?? true) return;
@@ -232,7 +232,7 @@ class Expirer with Events implements IExpirer {
     });
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);

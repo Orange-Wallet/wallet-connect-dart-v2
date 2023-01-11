@@ -6,13 +6,12 @@ import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/relay.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
-import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';
 
 class Publisher implements IPublisher {
-  @override
-  final EventSubject events;
+  // @override
+  // final EventSubject events;
   @override
   final String name = PUBLISHER_CONTEXT;
   @override
@@ -21,7 +20,8 @@ class Publisher implements IPublisher {
   final Logger logger;
 
   Publisher({required this.relayer, Logger? logger})
-      : events = EventSubject(),
+      :
+        // events = EventSubject(),
         logger = logger ?? Logger() {
     _registerEventListeners();
   }
@@ -127,7 +127,4 @@ class Publisher implements IPublisher {
       _checkQueue();
     });
   }
-
-  @override
-  void on(String event, void Function(dynamic data) callback) {}
 }

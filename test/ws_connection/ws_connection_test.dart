@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:wallet_connect/utils/crypto.dart' as crypto;
 import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/ws-connection/ws.dart';

@@ -1,6 +1,7 @@
 import 'dart:convert';
+
 import 'package:convert/convert.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';

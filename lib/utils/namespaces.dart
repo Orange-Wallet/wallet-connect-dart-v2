@@ -35,8 +35,9 @@ List<String> getNamespacesMethodsForChainId(
     if (namespace.extension != null) {
       namespace.extension!.forEach((extension) {
         final extensionChains = getAccountsChains(extension.accounts);
-        if (extensionChains.contains(chainId))
+        if (extensionChains.contains(chainId)) {
           methods.addAll(extension.methods);
+        }
       });
     }
   });

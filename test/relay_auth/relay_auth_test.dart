@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart';
 
 import 'mock_data.dart';
@@ -53,14 +53,6 @@ void main() {
       expect(jwt, EXPECTED_JWT);
       final verified = await verifyJWT(jwt);
       expect(verified, true);
-      // final decoded = didJWT.decodeJWT(jwt);
-      // chai.expect(decoded).to.eql(EXPECTED_DECODED);
-
-      // FIXME: currently errors with 'Unknown file extension ".ts"'
-      // const resolver = new Resolver(KeyDIDResolver.getResolver());
-      // const response = await didJWT.verifyJWT(jwt, { resolver });
-      // // eslint-disable-next-line
-      // console.log("response", response);
     });
   });
 }
