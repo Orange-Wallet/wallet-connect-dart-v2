@@ -17,8 +17,10 @@ import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';
 
 class Subscriber with Events implements ISubscriber {
+  @override
   final Map<String, SubscriberTypesActive> subscriptions;
 
+  @override
   final ISubscriberTopicMap topicMap;
 
   @override
@@ -28,15 +30,17 @@ class Subscriber with Events implements ISubscriber {
 
   final Map<String, SubscriberTypesParams> pending;
 
+  @override
   final IRelayer relayer;
 
+  @override
   final Logger logger;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
-  List<SubscriberTypesActive> _cached = [];
-  bool _initialized = false;
+  List<SubscriberTypesActive> _cached;
+  bool _initialized;
 
   final int _pendingSubInterval = 20;
   final String _storagePrefix = CORE_STORAGE_PREFIX;
@@ -49,8 +53,10 @@ class Subscriber with Events implements ISubscriber {
         name = SUBSCRIBER_CONTEXT,
         version = SUBSCRIBER_STORAGE_VERSION,
         pending = {},
-        events = EventSubject(),
-        logger = logger ?? Logger();
+        events = EventEmitter(),
+        logger = logger ?? Logger(),
+        _cached = [],
+        _initialized = false;
 
   @override
   Future<void> init() async {
@@ -71,10 +77,10 @@ class Subscriber with Events implements ISubscriber {
   List<String> get ids => subscriptions.keys.toList();
 
   @override
-  get values => subscriptions.values.toList();
+  List<SubscriberTypesActive> get values => subscriptions.values.toList();
 
   @override
-  get topics => topicMap.topics;
+  List<String> get topics => topicMap.topics;
 
   @override
   Future<String> subscribe(
@@ -83,7 +89,7 @@ class Subscriber with Events implements ISubscriber {
   }) async {
     _isInitialized();
     logger.d('Subscribing Topic');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "subscribe",
       'params': {topic, opts}
@@ -95,7 +101,7 @@ class Subscriber with Events implements ISubscriber {
       final id = await _rpcSubscribe(topic, relay);
       _onSubscribe(id, params);
       logger.d('Successfully Subscribed Topic');
-      logger.i({
+      logger.v({
         'type': "method",
         'method': "subscribe",
         'params': {topic, opts}
@@ -161,19 +167,19 @@ class Subscriber with Events implements ISubscriber {
     return result;
   }
 
-  _onEnable() {
+  void _onEnable() {
     _cached = [];
     _initialized = true;
   }
 
-  _onDisable() {
+  void _onDisable() {
     _cached = values;
     subscriptions.clear();
     topicMap.clear();
     _initialized = false;
   }
 
-  _unsubscribeByTopic(
+  Future<void> _unsubscribeByTopic(
     String topic, {
     RelayerUnsubscribeOptions? opts,
   }) async {
@@ -181,13 +187,13 @@ class Subscriber with Events implements ISubscriber {
     await Future.wait(ids.map((id) => _unsubscribeById(topic, id, opts: opts)));
   }
 
-  _unsubscribeById(
+  Future<void> _unsubscribeById(
     String topic,
     String id, {
     RelayerUnsubscribeOptions? opts,
   }) async {
     logger.d('Unsubscribing Topic');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "unsubscribe",
       'params': {topic, id, opts}
@@ -199,7 +205,7 @@ class Subscriber with Events implements ISubscriber {
           getSdkError(SdkErrorKey.USER_DISCONNECTED, context: '$name, $topic');
       await _onUnsubscribe(topic, id, reason);
       logger.d('Successfully Unsubscribed Topic');
-      logger.i({
+      logger.v({
         'type': "method",
         'method': "unsubscribe",
         'params': {topic, id, opts}
@@ -211,7 +217,7 @@ class Subscriber with Events implements ISubscriber {
     }
   }
 
-  _rpcSubscribe(String topic, RelayerProtocolOptions relay) {
+  Future<dynamic> _rpcSubscribe(String topic, RelayerProtocolOptions relay) {
     final api = getRelayProtocolApi(relay.protocol);
     final request = RequestArguments<RelayJsonRpcSubscribeParams>(
       method: api.subscribe,
@@ -219,7 +225,7 @@ class Subscriber with Events implements ISubscriber {
       paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
-    logger.i({
+    logger.v({
       'type': "payload",
       'direction': "outgoing",
       'request': request.toJson(),
@@ -228,7 +234,8 @@ class Subscriber with Events implements ISubscriber {
         .request<RelayJsonRpcSubscribeParams>(request: request);
   }
 
-  _rpcUnsubscribe(String topic, String id, RelayerProtocolOptions relay) {
+  Future<dynamic> _rpcUnsubscribe(
+      String topic, String id, RelayerProtocolOptions relay) {
     final api = getRelayProtocolApi(relay.protocol);
     final request = RequestArguments<RelayJsonRpcUnsubscribeParams>(
       method: api.unsubscribe,
@@ -239,7 +246,7 @@ class Subscriber with Events implements ISubscriber {
       paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
-    logger.i({
+    logger.v({
       'type': "payload",
       'direction': "outgoing",
       'request': request.toJson()
@@ -247,7 +254,7 @@ class Subscriber with Events implements ISubscriber {
     return relayer.provider.request(request: request);
   }
 
-  _onSubscribe(String id, SubscriberTypesParams params) {
+  void _onSubscribe(String id, SubscriberTypesParams params) {
     _setSubscription(
         id,
         SubscriberTypesActive(
@@ -258,7 +265,7 @@ class Subscriber with Events implements ISubscriber {
     pending.remove(params.topic);
   }
 
-  _onResubscribe(String id, SubscriberTypesParams params) {
+  void _onResubscribe(String id, SubscriberTypesParams params) {
     _addSubscription(
         id,
         SubscriberTypesActive(
@@ -269,22 +276,24 @@ class Subscriber with Events implements ISubscriber {
     pending.remove(params.topic);
   }
 
-  _onUnsubscribe(String topic, String id, ErrorResponse reason) async {
-    // events.removeAllListeners(id); TODO
+  Future<void> _onUnsubscribe(
+      String topic, String id, ErrorResponse reason) async {
+    events.removeAllByEvent(id);
     if (_hasSubscription(id, topic)) {
       _deleteSubscription(id, reason);
     }
     await relayer.messages.del(topic);
   }
 
-  _setRelayerSubscriptions(List<SubscriberTypesActive> subscriptions) async {
+  Future<void> _setRelayerSubscriptions(
+      List<SubscriberTypesActive> subscriptions) async {
     await relayer.core.storage.setItem<List<SubscriberTypesActive>>(
       storageKey,
       subscriptions,
     );
   }
 
-  _getRelayerSubscriptions() async {
+  Future<List<SubscriberTypesActive>?> _getRelayerSubscriptions() async {
     final subscriptions =
         await relayer.core.storage.getItem<List<SubscriberTypesActive>>(
       storageKey,
@@ -292,10 +301,10 @@ class Subscriber with Events implements ISubscriber {
     return subscriptions;
   }
 
-  _setSubscription(String id, SubscriberTypesActive subscription) {
+  void _setSubscription(String id, SubscriberTypesActive subscription) {
     if (subscriptions.containsKey(id)) return;
     logger.d('Setting subscription');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "setSubscription",
       'id': id,
@@ -304,36 +313,38 @@ class Subscriber with Events implements ISubscriber {
     _addSubscription(id, subscription);
   }
 
-  _addSubscription(String id, SubscriberTypesActive subscription) {
+  void _addSubscription(String id, SubscriberTypesActive subscription) {
     subscriptions[id] = subscription;
     topicMap.set(subscription.topic, id);
-    events.emitData(SubscriberEvents.created, subscription);
+    events.emit(SubscriberEvents.created, subscription);
   }
 
-  _getSubscription(String id) {
+  SubscriberTypesActive _getSubscription(String id) {
     logger.d('Getting subscription');
-    logger.i({'type': "method", 'method': "getSubscription", 'id': id});
+    logger.v({'type': "method", 'method': "getSubscription", 'id': id});
     final subscription = subscriptions[id];
     if (subscription == null) {
-      final error = getInternalError(InternalErrorKey.NO_MATCHING_KEY,
-          context: '$name: $id');
+      final error = getInternalError(
+        InternalErrorKey.NO_MATCHING_KEY,
+        context: '$name: $id',
+      );
       throw WCException(error.message);
     }
     return subscription;
   }
 
-  _deleteSubscription(String id, ErrorResponse reason) {
+  void _deleteSubscription(String id, ErrorResponse reason) {
     logger.d('Deleting subscription');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "deleteSubscription",
       'id': id,
-      'reason': reason
+      'reason': reason.toJson(),
     });
     final subscription = _getSubscription(id);
     subscriptions.remove(id);
     topicMap.delete(topic: subscription.topic, id: id);
-    events.emitData(
+    events.emit(
         SubscriberEvents.deleted,
         SubscriberEventsDeleted(
           id: id,
@@ -343,46 +354,45 @@ class Subscriber with Events implements ISubscriber {
         ));
   }
 
-  _restart() async {
+  Future<void> _restart() async {
     await _restore();
     await _reset();
   }
 
-  _persist() async {
+  Future<void> _persist() async {
     await _setRelayerSubscriptions(values);
-    events.emitData(SubscriberEvents.sync);
+    events.emit(SubscriberEvents.sync);
   }
 
-  _reset() async {
+  Future<void> _reset() async {
     if (_cached.isNotEmpty) {
       await Future.wait(
         _cached.map((subscription) => _resubscribe(subscription)),
       );
     }
-    events.emitData(SubscriberEvents.resubscribed);
+    events.emit(SubscriberEvents.resubscribed);
   }
 
-  _restore() async {
+  Future<void> _restore() async {
     try {
       final persisted = await _getRelayerSubscriptions();
-      if (persisted == null) return;
-      if (!persisted.length) return;
+      if (persisted?.isEmpty ?? true) return;
       if (subscriptions.isNotEmpty) {
         final error = getInternalError(InternalErrorKey.RESTORE_WILL_OVERRIDE,
             context: name);
         logger.e(error.message);
         throw WCException(error.message);
       }
-      _cached = persisted;
+      _cached = persisted!;
       logger.d('Successfully Restored subscriptions for $name');
-      logger.i({'type': "method", 'method': "restore", subscriptions: values});
+      logger.v({'type': "method", 'method': "restore", subscriptions: values});
     } catch (e) {
       logger.d('Failed to Restore subscriptions for $name');
       logger.e(e.toString());
     }
   }
 
-  _resubscribe(SubscriberTypesActive subscription) async {
+  Future<void> _resubscribe(SubscriberTypesActive subscription) async {
     if (!ids.contains(subscription.id)) {
       final params = SubscriberTypesParams(
           relay: subscription.relay, topic: subscription.topic);
@@ -392,16 +402,16 @@ class Subscriber with Events implements ISubscriber {
     }
   }
 
-  _onConnect() async {
+  Future<void> _onConnect() async {
     await _restart();
     _onEnable();
   }
 
-  _onDisconnect() {
+  void _onDisconnect() {
     _onDisable();
   }
 
-  _checkPending() {
+  void _checkPending() {
     if (relayer.transportExplicitlyClosed) {
       return;
     }
@@ -411,7 +421,7 @@ class Subscriber with Events implements ISubscriber {
     });
   }
 
-  _registerEventListeners() {
+  void _registerEventListeners() {
     relayer.core.heartbeat.on(HeartbeatEvents.pulse, (_) {
       _checkPending();
     });
@@ -421,21 +431,21 @@ class Subscriber with Events implements ISubscriber {
     relayer.provider.on(RelayerProviderEvents.disconnect, (_) async {
       _onDisconnect();
     });
-    events.on(SubscriberEvents.created, null, (createdEvent, _) async {
+    events.on(SubscriberEvents.created, (createdEvent) async {
       const eventName = SubscriberEvents.created;
       logger.i('Emitting $eventName');
-      logger.d({'type': "event", 'event': eventName, 'data': createdEvent});
+      logger.v({'type': "event", 'event': eventName, 'data': createdEvent});
       await _persist();
     });
-    events.on(SubscriberEvents.deleted, null, (deletedEvent, _) async {
+    events.on(SubscriberEvents.deleted, (deletedEvent) async {
       const eventName = SubscriberEvents.deleted;
       logger.i('Emitting $eventName');
-      logger.d({'type': "event", 'event': eventName, 'data': deletedEvent});
+      logger.v({'type': "event", 'event': eventName, 'data': deletedEvent});
       await _persist();
     });
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);

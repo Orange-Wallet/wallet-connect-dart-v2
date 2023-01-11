@@ -15,10 +15,6 @@ dependencies:
   json_annotation: ^4.7.0
   web_socket_channel: ^2.2.0
   logger: ^1.1.0
-  eventify:
-    git:
-      url: https://github.com/thelazyindian/EventEmitter.git
-      ref: master
   convert: ^3.1.1
   cryptography: ^2.0.5
   hive: ^2.2.3

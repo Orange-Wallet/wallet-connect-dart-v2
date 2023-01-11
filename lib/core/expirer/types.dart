@@ -1,4 +1,5 @@
 import 'package:logger/logger.dart';
+
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
@@ -10,6 +11,10 @@ class ExpirerTypesExpiration {
     required this.target,
     required this.expiry,
   });
+
+  @override
+  String toString() =>
+      'ExpirerTypesExpiration(target: $target, expiry: $expiry)';
 }
 
 class ExpirerTypesCreated {

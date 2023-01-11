@@ -31,7 +31,7 @@ class SignClient with Events implements ISignClient {
   @override
   final Logger logger;
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
   @override
   late final IEngine engine;
   @override
@@ -50,7 +50,7 @@ class SignClient with Events implements ISignClient {
     Level? logLevel,
     String? database,
   })  : name = name ?? SignClientDefault.name,
-        events = EventSubject(),
+        events = EventEmitter(),
         core = core ??
             Core(
               projectId: projectId,

@@ -61,7 +61,7 @@ class Relayer with Events implements IRelayer {
   IJsonRpcProvider get provider => _provider!;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   bool _initialized = false;
 
@@ -70,7 +70,7 @@ class Relayer with Events implements IRelayer {
     Logger? logger,
     String? relayUrl,
     this.projectId,
-  })  : events = EventSubject(),
+  })  : events = EventEmitter(),
         logger = logger ?? Logger(),
         relayUrl = relayUrl ?? RELAYER_DEFAULT_RELAY_URL,
         messages = MessageTracker(core: core, logger: logger),
@@ -199,7 +199,7 @@ class Relayer with Events implements IRelayer {
       logger.d('Emitting Relayer Payload');
       logger.i(
           {'type': "event", 'event': event.id, 'messageEvent': messageEvent});
-      events.emitData(event.id, messageEvent);
+      events.emit(event.id, messageEvent);
       await _acknowledgePayload<RelayJsonRpcSubscriptionParams>(payloadObj);
       await _onMessageEvent(messageEvent);
     }
@@ -207,7 +207,7 @@ class Relayer with Events implements IRelayer {
 
   _onMessageEvent(RelayerMessageEvent messageEvent) async {
     if (await _shouldIgnoreMessageEvent(messageEvent)) return;
-    events.emitData(RelayerEvents.message, messageEvent);
+    events.emit(RelayerEvents.message, messageEvent);
     await _recordMessageEvent(messageEvent);
   }
 
@@ -223,18 +223,18 @@ class Relayer with Events implements IRelayer {
   _registerEventListeners() {
     provider.on(
       RelayerProviderEvents.payload,
-      (payload) => _onProviderPayload(payload.eventData),
+      (payload) => _onProviderPayload(payload),
     );
     provider.on(RelayerProviderEvents.connect, (_) {
-      events.emitData(RelayerEvents.connect);
+      events.emit(RelayerEvents.connect);
     });
     provider.on(RelayerProviderEvents.disconnect, (_) {
-      events.emitData(RelayerEvents.disconnect);
+      events.emit(RelayerEvents.disconnect);
       _attemptToReconnect();
     });
     provider.on(
       RelayerProviderEvents.error,
-      (event) => events.emitData(RelayerEvents.error, event.eventData),
+      (error) => events.emit(RelayerEvents.error, error),
     );
   }
 

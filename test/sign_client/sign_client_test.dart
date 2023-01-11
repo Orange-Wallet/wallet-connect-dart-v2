@@ -183,7 +183,7 @@ void main() {
                   final params = pendingRequests[0].params;
                   final topic = pendingRequests[0].topic;
                   final id = pendingRequests[0].id;
-                  final args = event.eventData as Map<String, dynamic>;
+                  final args = event as Map<String, dynamic>;
                   expect(params.toJson(), equals(args['params']));
                   expect(topic, equals(args['topic']));
                   expect(id, equals(args['id']));
@@ -368,7 +368,7 @@ Future<Connection> testConnectMethod({
 
   final resolveSessionProposal = Completer<void>();
   clientB.once(SignClientTypesEvent.SESSION_PROPOSAL.value, (event) async {
-    final proposal = event.eventData as Map<String, dynamic>;
+    final proposal = event as Map<String, dynamic>;
 
     final ProposalTypesRequiredNamespaces reqNamespaces = (proposal['params']
             ['requiredNamespaces'] as Map<String, dynamic>)

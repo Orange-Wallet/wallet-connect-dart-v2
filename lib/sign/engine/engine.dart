@@ -16,6 +16,7 @@ import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
+import 'package:wallet_connect/utils/timeout_completer.dart';
 import 'package:wallet_connect/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -27,15 +28,18 @@ class Engine with Events implements IEngine {
   final String name = ENGINE_CONTEXT;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
-  bool _initialized = false;
-  List<int> ignoredPayloadTypes = [TYPE_1];
+  bool _initialized;
+  List<int> _ignoredPayloadTypes;
 
   @override
   final ISignClient client;
 
-  Engine({required this.client}) : events = EventSubject();
+  Engine({required this.client})
+      : events = EventEmitter(),
+        _initialized = false,
+        _ignoredPayloadTypes = [TYPE_1];
 
   @override
   Future<void> init() async {
@@ -85,12 +89,11 @@ class Engine with Events implements IEngine {
     final completer = Completer<SessionTypesStruct>();
     events.once(
       engineEvent(EngineTypesEvent.SESSION_CONNECT),
-      null,
-      (event, _) async {
-        if (event.eventData is ErrorResponse) {
-          completer.completeError(event.eventData.toString());
-        } else if (event.eventData is SessionTypesStruct) {
-          final session = event.eventData as SessionTypesStruct;
+      (data) async {
+        if (data is ErrorResponse) {
+          completer.completeError(data.toString());
+        } else if (data is SessionTypesStruct) {
+          final SessionTypesStruct session = data;
           final completeSession = session.copyWith(
             self: session.self.copyWith(publicKey: publicKey),
             requiredNamespaces: params.requiredNamespaces,
@@ -181,12 +184,12 @@ class Engine with Events implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<SessionTypesStruct>();
-    // final timer = completer.expirer();
-    events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId), null,
-        (event, _) {
-      // timer.cancel();
-      if (event.eventData is ErrorResponse) {
-        completer.completeError(event.eventData.toString());
+    final timer = completer.expirer();
+    events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId),
+        (data) {
+      timer.cancel();
+      if (data is ErrorResponse) {
+        completer.completeError(data);
       } else {
         completer.complete(client.session.get(sessionTopic));
       }
@@ -267,12 +270,11 @@ class Engine with Events implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<void>();
-    // final timer = completer.expirer();
-    events.once(engineEvent(EngineTypesEvent.SESSION_UPDATE, id), null,
-        (event, _) {
-      // timer.cancel();
-      if (event.eventData is ErrorResponse) {
-        completer.completeError(event.eventData as ErrorResponse);
+    final timer = completer.expirer();
+    events.once(engineEvent(EngineTypesEvent.SESSION_UPDATE, id), (data) {
+      timer.cancel();
+      if (data is ErrorResponse) {
+        completer.completeError(data);
       } else {
         completer.complete();
       }
@@ -296,14 +298,13 @@ class Engine with Events implements IEngine {
       (v) => v,
     );
     final completer = Completer<void>();
-    // final timer = completer.expirer();
+    final timer = completer.expirer();
     events.once(
       engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
-      null,
-      (event, _) {
-        // timer.cancel();
-        if (event.eventData is ErrorResponse) {
-          completer.completeError(event.eventData as ErrorResponse);
+      (data) {
+        timer.cancel();
+        if (data is ErrorResponse) {
+          completer.completeError(data);
         } else {
           completer.complete();
         }
@@ -328,16 +329,15 @@ class Engine with Events implements IEngine {
       (v) => v.toJson(),
     );
     final completer = Completer<T>();
-    // final timer = completer.expirer();
+    final timer = completer.expirer();
     events.once(
       engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
-      null,
-      (event, _) {
-        // timer.cancel();
-        if (event.eventData is ErrorResponse) {
-          completer.completeError(event.eventData as ErrorResponse);
+      (data) {
+        timer.cancel();
+        if (data is ErrorResponse) {
+          completer.completeError(data);
         } else {
-          completer.complete(event.eventData as T);
+          completer.complete(data as T);
         }
       },
     );
@@ -381,14 +381,13 @@ class Engine with Events implements IEngine {
         (v) => v,
       );
       final completer = Completer<void>();
-      // final timer = completer.expirer();
+      final timer = completer.expirer();
       events.once(
         engineEvent(EngineTypesEvent.SESSION_PING, id),
-        null,
-        (event, _) {
-          // timer.cancel();
-          if (event.eventData is ErrorResponse) {
-            completer.completeError(event.eventData as ErrorResponse);
+        (data) {
+          timer.cancel();
+          if (data is ErrorResponse) {
+            completer.completeError(data);
           } else {
             completer.complete();
           }
@@ -602,13 +601,13 @@ class Engine with Events implements IEngine {
   // ---------- Relay Events Router ----------------------------------- //
 
   _registerRelayerEvents() {
-    client.core.relayer.on(RelayerEvents.message, (event) async {
-      if (event.eventData is RelayerMessageEvent) {
-        final topic = (event.eventData as RelayerMessageEvent).topic;
-        final message = (event.eventData as RelayerMessageEvent).message;
+    client.core.relayer.on(RelayerEvents.message, (data) async {
+      if (data is RelayerMessageEvent) {
+        final topic = data.topic;
+        final message = data.message;
 
         // messages of certain types should be ignored as they are handled by their respective SDKs
-        if (ignoredPayloadTypes
+        if (_ignoredPayloadTypes
             .contains(client.core.crypto.getPayloadType(message))) {
           return;
         }
@@ -707,7 +706,7 @@ class Engine with Events implements IEngine {
         pairingTopic: topic,
       );
       await _setProposal(request.id.toString(), proposal);
-      client.events.emitData(
+      client.events.emit(
         SignClientTypesEvent.SESSION_PROPOSAL.value,
         {
           'id': id,
@@ -774,7 +773,7 @@ class Engine with Events implements IEngine {
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
       );
       final errorPayload = JsonRpcError.fromJson(payload);
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_CONNECT),
         errorPayload.error,
       );
@@ -808,10 +807,9 @@ class Engine with Events implements IEngine {
           publicKey: request.params!.controller.publicKey,
           metadata: request.params!.controller.metadata,
         ),
-        requiredNamespaces: null,
       );
       await _sendResult<ResultSessionSettle>(id, topic, true, (v) => v);
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_CONNECT),
         session,
       );
@@ -831,13 +829,13 @@ class Engine with Events implements IEngine {
         topic,
         (session) => session.copyWith(acknowledged: true),
       );
-      events.emitData(engineEvent(EngineTypesEvent.SESSION_APPROVE, id));
+      events.emit(engineEvent(EngineTypesEvent.SESSION_APPROVE, id));
     } else if (isJsonRpcError(payload)) {
       await client.session.delete(
         topic,
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
       );
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_APPROVE, id),
         JsonRpcError.fromJson(payload).error,
       );
@@ -861,7 +859,7 @@ class Engine with Events implements IEngine {
         (session) => session.copyWith(namespaces: params.namespaces),
       );
       await _sendResult(id, topic, true, (v) => v);
-      client.events.emitData("session_update", {
+      client.events.emit("session_update", {
         'id': id,
         'topic': topic,
         'params': params.toJson(),
@@ -878,9 +876,9 @@ class Engine with Events implements IEngine {
   ) {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
-      events.emitData(engineEvent(EngineTypesEvent.SESSION_UPDATE, id));
+      events.emit(engineEvent(EngineTypesEvent.SESSION_UPDATE, id));
     } else if (isJsonRpcError(payload)) {
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_UPDATE, id),
         JsonRpcError.fromJson(payload).error,
       );
@@ -896,7 +894,7 @@ class Engine with Events implements IEngine {
       _isValidExtend(topic);
       await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
       await _sendResult(id, topic, true, (v) => v);
-      client.events.emitData(SignClientTypesEvent.SESSION_EXTEND.value, {
+      client.events.emit(SignClientTypesEvent.SESSION_EXTEND.value, {
         'id': id,
         'topic': topic,
       });
@@ -912,9 +910,9 @@ class Engine with Events implements IEngine {
   ) {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
-      events.emitData(engineEvent(EngineTypesEvent.SESSION_EXTEND, id));
+      events.emit(engineEvent(EngineTypesEvent.SESSION_EXTEND, id));
     } else if (isJsonRpcError(payload)) {
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
         JsonRpcError.fromJson(payload).error,
       );
@@ -929,7 +927,7 @@ class Engine with Events implements IEngine {
     try {
       _isValidPing(topic);
       await _sendResult<bool>(id, topic, true, (v) => v);
-      client.events.emitData(SignClientTypesEvent.SESSION_PING.value, {
+      client.events.emit(SignClientTypesEvent.SESSION_PING.value, {
         'id': id,
         'topic': topic,
       });
@@ -948,9 +946,9 @@ class Engine with Events implements IEngine {
     // where session_ping listener is not yet _initialized
     Timer(const Duration(milliseconds: 500), () {
       if (isJsonRpcResult(payload)) {
-        events.emitData(engineEvent(EngineTypesEvent.SESSION_PING, id));
+        events.emit(engineEvent(EngineTypesEvent.SESSION_PING, id));
       } else if (isJsonRpcError(payload)) {
-        events.emitData(
+        events.emit(
           engineEvent(EngineTypesEvent.SESSION_PING, id),
           JsonRpcError.fromJson(payload).error,
         );
@@ -969,7 +967,7 @@ class Engine with Events implements IEngine {
       // RPC request needs to happen before deletion as it utalises session encryption
       await _sendResult<bool>(id, topic, true, (v) => v);
       await _deleteSession(topic);
-      client.events.emitData(SignClientTypesEvent.SESSION_DELETE.value, {
+      client.events.emit(SignClientTypesEvent.SESSION_DELETE.value, {
         'id': id,
         'topic': topic,
       });
@@ -994,7 +992,7 @@ class Engine with Events implements IEngine {
       ));
       final pendingRequest = PendingRequestTypesStruct(topic, id, params);
       await setPendingSessionRequest(pendingRequest);
-      client.events.emitData(
+      client.events.emit(
         SignClientTypesEvent.SESSION_REQUEST.value,
         pendingRequest.toJson(),
       );
@@ -1010,12 +1008,12 @@ class Engine with Events implements IEngine {
   ) {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
         payload['result'],
       );
     } else if (isJsonRpcError(payload)) {
-      events.emitData(
+      events.emit(
         engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
         JsonRpcError.fromJson(payload).error,
       );
@@ -1034,7 +1032,7 @@ class Engine with Events implements IEngine {
         event: params.event,
         chainId: params.chainId,
       ));
-      client.events.emitData(SignClientTypesEvent.SESSION_REQUEST.value, {
+      client.events.emit(SignClientTypesEvent.SESSION_REQUEST.value, {
         'id': id,
         'topic': topic,
         'params': params.toJson(),
@@ -1048,11 +1046,9 @@ class Engine with Events implements IEngine {
   // ---------- Expirer Events ---------------------------------------- //
 
   _registerExpirerEvents() {
-    client.core.expirer.on(ExpirerEvents.expired, (event) async {
-      if (event is ExpirerTypesExpiration) {
-        final eventData = event.eventData as ExpirerTypesExpiration;
-
-        final expirerTarget = parseExpirerTarget(eventData.target);
+    client.core.expirer.on(ExpirerEvents.expired, (data) async {
+      if (data is ExpirerTypesExpiration) {
+        final expirerTarget = parseExpirerTarget(data.target);
         final id = expirerTarget.id;
         final topic = expirerTarget.topic;
 
@@ -1070,7 +1066,7 @@ class Engine with Events implements IEngine {
         if (topic != null) {
           if (client.session.keys.contains(topic)) {
             await _deleteSession(topic, expirerHasDeleted: true);
-            client.events.emitData(
+            client.events.emit(
               SignClientTypesEvent.SESSION_EXPIRE.value,
               {'topic': topic},
             );

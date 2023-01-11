@@ -12,12 +12,12 @@ class HeartBeat with Events implements IHeartBeat {
   }
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   @override
   final int interval;
 
-  HeartBeat({this.interval = HEARTBEAT_INTERVAL}) : events = EventSubject();
+  HeartBeat({this.interval = HEARTBEAT_INTERVAL}) : events = EventEmitter();
 
   @override
   Future<void> init() async => _initialize();
@@ -32,6 +32,6 @@ class HeartBeat with Events implements IHeartBeat {
   }
 
   _pulse() {
-    events.emitData(HeartbeatEvents.pulse);
+    events.emit(HeartbeatEvents.pulse);
   }
 }

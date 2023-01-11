@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/constants.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
-import 'package:wallet_connect/core/store/store.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
+import 'package:wallet_connect/core/store/store.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
@@ -27,18 +27,20 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 class Pairing with Events implements IPairing {
   @override
   final String name = PAIRING_CONTEXT;
+
   final String version = PAIRING_STORAGE_VERSION;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   @override
   final IStore<String, PairingTypesStruct> pairings;
 
-  bool _initialized = false;
-  String storagePrefix = CORE_STORAGE_PREFIX;
-  List<int> ignoredPayloadTypes = [TYPE_1];
-  List<String> registeredMethods = [];
+  final storagePrefix = CORE_STORAGE_PREFIX;
+
+  bool _initialized;
+  List<int> _ignoredPayloadTypes;
+  List<String> _registeredMethods;
 
   @override
   final ICore core;
@@ -51,7 +53,7 @@ class Pairing with Events implements IPairing {
 
   Pairing({required this.core, Logger? logger})
       : logger = logger ?? Logger(),
-        events = EventSubject(),
+        events = EventEmitter(),
         pairings = Store(
           core: core,
           logger: logger,
@@ -60,10 +62,13 @@ class Pairing with Events implements IPairing {
           fromJson: (v) =>
               PairingTypesStruct.fromJson(v as Map<String, dynamic>),
           toJson: (v) => v.toJson(),
-        );
+        ),
+        _initialized = false,
+        _ignoredPayloadTypes = [TYPE_1],
+        _registeredMethods = [];
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       await pairings.init();
       await _cleanup();
@@ -75,15 +80,15 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  register(List<String> methods) {
+  void register(List<String> methods) {
     _isInitialized();
-    registeredMethods = [
-      ...[...registeredMethods, ...methods].toSet()
+    _registeredMethods = [
+      ...[..._registeredMethods, ...methods].toSet()
     ];
   }
 
   @override
-  create() async {
+  Future<PairingTopicUriData> create() async {
     _isInitialized();
     final symKey = generateRandomBytes32();
     final topic = await core.crypto.setSymKey(symKey: symKey);
@@ -110,7 +115,7 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  pair({
+  Future<PairingTypesStruct> pair({
     required String uri,
     bool activatePairing = false,
   }) async {
@@ -141,7 +146,7 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  activate({required String topic}) async {
+  Future<void> activate({required String topic}) async {
     _isInitialized();
     final expiry = calcExpiry(ttl: THIRTY_DAYS);
     await pairings.update(
@@ -152,17 +157,16 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  ping({required String topic}) async {
+  Future<void> ping({required String topic}) async {
     _isInitialized();
     await _isValidPairingTopic(topic);
     if (pairings.keys.contains(topic)) {
       final id = await _sendRequest(
           topic, PairingRpcMethod.WC_PAIRING_PING, {}, (_) => {});
       final completer = Completer<void>();
-      events.once(engineEvent(EngineTypesEvent.PAIRING_PING, id), null,
-          (event, _) {
-        if (event.eventData is ErrorResponse) {
-          completer.completeError(event.eventData!);
+      events.once(engineEvent(EngineTypesEvent.PAIRING_PING, id), (data) {
+        if (data is ErrorResponse) {
+          completer.completeError(data);
         } else {
           completer.complete();
         }
@@ -172,26 +176,28 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  updateExpiry({required String topic, required int expiry}) async {
+  Future<void> updateExpiry(
+      {required String topic, required int expiry}) async {
     _isInitialized();
     await pairings.update(topic, (value) => value.copyWith(expiry: expiry));
   }
 
   @override
-  updateMetadata({required String topic, required AppMetadata metadata}) async {
+  Future<void> updateMetadata(
+      {required String topic, required AppMetadata metadata}) async {
     _isInitialized();
     await pairings.update(
         topic, (value) => value.copyWith(peerMetadata: metadata));
   }
 
   @override
-  getPairings() {
+  List<PairingTypesStruct> getPairings() {
     _isInitialized();
     return pairings.values;
   }
 
   @override
-  disconnect({required String topic}) async {
+  Future<void> disconnect({required String topic}) async {
     _isInitialized();
     await _isValidPairingTopic(topic);
     if (pairings.keys.contains(topic)) {
@@ -265,7 +271,7 @@ class Pairing with Events implements IPairing {
     core.history.resolve(payload.toJson());
   }
 
-  _deletePairing({
+  Future<void> _deletePairing({
     required String topic,
     bool expirerHasDeleted = false,
   }) async {
@@ -280,7 +286,7 @@ class Pairing with Events implements IPairing {
     ]);
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);
@@ -288,7 +294,7 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _cleanup() async {
+  Future<void> _cleanup() async {
     final expiredPairings =
         pairings.getAll().where((pairing) => isExpired(pairing.expiry));
     await Future.wait(
@@ -297,15 +303,15 @@ class Pairing with Events implements IPairing {
 
   // ---------- Relay Events Router ----------------------------------- //
 
-  _registerRelayerEvents() {
-    core.relayer.on(RelayerEvents.message, (event) async {
-      if (event.eventData is RelayerMessageEvent) {
-        final eventData = event.eventData as RelayerMessageEvent;
-        final topic = eventData.topic;
-        final message = eventData.message;
+  void _registerRelayerEvents() {
+    core.relayer.on(RelayerEvents.message, (data) async {
+      if (data is RelayerMessageEvent) {
+        final topic = data.topic;
+        final message = data.message;
 
         // messages of certain types should be ignored as they are handled by their respective SDKs
-        if (ignoredPayloadTypes.contains(core.crypto.getPayloadType(message))) {
+        if (_ignoredPayloadTypes
+            .contains(core.crypto.getPayloadType(message))) {
           return;
         }
 
@@ -322,7 +328,7 @@ class Pairing with Events implements IPairing {
     });
   }
 
-  _onRelayEventRequest({
+  Future<void> _onRelayEventRequest({
     required String topic,
     required Map<String, dynamic> payload,
   }) {
@@ -339,7 +345,7 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _onRelayEventResponse({
+  void _onRelayEventResponse({
     required String topic,
     required Map<String, dynamic> payload,
   }) async {
@@ -355,14 +361,14 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _onPairingPingRequest({
+  Future<void> _onPairingPingRequest({
     required String topic,
     required int id,
   }) async {
     try {
       _isValidPairingTopic(topic);
       await _sendResult<bool>(id, topic, true, (v) => v);
-      events.emitData(
+      events.emit(
           EngineTypesEvent.PAIRING_PING.value, {'id': id, 'topic': topic});
     } catch (err) {
       await _sendError(id, topic, err);
@@ -370,7 +376,7 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _onPairingPingResponse({
+  void _onPairingPingResponse({
     required String topic,
     required Map<String, dynamic> payload,
   }) async {
@@ -379,12 +385,12 @@ class Pairing with Events implements IPairing {
     // where pairing_ping listener is not yet _initialized
     Timer(const Duration(milliseconds: 500), () {
       if (isJsonRpcResult(payload)) {
-        events.emitData(engineEvent(
+        events.emit(engineEvent(
           EngineTypesEvent.PAIRING_PING,
           id,
         ));
       } else if (isJsonRpcError(payload)) {
-        events.emitData(
+        events.emit(
           engineEvent(EngineTypesEvent.PAIRING_PING, id),
           JsonRpcError.fromJson(payload).error,
         );
@@ -392,7 +398,7 @@ class Pairing with Events implements IPairing {
     });
   }
 
-  _onPairingDeleteRequest({
+  Future<void> _onPairingDeleteRequest({
     required String topic,
     required int id,
   }) async {
@@ -401,7 +407,7 @@ class Pairing with Events implements IPairing {
       // RPC request needs to happen before deletion as it utilises pairing encryption
       await _sendResult<bool>(id, topic, true, (v) => v);
       await _deletePairing(topic: topic);
-      events.emitData("pairing_delete", {
+      events.emit("pairing_delete", {
         'id': id,
         'topic': topic,
       });
@@ -411,7 +417,7 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _onUnknownRpcMethodRequest({
+  Future<void> _onUnknownRpcMethodRequest({
     required String topic,
     required Map<String, dynamic> payload,
   }) async {
@@ -419,7 +425,7 @@ class Pairing with Events implements IPairing {
     final String method = payload['method'];
     try {
       // Ignore if the implementing client has registered this method as known.
-      if (registeredMethods.contains(method)) return;
+      if (_registeredMethods.contains(method)) return;
       final error = getSdkError(
         SdkErrorKey.WC_METHOD_UNSUPPORTED,
         context: method,
@@ -432,24 +438,23 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _onUnknownRpcMethodResponse(String method) {
+  void _onUnknownRpcMethodResponse(String method) {
     // Ignore if the implementing client has registered this method as known.
-    if (registeredMethods.contains(method)) return;
+    if (_registeredMethods.contains(method)) return;
     logger.e(getSdkError(SdkErrorKey.WC_METHOD_UNSUPPORTED, context: method));
   }
 
   // ---------- Expirer Events ---------------------------------------- //
 
-  _registerExpirerEvents() {
-    core.expirer.on(ExpirerEvents.expired, (event) async {
-      if (event.eventData is ExpirerTypesExpiration) {
-        final eventData = event.eventData as ExpirerTypesExpiration;
-        final expirerTarget = parseExpirerTarget(eventData.target);
+  void _registerExpirerEvents() {
+    core.expirer.on(ExpirerEvents.expired, (data) async {
+      if (data is ExpirerTypesExpiration) {
+        final expirerTarget = parseExpirerTarget(data.target);
         final topic = expirerTarget.topic;
         if (topic != null) {
           if (pairings.keys.contains(topic)) {
             await _deletePairing(topic: topic, expirerHasDeleted: true);
-            events.emitData("pairing_expire", {topic});
+            events.emit("pairing_expire", {topic});
           }
         }
       }
@@ -458,7 +463,7 @@ class Pairing with Events implements IPairing {
 
   // ---------- Validation Helpers ----------------------------------- //
 
-  _isValidPair(String uri) {
+  void _isValidPair(String uri) {
     if (!isValidUrl(uri)) {
       final error = getInternalError(InternalErrorKey.MISSING_OR_INVALID,
           context: 'pair() uri: $uri');
@@ -466,7 +471,7 @@ class Pairing with Events implements IPairing {
     }
   }
 
-  _isValidPairingTopic(String topic) async {
+  Future<void> _isValidPairingTopic(String topic) async {
     if (!pairings.keys.contains(topic)) {
       final error = getInternalError(
         InternalErrorKey.NO_MATCHING_KEY,

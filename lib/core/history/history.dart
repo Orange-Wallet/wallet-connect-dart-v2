@@ -9,13 +9,13 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 class JsonRpcHistory with Events implements IJsonRpcHistory {
   @override
-  Map<int, JsonRpcRecord> records = {};
+  Map<int, JsonRpcRecord> records;
 
   final String name = HISTORY_CONTEXT;
   final String version = HISTORY_STORAGE_VERSION;
 
-  List<JsonRpcRecord> cached = [];
-  bool _initialized = false;
+  List<JsonRpcRecord> _cached;
+  bool _initialized;
   final _storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
@@ -23,21 +23,24 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   @override
   final Logger logger;
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   JsonRpcHistory({
     required this.core,
     Logger? logger,
   })  : logger = logger ?? Logger(),
-        events = EventSubject();
+        events = EventEmitter(),
+        records = {},
+        _cached = [],
+        _initialized = false;
 
   @override
   Future<void> init() async {
     if (!_initialized) {
       logger.i('_Initialized');
       await _restore();
-      cached.forEach((record) => records[record.id] = record);
-      cached = [];
+      _cached.forEach((record) => records[record.id] = record);
+      _cached = [];
       _registerEventListeners();
       _initialized = true;
     }
@@ -79,7 +82,7 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   }) {
     _isInitialized();
     logger.d('Setting JSON-RPC request history record');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "set",
       'topic': topic,
@@ -97,20 +100,20 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
       chainId: chainId,
     );
     records[record.id] = record;
-    events.emitData(HistoryEvents.created, record);
+    events.emit(HistoryEvents.created, record);
   }
 
   @override
   void resolve(Map<String, dynamic> response) {
     _isInitialized();
     logger.d('Updating JSON-RPC response history record');
-    logger.i({'type': "method", 'method': "update", 'response': response});
+    logger.v({'type': "method", 'method': "update", 'response': response});
     if (!records.containsKey(response['id'])) return;
     var record = _getRecord(response['id']);
     if (record.response != null) return;
     record = record.copyWith(response: response);
     records[record.id] = record;
-    events.emitData(HistoryEvents.updated, record);
+    events.emit(HistoryEvents.updated, record);
   }
 
   @override
@@ -120,7 +123,7 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   }) {
     _isInitialized();
     logger.d('Getting record');
-    logger.i({'type': "method", 'method': "get", 'topic': topic, 'id': id});
+    logger.v({'type': "method", 'method': "get", 'topic': topic, 'id': id});
     final record = _getRecord(id);
     return record;
   }
@@ -132,12 +135,12 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   }) {
     _isInitialized();
     logger.d('Deleting record');
-    logger.i({'type': "method", 'method': "delete", 'id': id});
+    logger.v({'type': "method", 'method': "delete", 'id': id});
     values.forEach((record) {
       if (record.topic == topic) {
         if (id != null && record.id != id) return;
         records.remove(record.id);
-        events.emitData(HistoryEvents.deleted, record);
+        events.emit(HistoryEvents.deleted, record);
       }
     });
   }
@@ -173,19 +176,19 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
     if (record == null) {
       final error = getInternalError(
         InternalErrorKey.NO_MATCHING_KEY,
-        context: '$name: ${id}',
+        context: '$name: $id',
       );
       throw WCException(error.message);
     }
     return record;
   }
 
-  _persist() async {
+  Future<void> _persist() async {
     await _setJsonRpcRecords(values);
-    events.emitData(HistoryEvents.sync);
+    events.emit(HistoryEvents.sync);
   }
 
-  _restore() async {
+  Future<void> _restore() async {
     try {
       final persisted = await _getJsonRpcRecords();
       if (persisted.isEmpty) return;
@@ -197,9 +200,13 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      cached = persisted;
+      _cached = persisted;
       logger.d('Successfully Restored records for $name');
-      logger.i({'type': "method", 'method': "_restore", records: values});
+      logger.v({
+        'type': "method",
+        'method': "_restore",
+        'records': values.map((e) => e.toJson()).toList(),
+      });
     } catch (e) {
       logger.d('Failed to Restore records for $name');
       logger.e(e.toString());
@@ -207,29 +214,38 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   }
 
   void _registerEventListeners() {
-    events.on(HistoryEvents.created, null, (event, _) {
+    events.on(HistoryEvents.created, (data) {
       const eventName = HistoryEvents.created;
-      final record = event.eventData as JsonRpcRecord;
+      final record = data as JsonRpcRecord;
       logger.i('Emitting $eventName');
-      logger
-          .d({'type': "event", 'event': eventName, 'record': record.toJson()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'record': record.toJson(),
+      });
       _persist();
     });
-    events.on(HistoryEvents.updated, null, (event, _) {
+    events.on(HistoryEvents.updated, (data) {
       const eventName = HistoryEvents.updated;
-      final record = event.eventData as JsonRpcRecord;
+      final record = data as JsonRpcRecord;
       logger.i('Emitting $eventName');
-      logger
-          .d({'type': "event", 'event': eventName, 'record': record.toJson()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'record': record.toJson(),
+      });
       _persist();
     });
 
-    events.on(HistoryEvents.deleted, null, (event, _) {
+    events.on(HistoryEvents.deleted, (data) {
       const eventName = HistoryEvents.deleted;
-      final record = event.eventData as JsonRpcRecord;
+      final record = data as JsonRpcRecord;
       logger.i('Emitting $eventName');
-      logger
-          .d({'type': "event", 'event': eventName, 'record': record.toJson()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'record': record.toJson(),
+      });
       _persist();
     });
   }

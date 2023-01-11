@@ -35,7 +35,7 @@ class Core with Events implements ICore {
   final String? projectId;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   @override
   final Logger logger;
@@ -78,7 +78,7 @@ class Core with Events implements ICore {
     String? database,
   })  : logger = logger ?? Logger(),
         heartbeat = heartbeat ?? HeartBeat(),
-        events = EventSubject() {
+        events = EventEmitter() {
     this.crypto = crypto ?? Crypto(core: this, logger: logger);
     this.history = history ?? JsonRpcHistory(core: this, logger: logger);
     this.expirer = expirer ?? Expirer(core: this, logger: logger);

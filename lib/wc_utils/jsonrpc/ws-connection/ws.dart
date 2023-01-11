@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/url.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../provider/types.dart';
-import '../utils/url.dart';
-
 class WsConnection with Events implements IJsonRpcConnection {
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   WebSocketChannel? socket;
 
@@ -23,7 +22,7 @@ class WsConnection with Events implements IJsonRpcConnection {
   WsConnection(this.url)
       : assert(isWsUrl(url),
             'Provided URL is not compatible with WebSocket connection: $url'),
-        events = EventSubject();
+        events = EventEmitter();
 
   @override
   bool get connected => socket != null;
@@ -67,10 +66,10 @@ class WsConnection with Events implements IJsonRpcConnection {
 
     if (registering) {
       final completer = Completer<WebSocketChannel>();
-      events.once('register_error', null, (event, _) {
-        completer.completeError(WCException(event.eventData!.toString()));
+      events.once('register_error', (event) {
+        completer.completeError(WCException(event!.toString()));
       });
-      events.once('open', null, (event, _) {
+      events.once('open', (event) {
         if (socket == null) {
           completer.completeError(
               WCException("WebSocket connection is missing or invalid"));
@@ -100,26 +99,26 @@ class WsConnection with Events implements IJsonRpcConnection {
   WebSocketChannel _onOpen(WebSocketChannel socket) {
     this.socket = socket;
     registering = false;
-    events.emitData("open");
+    events.emit("open");
     return socket;
   }
 
   _onClose() {
     socket = null;
     registering = false;
-    events.emitData("close");
+    events.emit("close");
   }
 
   _onPayload(dynamic data) {
     if (data == null) return;
     final payload = data is String ? jsonDecode(data) : data;
-    events.emitData("payload", payload);
+    events.emit("payload", payload);
   }
 
   _onError({required int id, required Object e}) {
     final error = _parseError(e: WCException(e.toString()));
     final payload = formatJsonRpcError(id: id, error: error.message);
-    events.emitData("payload", payload.toJson());
+    events.emit("payload", payload.toJson());
   }
 
   _parseError({required WCException e, String? url}) {
@@ -133,7 +132,7 @@ class WsConnection with Events implements IJsonRpcConnection {
           ? errorEvent.toString()
           : 'WebSocket connection failed for URL: $url'),
     );
-    events.emitData("register_error", error);
+    events.emit("register_error", error);
     return error;
   }
 }

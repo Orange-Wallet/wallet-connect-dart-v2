@@ -1,16 +1,15 @@
 import 'dart:async';
 
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-import 'types.dart';
-
 class JsonRpcProvider with Events implements IJsonRpcProvider {
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   IJsonRpcConnection? _connection;
 
@@ -19,7 +18,7 @@ class JsonRpcProvider with Events implements IJsonRpcProvider {
 
   bool _hasRegisteredEventListeners = false;
 
-  JsonRpcProvider(IJsonRpcConnection connection) : events = EventSubject() {
+  JsonRpcProvider(IJsonRpcConnection connection) : events = EventEmitter() {
     _connection = setConnection(connection);
     if (this.connection.connected) {
       _registerEventListeners();
@@ -63,14 +62,12 @@ class JsonRpcProvider with Events implements IJsonRpcProvider {
 
     try {
       final completer = Completer<dynamic>();
-      events.once(request.id.toString(), null, (event, _) {
-        if (isJsonRpcError(event.eventData)) {
+      events.once(request.id.toString(), (data) {
+        if (isJsonRpcError(data)) {
           completer.completeError(
-              JsonRpcError.fromJson(event.eventData as Map<String, dynamic>)
-                  .error!);
+              JsonRpcError.fromJson(data as Map<String, dynamic>).error!);
         } else {
-          completer
-              .complete((event.eventData as Map<String, dynamic>)['result']);
+          completer.complete((data as Map<String, dynamic>)['result']);
         }
       });
       await connection.send(payload: request, context: context);
@@ -87,11 +84,11 @@ class JsonRpcProvider with Events implements IJsonRpcProvider {
 
   @override
   void onPayload(dynamic payload) {
-    events.emitData("payload", payload);
+    events.emit("payload", payload);
     // if (isJsonRpcResponse(payload)) {
-    events.emitData(payload['id'].toString(), payload);
+    events.emit(payload['id'].toString(), payload);
     // } else {
-    // events.emitData("message",JsonRpcProviderMessage(
+    // events.emit("message",JsonRpcProviderMessage(
     //   type: payload.method,
     //   data: payload.params,
     //  ));
@@ -110,26 +107,26 @@ class JsonRpcProvider with Events implements IJsonRpcProvider {
     _connection = setConnection(connection);
     await this.connection.open();
     _registerEventListeners();
-    events.emitData("connect");
+    events.emit("connect");
   }
 
   @override
-  close() async {
+  Future<void> close() async {
     await connection.close();
   }
 
   // ---------- Private ----------------------------------------------- //
 
-  _registerEventListeners() {
+  void _registerEventListeners() {
     if (_hasRegisteredEventListeners) return;
     connection.on("payload", (data) {
-      onPayload(data.eventData);
+      onPayload(data);
     });
     connection.on("close", (_) {
-      events.emitData("disconnect");
+      events.emit("disconnect");
     });
     connection.on("error", (value) {
-      events.emitData("error", value);
+      events.emit("error", value);
     });
     _hasRegisteredEventListeners = true;
   }

@@ -13,16 +13,16 @@ class Expirer with Events implements IExpirer {
   Map<String, ExpirerTypesExpiration> expirations;
 
   @override
-  final EventSubject events;
+  final EventEmitter<String> events;
 
   @override
   final String name = EXPIRER_CONTEXT;
 
   final String version = EXPIRER_STORAGE_VERSION;
 
-  List<ExpirerTypesExpiration> cached = [];
+  List<ExpirerTypesExpiration> _cached;
 
-  bool _initialized = false;
+  bool _initialized;
 
   final String storagePrefix = CORE_STORAGE_PREFIX;
 
@@ -34,17 +34,19 @@ class Expirer with Events implements IExpirer {
 
   Expirer({required this.core, Logger? logger})
       : logger = logger ?? Logger(),
-        events = EventSubject(),
-        expirations = {};
+        events = EventEmitter(),
+        expirations = {},
+        _cached = [],
+        _initialized = false;
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       logger.i('Initialized');
       await _restore();
-      cached
+      _cached
           .forEach((expiration) => expirations[expiration.target] = expiration);
-      cached = [];
+      _cached = [];
       _registerEventListeners();
       _initialized = true;
     }
@@ -53,7 +55,7 @@ class Expirer with Events implements IExpirer {
   String get storageKey => '$storagePrefix$version//$name';
 
   @override
-  get length => expirations.length;
+  int get length => expirations.length;
 
   @override
   List<String> get keys => expirations.keys.toList();
@@ -79,7 +81,7 @@ class Expirer with Events implements IExpirer {
     final expiration = ExpirerTypesExpiration(target: target, expiry: expiry);
     expirations[target] = expiration;
     _checkExpiry(target, expiration);
-    events.emitData(
+    events.emit(
         ExpirerEvents.created,
         ExpirerTypesCreated(
           target: target,
@@ -102,7 +104,7 @@ class Expirer with Events implements IExpirer {
     if (exists) {
       final expiration = _getExpiration(target);
       expirations.remove(target);
-      events.emitData(
+      events.emit(
           ExpirerEvents.deleted,
           ExpirerTypesDeleted(
             target: target,
@@ -139,7 +141,7 @@ class Expirer with Events implements IExpirer {
 
   Future<void> _persist() async {
     await _setExpirations(values);
-    events.emitData(ExpirerEvents.sync);
+    events.emit(ExpirerEvents.sync);
   }
 
   Future<void> _restore() async {
@@ -153,9 +155,13 @@ class Expirer with Events implements IExpirer {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      cached = persisted!;
+      _cached = persisted!;
       logger.d('Successfully Restored expirations for $name');
-      logger.i({'type': "method", 'method': "_restore", 'expirations': values});
+      logger.v({
+        'type': "method",
+        'method': "_restore",
+        'expirations': values.map((e) => e.toString()).toList(),
+      });
     } catch (e) {
       logger.d('Failed to Restore expirations for $name');
       logger.e(e.toString());
@@ -181,7 +187,7 @@ class Expirer with Events implements IExpirer {
 
   void _expire(String target, ExpirerTypesExpiration expiration) {
     expirations.remove(target);
-    events.emitData(
+    events.emit(
         ExpirerEvents.expired,
         ExpirerTypesExpired(
           target: target,
@@ -200,34 +206,22 @@ class Expirer with Events implements IExpirer {
 
   void _registerEventListeners() {
     core.heartbeat.on(HeartbeatEvents.pulse, (_) => _checkExpirations());
-    events.on(ExpirerEvents.created, null, (event, _) {
+    events.on(ExpirerEvents.created, (data) {
       const eventName = ExpirerEvents.created;
       logger.i('Emitting $eventName');
-      logger.d({
-        'type': "event",
-        'event': eventName,
-        'data': event.eventData.toString()
-      });
+      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
       _persist();
     });
-    events.on(ExpirerEvents.expired, null, (event, _) {
+    events.on(ExpirerEvents.expired, (data) {
       const eventName = ExpirerEvents.expired;
       logger.i('Emitting $eventName');
-      logger.d({
-        'type': "event",
-        'event': eventName,
-        'data': event.eventData.toString()
-      });
+      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
       _persist();
     });
-    events.on(ExpirerEvents.deleted, null, (event, _) {
+    events.on(ExpirerEvents.deleted, (data) {
       const eventName = ExpirerEvents.deleted;
       logger.i('Emitting $eventName');
-      logger.d({
-        'type': "event",
-        'event': eventName,
-        'data': event.eventData.toString()
-      });
+      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
       _persist();
     });
   }

@@ -1,3 +1,5 @@
+import 'package:logger/logger.dart';
+import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
@@ -47,6 +49,10 @@ abstract class ISubscriberTopicMap {
 }
 
 abstract class ISubscriber with IEvents {
+  Map<String, SubscriberTypesActive> get subscriptions;
+
+  ISubscriberTopicMap get topicMap;
+
   int get length;
 
   List<String> get ids;
@@ -56,6 +62,10 @@ abstract class ISubscriber with IEvents {
   List<String> get topics;
 
   String get name;
+
+  IRelayer get relayer;
+
+  Logger get logger;
 
   Future<void> init();
 
