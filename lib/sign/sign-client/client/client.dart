@@ -4,7 +4,7 @@ import 'package:wallet_connect/core/core.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/core/store/types.dart';
+import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/engine/engine.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/constants.dart';

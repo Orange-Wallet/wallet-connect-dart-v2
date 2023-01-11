@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect/core/store/types.dart';
+import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/sign-client/jsonrpc/types.dart';
 
 part 'types.g.dart';

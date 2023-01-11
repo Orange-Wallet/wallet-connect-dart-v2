@@ -1,10 +1,8 @@
-import 'package:hive/hive.dart';
 import 'package:logger/logger.dart';
-
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/store/constants.dart';
-import 'package:wallet_connect/core/store/types.dart';
+import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/utils/error.dart';
@@ -13,15 +11,9 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 class Store<K, V> implements IStore<K, V> {
   @override
   final Map<K, V> map;
-  final version = STORE_STORAGE_VERSION;
 
-  List<V> cached = [];
-  bool _initialized = false;
+  final String version = STORE_STORAGE_VERSION;
 
-  /**
-   * Regenerates the value key to retrieve it from cache
-   */
-  // private getKey: ((data: V) => K) | undefined;
   @override
   final String storagePrefix;
 
@@ -35,18 +27,21 @@ class Store<K, V> implements IStore<K, V> {
   final String name;
 
   @override
-  final dynamic Function(V) toJson;
+  final StoreObjToJson<V> toJson;
 
   @override
-  final V Function(Object?) fromJson;
+  final StoreObjFromJson<V> fromJson;
 
-  /**
-   * @param {ICore} core Core
-   * @param {Logger} logger Logger
-   * @param {string} name Store's name
-   * @param {Store<K, V>["getKey"]} getKey Regenerates the value key to retrieve it from cache
-   * @param {string} storagePrefix Prefixes value keys
-   */
+  List<V> _cached;
+
+  bool _initialized;
+
+  /// * [ICore], core Core
+  /// * [Logger], logger Logger
+  /// * [String], name Store's name
+  /// * [String], storagePrefix Prefixes value keys
+  /// * [StoreObjToJson], toJson Converts stored data object to json
+  /// * [StoreObjFromJson], fromJson Converts stored data object from json
   Store({
     required this.core,
     Logger? logger,
@@ -56,28 +51,32 @@ class Store<K, V> implements IStore<K, V> {
     required this.toJson,
   })  : logger = logger ?? Logger(),
         storagePrefix = storagePrefix ?? CORE_STORAGE_PREFIX,
-        map = {};
+        map = {},
+        _cached = [],
+        _initialized = false;
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       logger.i('Initialized');
       await _restore();
 
-      cached.forEach((value) {
-        if (value is ProposalTypesStruct &&
-            (value as ProposalTypesStruct).proposer.publicKey != null) {
-          map[(value as ProposalTypesStruct).id as K] = value;
-        } else if (value is SessionTypesStruct &&
-            (value as SessionTypesStruct).topic != null) {
-          map[(value as SessionTypesStruct).topic as K] = value;
+      for (final value in _cached) {
+        if (value is ProposalTypesStruct
+            //  && value.proposer.publicKey != null
+            ) {
+          map[value.id as K] = value;
+        } else if (value is SessionTypesStruct
+            //  && value.topic != null
+            ) {
+          map[value.topic as K] = value;
         }
         // else if (getKey && value != null ) {
         //   map.set(getKey(value), value);
         // }
-      });
+      }
 
-      cached.clear();
+      _cached.clear();
       _initialized = true;
     }
   }
@@ -85,26 +84,21 @@ class Store<K, V> implements IStore<K, V> {
   String get storageKey => '$storagePrefix$version//$name';
 
   @override
-  get length => map.length;
+  int get length => map.length;
 
   @override
-  get keys => map.keys.toList();
+  List<K> get keys => map.keys.toList();
 
   @override
-  get values => map.values.toList();
+  List<V> get values => map.values.toList();
 
   @override
-  set(K key, V value) async {
+  Future<void> set(K key, V value) async {
     _isInitialized();
-    // if (map.containsKey(key)) {
-    // TODO: Might MF
-    //   await update(key, value);
-    // } else {
     logger.d('Setting value');
     logger.i({'type': "method", 'method': "set", 'key': key, 'value': value});
     map[key] = value;
     await _persist();
-    // }
   }
 
   @override
@@ -125,30 +119,38 @@ class Store<K, V> implements IStore<K, V> {
   }
 
   @override
-  update(key, V Function(V V) update) async {
+  Future<void> update(key, V Function(V V) update) async {
     _isInitialized();
     final value = update(_getData(key));
     logger.d('Updating value');
-    logger.i(
-        {'type': "method", 'method': "update", 'key': key, 'update': update});
+    logger.i({
+      'type': "method",
+      'method': "update",
+      'key': key,
+      'update': update,
+    });
     map[key] = value;
     await _persist();
   }
 
   @override
-  delete(key, reason) async {
+  Future<void> delete(key, reason) async {
     _isInitialized();
     if (!map.containsKey(key)) return;
     logger.d('Deleting value');
-    logger.i(
-        {'type': "method", 'method': "delete", 'key': key, 'reason': reason});
+    logger.i({
+      'type': "method",
+      'method': "delete",
+      'key': key,
+      'reason': reason,
+    });
     map.remove(key);
     await _persist();
   }
 
   // ---------- Private ----------------------------------------------- //
 
-  void _setDataStore(List<dynamic> values) async {
+  Future<void> _setDataStore(List<dynamic> values) async {
     await core.storage.setItem<List<dynamic>>(storageKey, values);
   }
 
@@ -162,7 +164,7 @@ class Store<K, V> implements IStore<K, V> {
     if (value == null) {
       final error = getInternalError(
         InternalErrorKey.NO_MATCHING_KEY,
-        context: '${name}: ${key}',
+        context: '$name: $key',
       );
       logger.e(error.message);
       throw WCException(error.message);
@@ -170,11 +172,11 @@ class Store<K, V> implements IStore<K, V> {
     return value;
   }
 
-  _persist() {
-    _setDataStore(values.map((e) => toJson(e)).toList());
+  Future<void> _persist() async {
+    await _setDataStore(values.map((e) => toJson(e)).toList());
   }
 
-  _restore() async {
+  Future<void> _restore() async {
     try {
       final persisted = await _getDataStore();
       if (persisted?.isEmpty ?? true) return;
@@ -186,16 +188,20 @@ class Store<K, V> implements IStore<K, V> {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      cached = persisted?.map((e) => fromJson(e)).toList() ?? [];
-      logger.d('Successfully Restored value for ${name}');
-      logger.i({'type': "method", 'method': "restore", 'value': values});
+      _cached = persisted?.map((e) => fromJson(e)).toList() ?? [];
+      logger.d('Successfully Restored value for $name');
+      logger.i({
+        'type': "method",
+        'method': "restore",
+        'value': values,
+      });
     } catch (e) {
-      logger.d('Failed to Restore value for ${name}');
+      logger.d('Failed to Restore value for $name');
       logger.e(e.toString());
     }
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error = getInternalError(
         InternalErrorKey.NOT_INITIALIZED,

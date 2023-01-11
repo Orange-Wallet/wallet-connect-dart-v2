@@ -2,6 +2,10 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
+typedef StoreObjToJson<V> = dynamic Function(V);
+
+typedef StoreObjFromJson<V> = V Function(Object?);
+
 abstract class IStore<K, V> {
   Map<K, V> get map;
 
@@ -17,9 +21,9 @@ abstract class IStore<K, V> {
 
   String get name;
 
-  dynamic Function(V) get toJson;
+  StoreObjToJson<V> get toJson;
 
-  V Function(Object?) get fromJson;
+  StoreObjFromJson<V> get fromJson;
 
   String? get storagePrefix;
 
