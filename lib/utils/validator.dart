@@ -118,7 +118,7 @@ ErrorObject? isValidExtension(
 }
 
 bool isValidNamespaceMethodsOrEvents(List<String>? input) {
-  return input?.isNotEmpty ?? false;
+  return input != null;
 }
 
 ErrorObject? isValidChains(
