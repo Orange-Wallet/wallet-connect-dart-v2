@@ -85,14 +85,16 @@ class JsonRpcProvider with Events implements IJsonRpcProvider {
   @override
   void onPayload(dynamic payload) {
     events.emit("payload", payload);
-    // if (isJsonRpcResponse(payload)) {
-    events.emit(payload['id'].toString(), payload);
-    // } else {
-    // events.emit("message",JsonRpcProviderMessage(
-    //   type: payload.method,
-    //   data: payload.params,
-    //  ));
-    // }
+    if (isJsonRpcResponse(payload)) {
+      events.emit(payload['id'].toString(), payload);
+    } else {
+      events.emit(
+          "message",
+          JsonRpcProviderMessage(
+            type: payload['method'],
+            data: payload['params'],
+          ));
+    }
   }
 
   @override
