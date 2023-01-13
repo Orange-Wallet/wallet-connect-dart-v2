@@ -1,23 +1,23 @@
-import 'package:wallet_connect/core/subscriber/types.dart';
+import 'package:wallet_connect/core/topicmap/i_topicmap.dart';
 
 class SubscriberTopicMap implements ISubscriberTopicMap {
-  final Map<String, List<String>> map;
+  final Map<String, List<String>> _map;
 
-  SubscriberTopicMap() : map = {};
+  SubscriberTopicMap() : _map = {};
 
   @override
-  List<String> get topics => map.keys.toList();
+  List<String> get topics => _map.keys.toList();
 
   @override
   void set(String topic, String id) {
     final ids = get(topic);
     if (exists(topic, id)) return;
-    map[topic] = [...ids, id];
+    _map[topic] = [...ids, id];
   }
 
   @override
   List<String> get(String topic) {
-    final ids = map[topic];
+    final ids = _map[topic];
     return ids ?? [];
   }
 
@@ -30,22 +30,22 @@ class SubscriberTopicMap implements ISubscriberTopicMap {
   @override
   void delete({required String topic, String? id}) {
     if (id == null) {
-      map.remove(topic);
+      _map.remove(topic);
       return;
     }
-    if (!map.containsKey(topic)) return;
+    if (!_map.containsKey(topic)) return;
     final ids = get(topic);
     if (!exists(topic, id)) return;
     final remaining = ids.where((x) => x != id).toList();
     if (remaining.isEmpty) {
-      map.remove(topic);
+      _map.remove(topic);
       return;
     }
-    map[topic] = remaining;
+    _map[topic] = remaining;
   }
 
   @override
   void clear() {
-    map.clear();
+    _map.clear();
   }
 }

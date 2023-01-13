@@ -1,16 +1,18 @@
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
 bool isJsonRpcPayload(dynamic payload) {
-  return (payload is Map &&
-      payload.containsKey('id') &&
-      payload.containsKey('jsonrpc') &&
-      payload['jsonrpc'] == '2.0');
+  return payload is JsonRpcPayload ||
+      (payload is Map &&
+          payload.containsKey('id') &&
+          payload.containsKey('jsonrpc') &&
+          payload['jsonrpc'] == '2.0');
 }
 
 bool isJsonRpcRequest(dynamic payload) {
-  return payload is Map &&
-      isJsonRpcPayload(payload) &&
-      payload.containsKey('method');
+  return payload is JsonRpcRequest ||
+      (payload is Map &&
+          isJsonRpcPayload(payload) &&
+          payload.containsKey('method'));
 }
 
 bool isJsonRpcResponse(dynamic payload) {

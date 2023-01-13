@@ -1,6 +1,6 @@
 import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/sign/sign-client/session/types.dart';
 

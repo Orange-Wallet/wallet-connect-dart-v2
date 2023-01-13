@@ -1,4 +1,4 @@
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/relay/jsonrpc.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';

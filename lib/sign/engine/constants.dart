@@ -1,5 +1,5 @@
 import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 

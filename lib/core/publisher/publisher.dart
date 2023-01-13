@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/publisher/constants.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/relay.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';

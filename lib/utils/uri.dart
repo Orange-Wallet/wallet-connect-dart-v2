@@ -1,4 +1,4 @@
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 
 // -- uri -------------------------------------------------- //

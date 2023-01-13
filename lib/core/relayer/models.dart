@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
 @JsonSerializable()
 class RelayerProtocolOptions {
@@ -13,9 +13,9 @@ class RelayerProtocolOptions {
   });
 
   factory RelayerProtocolOptions.fromJson(Map<String, dynamic> json) =>
-      _$RelayerTypesProtocolOptionsFromJson(json);
+      _$RelayerProtocolOptionsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RelayerTypesProtocolOptionsToJson(this);
+  Map<String, dynamic> toJson() => _$RelayerProtocolOptionsToJson(this);
 
   @override
   bool operator ==(Object other) {
@@ -44,12 +44,19 @@ class RelayerPublishOptions {
   });
 }
 
+@JsonSerializable()
 class RelayerSubscribeOptions {
   final RelayerProtocolOptions relay;
 
   RelayerSubscribeOptions({required this.relay});
+
+  factory RelayerSubscribeOptions.fromJson(Map<String, dynamic> json) =>
+      _$RelayerSubscribeOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayerSubscribeOptionsToJson(this);
 }
 
+@JsonSerializable()
 class RelayerUnsubscribeOptions {
   final String? id;
   final RelayerProtocolOptions relay;
@@ -58,8 +65,14 @@ class RelayerUnsubscribeOptions {
     required this.id,
     required this.relay,
   });
+
+  factory RelayerUnsubscribeOptions.fromJson(Map<String, dynamic> json) =>
+      _$RelayerUnsubscribeOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayerUnsubscribeOptionsToJson(this);
 }
 
+@JsonSerializable()
 class RelayerMessageEvent {
   final String topic;
   final String message;
@@ -68,6 +81,11 @@ class RelayerMessageEvent {
     required this.topic,
     required this.message,
   });
+
+  factory RelayerMessageEvent.fromJson(Map<String, dynamic> json) =>
+      _$RelayerMessageEventFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayerMessageEventToJson(this);
 }
 
 class RelayerClientMetadata {

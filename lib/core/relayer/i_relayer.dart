@@ -2,8 +2,8 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/messages/types.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
-import 'package:wallet_connect/core/subscriber/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/core/subscriber/i_subscriber.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 

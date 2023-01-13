@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 
 class PublisherTypesParams {
   final String topic;

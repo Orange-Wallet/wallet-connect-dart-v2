@@ -4,7 +4,7 @@ import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/constants.dart';
 import 'package:wallet_connect/sign/engine/types.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';

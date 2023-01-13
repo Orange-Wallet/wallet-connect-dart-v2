@@ -9,7 +9,7 @@ import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/constants.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/core/store/store.dart';
 import 'package:wallet_connect/sign/engine/types.dart';

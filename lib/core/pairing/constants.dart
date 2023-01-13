@@ -1,5 +1,5 @@
 import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 
 const PAIRING_CONTEXT = "pairing";
 

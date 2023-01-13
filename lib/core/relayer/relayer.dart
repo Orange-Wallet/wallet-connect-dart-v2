@@ -8,10 +8,10 @@ import 'package:wallet_connect/core/publisher/publisher.dart';
 import 'package:wallet_connect/core/publisher/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/core/subscriber/constants.dart';
+import 'package:wallet_connect/core/subscriber/i_subscriber.dart';
 import 'package:wallet_connect/core/subscriber/subscriber.dart';
-import 'package:wallet_connect/core/subscriber/types.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/provider/provider.dart';
@@ -81,7 +81,7 @@ class Relayer with Events implements IRelayer {
   }
 
   @override
-  init() async {
+  Future<void> init() async {
     logger.i('Initialized');
     _provider = await _createProvider();
     await Future.wait([
@@ -94,13 +94,13 @@ class Relayer with Events implements IRelayer {
   }
 
   @override
-  get connected => provider.connection.connected;
+  bool get connected => provider.connection.connected;
 
   @override
-  get connecting => provider.connection.connecting;
+  bool get connecting => provider.connection.connecting;
 
   @override
-  publish({
+  Future<void> publish({
     required String topic,
     required String message,
     RelayerPublishOptions? opts,
@@ -112,7 +112,7 @@ class Relayer with Events implements IRelayer {
   }
 
   @override
-  subscribe({
+  Future<String> subscribe({
     required String topic,
     RelayerSubscribeOptions? opts,
   }) async {
@@ -122,7 +122,7 @@ class Relayer with Events implements IRelayer {
   }
 
   @override
-  unsubscribe({
+  Future<void> unsubscribe({
     required String topic,
     RelayerUnsubscribeOptions? opts,
   }) async {
@@ -131,13 +131,13 @@ class Relayer with Events implements IRelayer {
   }
 
   @override
-  transportClose() async {
+  Future<void> transportClose() async {
     transportExplicitlyClosed = true;
     await provider.disconnect();
   }
 
   @override
-  transportOpen({String? relayUrl}) async {
+  Future<void> transportOpen({String? relayUrl}) async {
     relayUrl = relayUrl ?? relayUrl;
     transportExplicitlyClosed = false;
     await provider.connect();
@@ -166,7 +166,7 @@ class Relayer with Events implements IRelayer {
     );
   }
 
-  _recordMessageEvent(RelayerMessageEvent messageEvent) async {
+  Future<void> _recordMessageEvent(RelayerMessageEvent messageEvent) async {
     await messages.set(messageEvent.topic, messageEvent.message);
   }
 
@@ -177,9 +177,9 @@ class Relayer with Events implements IRelayer {
     return exists;
   }
 
-  _onProviderPayload(dynamic payload) async {
+  Future<void> _onProviderPayload(dynamic payload) async {
     logger.d('Incoming Relay Payload');
-    logger.i({
+    logger.v({
       'type': "payload",
       'direction': "incoming",
       'payload': payload,
@@ -197,21 +197,24 @@ class Relayer with Events implements IRelayer {
         message: event.data.message,
       );
       logger.d('Emitting Relayer Payload');
-      logger.i(
-          {'type': "event", 'event': event.id, 'messageEvent': messageEvent});
+      logger.v({
+        'type': "event",
+        'event': event.id,
+        'messageEvent': messageEvent.toJson(),
+      });
       events.emit(event.id, messageEvent);
       await _acknowledgePayload<RelayJsonRpcSubscriptionParams>(payloadObj);
       await _onMessageEvent(messageEvent);
     }
   }
 
-  _onMessageEvent(RelayerMessageEvent messageEvent) async {
+  Future<void> _onMessageEvent(RelayerMessageEvent messageEvent) async {
     if (await _shouldIgnoreMessageEvent(messageEvent)) return;
     events.emit(RelayerEvents.message, messageEvent);
     await _recordMessageEvent(messageEvent);
   }
 
-  _acknowledgePayload<T>(JsonRpcRequest<T> payload) async {
+  Future<void> _acknowledgePayload<T>(JsonRpcRequest<T> payload) async {
     final response = formatJsonRpcResult<bool>(
       id: payload.id,
       result: true,
@@ -220,7 +223,7 @@ class Relayer with Events implements IRelayer {
     await provider.connection.send(payload: response);
   }
 
-  _registerEventListeners() {
+  void _registerEventListeners() {
     provider.on(
       RelayerProviderEvents.payload,
       (payload) => _onProviderPayload(payload),
@@ -238,7 +241,7 @@ class Relayer with Events implements IRelayer {
     );
   }
 
-  _attemptToReconnect() {
+  void _attemptToReconnect() {
     if (transportExplicitlyClosed) {
       return;
     }
@@ -248,7 +251,7 @@ class Relayer with Events implements IRelayer {
     });
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);

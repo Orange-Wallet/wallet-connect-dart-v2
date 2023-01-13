@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';
 import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';

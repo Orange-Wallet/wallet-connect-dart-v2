@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/core/relayer/types.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
 
 part 'types.g.dart';
