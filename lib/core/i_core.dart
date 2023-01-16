@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/crypto/i_crypto.dart';
-import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/expirer/i_expirer.dart';
 import 'package:wallet_connect/core/history/types.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';

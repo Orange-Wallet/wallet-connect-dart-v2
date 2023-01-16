@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:wallet_connect/core/expirer/constants.dart';
-import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
 import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
@@ -1047,7 +1047,7 @@ class Engine with Events implements IEngine {
 
   _registerExpirerEvents() {
     client.core.expirer.on(ExpirerEvents.expired, (data) async {
-      if (data is ExpirerTypesExpiration) {
+      if (data is ExpirerEvent) {
         final expirerTarget = parseExpirerTarget(data.target);
         final id = expirerTarget.id;
         final topic = expirerTarget.topic;

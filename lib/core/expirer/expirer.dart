@@ -1,7 +1,8 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
-import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/expirer/i_expirer.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
@@ -10,7 +11,7 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 
 class Expirer with Events implements IExpirer {
-  Map<String, ExpirerTypesExpiration> expirations;
+  Map<String, ExpirerExpiration> expirations;
 
   @override
   final EventEmitter<String> events;
@@ -20,7 +21,7 @@ class Expirer with Events implements IExpirer {
 
   final String version = EXPIRER_STORAGE_VERSION;
 
-  List<ExpirerTypesExpiration> _cached;
+  List<ExpirerExpiration> _cached;
 
   bool _initialized;
 
@@ -61,10 +62,10 @@ class Expirer with Events implements IExpirer {
   List<String> get keys => expirations.keys.toList();
 
   @override
-  List<ExpirerTypesExpiration> get values => expirations.values.toList();
+  List<ExpirerExpiration> get values => expirations.values.toList();
 
   @override
-  bool has(key) {
+  bool has(dynamic key) {
     try {
       final target = _formatTarget(key);
       final expiration = _getExpiration(target);
@@ -75,29 +76,29 @@ class Expirer with Events implements IExpirer {
   }
 
   @override
-  void set(key, expiry) {
+  void set(dynamic key, int expiry) {
     _isInitialized();
     final target = _formatTarget(key);
-    final expiration = ExpirerTypesExpiration(target: target, expiry: expiry);
+    final expiration = ExpirerExpiration(target: target, expiry: expiry);
     expirations[target] = expiration;
     _checkExpiry(target, expiration);
     events.emit(
         ExpirerEvents.created,
-        ExpirerTypesCreated(
+        ExpirerEvent(
           target: target,
           expiration: expiration,
         ));
   }
 
   @override
-  ExpirerTypesExpiration get(key) {
+  ExpirerExpiration get(dynamic key) {
     _isInitialized();
     final target = _formatTarget(key);
     return _getExpiration(target);
   }
 
   @override
-  void del(key) {
+  void del(dynamic key) {
     _isInitialized();
     final target = _formatTarget(key);
     final exists = has(target);
@@ -106,7 +107,7 @@ class Expirer with Events implements IExpirer {
       expirations.remove(target);
       events.emit(
           ExpirerEvents.deleted,
-          ExpirerTypesDeleted(
+          ExpirerEvent(
             target: target,
             expiration: expiration,
           ));
@@ -128,14 +129,14 @@ class Expirer with Events implements IExpirer {
     throw WCException(error.message);
   }
 
-  Future<void> _setExpirations(List<ExpirerTypesExpiration> expirations) async {
+  Future<void> _setExpirations(List<ExpirerExpiration> expirations) async {
     await core.storage
-        .setItem<List<ExpirerTypesExpiration>>(storageKey, expirations);
+        .setItem<List<ExpirerExpiration>>(storageKey, expirations);
   }
 
-  Future<List<ExpirerTypesExpiration>?> _getExpirations() async {
+  Future<List<ExpirerExpiration>?> _getExpirations() async {
     final expirations =
-        await core.storage.getItem<List<ExpirerTypesExpiration>>(storageKey);
+        await core.storage.getItem<List<ExpirerExpiration>>(storageKey);
     return expirations;
   }
 
@@ -160,7 +161,7 @@ class Expirer with Events implements IExpirer {
       logger.v({
         'type': "method",
         'method': "_restore",
-        'expirations': values.map((e) => e.toString()).toList(),
+        'expirations': values.map((e) => e.toJson()).toList(),
       });
     } catch (e) {
       logger.d('Failed to Restore expirations for $name');
@@ -168,7 +169,7 @@ class Expirer with Events implements IExpirer {
     }
   }
 
-  ExpirerTypesExpiration _getExpiration(String target) {
+  ExpirerExpiration _getExpiration(String target) {
     final expiration = expirations[target];
     if (expiration == null) {
       final error = getInternalError(InternalErrorKey.NO_MATCHING_KEY,
@@ -179,17 +180,17 @@ class Expirer with Events implements IExpirer {
     return expiration;
   }
 
-  bool _checkExpiry(String target, ExpirerTypesExpiration expiration) {
+  bool _checkExpiry(String target, ExpirerExpiration expiration) {
     final msToTimeout =
         expiration.expiry * 1000 - DateTime.now().millisecondsSinceEpoch;
     return (msToTimeout <= 0);
   }
 
-  void _expire(String target, ExpirerTypesExpiration expiration) {
+  void _expire(String target, ExpirerExpiration expiration) {
     expirations.remove(target);
     events.emit(
         ExpirerEvents.expired,
-        ExpirerTypesExpired(
+        ExpirerEvent(
           target: target,
           expiration: expiration,
         ));
@@ -209,19 +210,31 @@ class Expirer with Events implements IExpirer {
     events.on(ExpirerEvents.created, (data) {
       const eventName = ExpirerEvents.created;
       logger.i('Emitting $eventName');
-      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'data': (data as ExpirerEvent?)?.toJson(),
+      });
       _persist();
     });
     events.on(ExpirerEvents.expired, (data) {
       const eventName = ExpirerEvents.expired;
       logger.i('Emitting $eventName');
-      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'data': (data as ExpirerEvent?)?.toJson(),
+      });
       _persist();
     });
     events.on(ExpirerEvents.deleted, (data) {
       const eventName = ExpirerEvents.deleted;
       logger.i('Emitting $eventName');
-      logger.v({'type': "event", 'event': eventName, 'data': data.toString()});
+      logger.v({
+        'type': "event",
+        'event': eventName,
+        'data': (data as ExpirerEvent?)?.toJson(),
+      });
       _persist();
     });
   }

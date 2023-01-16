@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/expirer/constants.dart';
-import 'package:wallet_connect/core/expirer/types.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/constants.dart';
@@ -448,7 +448,7 @@ class Pairing with Events implements IPairing {
 
   void _registerExpirerEvents() {
     core.expirer.on(ExpirerEvents.expired, (data) async {
-      if (data is ExpirerTypesExpiration) {
+      if (data is ExpirerEvent) {
         final expirerTarget = parseExpirerTarget(data.target);
         final topic = expirerTarget.topic;
         if (topic != null) {
