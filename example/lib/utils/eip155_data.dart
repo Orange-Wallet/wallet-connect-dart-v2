@@ -49,7 +49,7 @@ class Eip155Data {
 
   static final ChainData chains = {...mainChains, ...testChains};
 
-  final Map<Eip155Methods, String> methods = {
+  static final Map<Eip155Methods, String> methods = {
     Eip155Methods.PERSONAL_SIGN: 'personal_sign',
     Eip155Methods.ETH_SIGN: 'eth_sign',
     Eip155Methods.ETH_SIGN_TRANSACTION: 'eth_signTransaction',
@@ -70,4 +70,8 @@ enum Eip155Methods {
   ETH_SIGN_TYPED_DATA_V4,
   ETH_SEND_RAW_TRANSACTION,
   ETH_SEND_TRANSACTION,
+}
+
+extension Eip155MethodsX on Eip155Methods {
+  String? get value => Eip155Data.methods[this];
 }

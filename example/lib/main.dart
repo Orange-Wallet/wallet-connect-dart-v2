@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:example/utils/eip155_data.dart';
 import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:wallet_connect/sign/sign-client/client/client.dart';
 import 'package:wallet_connect/sign/sign-client/client/types.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
 import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 
 void main() {
@@ -80,8 +82,20 @@ class _MyHomePageState extends State<MyHomePage> {
       final id = eventData['id'] as int;
       final proposal = ProposalTypesStruct.fromJson(
           eventData['params'] as Map<String, dynamic>);
-      log('PROPOSAL ${proposal.toJson()}');
       _onSessionRequest(id, proposal);
+    });
+    _signClient.on(SignClientTypesEvent.SESSION_REQUEST.value, (data) async {
+      final eventData = (data as Map<String, dynamic>);
+      log('DATA $eventData');
+      final id = eventData['id'] as int;
+      final request = RequestArguments.fromJson(
+          eventData['params'] as Map<String, dynamic>, (json) => json);
+
+      if (request.method == Eip155Methods.PERSONAL_SIGN.value) {
+        final requestParams = request.params as List<String>;
+        final dataToSign = requestParams[0];
+        final address = requestParams[1];
+      }
     });
   }
 
