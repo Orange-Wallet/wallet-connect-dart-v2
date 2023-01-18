@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
-import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';
+import 'package:wallet_connect/wc_utils/misc/heartbeat/i_heart_beat.dart';
 
 class HeartBeat with Events implements IHeartBeat {
   static HeartBeat get instance {

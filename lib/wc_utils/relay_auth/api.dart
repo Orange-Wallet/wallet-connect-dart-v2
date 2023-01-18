@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/constants.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/types.dart';
+import 'package:wallet_connect/wc_utils/relay_auth/models.dart';
 
 Future<RelayAuthKeyPair> generateKeyPair([Uint8List? seed]) async {
   // seed ??= Uint8List.fromList(randomBytes(KEY_PAIR_SEED_LENGTH));

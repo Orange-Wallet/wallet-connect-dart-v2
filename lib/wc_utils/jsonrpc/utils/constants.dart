@@ -1,4 +1,4 @@
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 
 const PARSE_ERROR = "PARSE_ERROR";
 const INVALID_REQUEST = "INVALID_REQUEST";

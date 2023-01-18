@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
 @JsonSerializable()
 class IridiumJWTHeader {

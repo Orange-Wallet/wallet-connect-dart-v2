@@ -4,7 +4,7 @@ import 'package:wallet_connect/core/messages/i_message_tracker.dart';
 import 'package:wallet_connect/core/publisher/i_publisher.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/core/subscriber/i_subscriber.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/i_json_rpc_provider.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 abstract class IRelayer with IEvents {

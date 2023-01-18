@@ -6,9 +6,9 @@ import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/relay.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
-import 'package:wallet_connect/wc_utils/relay/types.dart';
+import 'package:wallet_connect/wc_utils/relay/models.dart';
 
 class Publisher implements IPublisher {
   @override

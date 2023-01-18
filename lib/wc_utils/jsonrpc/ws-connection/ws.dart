@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/i_json_rpc_connection.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/url.dart';

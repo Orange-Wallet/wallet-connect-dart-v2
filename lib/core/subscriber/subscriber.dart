@@ -12,11 +12,11 @@ import 'package:wallet_connect/core/topicmap/i_topicmap.dart';
 import 'package:wallet_connect/core/topicmap/topicmap.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/relay.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
-import 'package:wallet_connect/wc_utils/relay/types.dart';
+import 'package:wallet_connect/wc_utils/relay/models.dart';
 
 class Subscriber with Events implements ISubscriber {
   @override

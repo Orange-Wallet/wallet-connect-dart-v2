@@ -1,14 +1,6 @@
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/i_json_rpc_connection.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
-
-abstract class IJsonRpcConnection with IEvents {
-  bool get connected;
-  bool get connecting;
-
-  Future<void> open({String? url});
-  Future<void> close();
-  Future<void> send({required JsonRpcPayload payload, dynamic context});
-}
 
 abstract class IBaseJsonRpcProvider with IEvents {
   Future<void> connect({dynamic connection});

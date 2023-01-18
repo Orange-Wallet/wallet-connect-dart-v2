@@ -17,7 +17,7 @@ import 'package:wallet_connect/sign/sign-client/proposal/proposal.dart';
 import 'package:wallet_connect/sign/sign-client/session/i_session.dart';
 import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/session.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 class SignClient with Events implements ISignClient {

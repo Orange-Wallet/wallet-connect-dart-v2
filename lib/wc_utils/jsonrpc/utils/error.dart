@@ -1,4 +1,4 @@
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/constants.dart';
 
 bool isServerErrorCode(int code) {

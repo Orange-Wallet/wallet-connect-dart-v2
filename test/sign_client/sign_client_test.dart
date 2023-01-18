@@ -10,7 +10,7 @@ import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/uri.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/constants.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 

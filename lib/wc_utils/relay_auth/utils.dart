@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/base64.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/constants.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/types.dart';
+import 'package:wallet_connect/wc_utils/relay_auth/models.dart';
 
 // ---------- JSON ----------------------------------------------- //
 

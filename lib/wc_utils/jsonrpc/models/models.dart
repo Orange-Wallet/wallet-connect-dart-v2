@@ -44,7 +44,6 @@ abstract class JsonRpcPayload<T> {
   Map<String, dynamic> toJson();
 }
 
-@JsonSerializable(genericArgumentFactories: true)
 class JsonRpcRequest<T> extends RequestArguments<T>
     implements JsonRpcPayload<T> {
   @override

@@ -4,7 +4,7 @@ import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 
 import 'mock_data.dart';
 

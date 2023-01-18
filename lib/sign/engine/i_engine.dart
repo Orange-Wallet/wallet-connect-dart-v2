@@ -3,7 +3,7 @@ import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/i_sign_client.dart';
 import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 
 abstract class IEngine {
   ISignClient get client;

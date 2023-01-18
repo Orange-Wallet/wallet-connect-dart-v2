@@ -3,7 +3,7 @@ import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 
 part 'models.g.dart';
 

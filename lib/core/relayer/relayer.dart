@@ -14,15 +14,15 @@ import 'package:wallet_connect/core/subscriber/i_subscriber.dart';
 import 'package:wallet_connect/core/subscriber/subscriber.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/provider/provider.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/provider/types.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/i_json_rpc_provider.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/provider/json_rpc_provider.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/ws-connection/ws.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
-import 'package:wallet_connect/wc_utils/relay/types.dart';
+import 'package:wallet_connect/wc_utils/relay/models.dart';
 
 class Relayer with Events implements IRelayer {
   final String protocol = "wc";
