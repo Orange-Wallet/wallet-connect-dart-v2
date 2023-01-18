@@ -33,15 +33,15 @@ class Engine with Events implements IEngine {
   final EventEmitter<String> events;
 
   bool _initialized;
-  List<int> _ignoredPayloadTypes;
+
+  final List<int> _ignoredPayloadTypes = [TYPE_1];
 
   @override
   final ISignClient client;
 
   Engine({required this.client})
       : events = EventEmitter(),
-        _initialized = false,
-        _ignoredPayloadTypes = [TYPE_1];
+        _initialized = false;
 
   @override
   Future<void> init() async {
@@ -89,9 +89,11 @@ class Engine with Events implements IEngine {
     );
 
     final completer = Completer<SessionStruct>();
+    final timer = completer.expirer();
     events.once(
       engineEvent(EngineEvent.SESSION_CONNECT),
       (data) async {
+        timer.cancel();
         if (data is ErrorResponse) {
           completer.completeError(data.toString());
         } else if (data is SessionStruct) {
