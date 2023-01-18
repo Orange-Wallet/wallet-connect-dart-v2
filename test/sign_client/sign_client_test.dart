@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:test/test.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
-import 'package:wallet_connect/sign/sign-client/client/client.dart';
-import 'package:wallet_connect/sign/sign-client/client/types.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
+import 'package:wallet_connect/sign/sign-client/client/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/uri.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
@@ -231,7 +231,7 @@ void main() {
         final namespacesBefore = clients.clientA.session.get(topic).namespaces;
         final namespacesAfter = {
           ...namespacesBefore,
-          'eip9001': const SessionTypesNamespace(
+          'eip9001': const SessionNamespace(
             accounts: ["eip9001:1:0x000000000000000000000000000000000000dead"],
             methods: ["eth_sendTransaction"],
             events: ["accountsChanged"],
@@ -339,8 +339,8 @@ Future<void> disconnectClients(List<SignClient> clients) async {
 }
 
 class Connection {
-  final PairingTypesStruct pairingA;
-  final SessionTypesStruct sessionA;
+  final PairingStruct pairingA;
+  final SessionStruct sessionA;
   final int? clientAConnectLatencyMs, settlePairingLatencyMs;
 
   Connection({
@@ -355,8 +355,8 @@ Future<Connection> testConnectMethod({
   required SignClient clientA,
   required SignClient clientB,
   String? pairingTopic,
-  ProposalTypesRequiredNamespaces? requiredNamespaces,
-  SessionTypesNamespaces? namespaces,
+  ProposalRequiredNamespaces? requiredNamespaces,
+  SessionNamespaces? namespaces,
   int? qrCodeScanLatencyMs,
 }) async {
   final start = DateTime.now().millisecondsSinceEpoch;
@@ -364,19 +364,18 @@ Future<Connection> testConnectMethod({
   requiredNamespaces ??= TEST_REQUIRED_NAMESPACES;
   namespaces ??= TEST_NAMESPACES;
 
-  SessionTypesStruct? sessionA, sessionB;
+  SessionStruct? sessionA, sessionB;
 
   final resolveSessionProposal = Completer<void>();
-  clientB.once(SignClientTypesEvent.SESSION_PROPOSAL.value, (event) async {
+  clientB.once(SignClientEvent.SESSION_PROPOSAL.value, (event) async {
     final proposal = event as Map<String, dynamic>;
 
-    final ProposalTypesRequiredNamespaces reqNamespaces = (proposal['params']
-            ['requiredNamespaces'] as Map<String, dynamic>)
-        .entries
-        .map((e) => {
-              e.key.toString(): ProposalTypesRequiredNamespace.fromJson(e.value)
-            })
-        .reduce((value, element) => value..addAll(element));
+    final ProposalRequiredNamespaces reqNamespaces =
+        (proposal['params']['requiredNamespaces'] as Map<String, dynamic>)
+            .entries
+            .map((e) =>
+                {e.key.toString(): ProposalRequiredNamespace.fromJson(e.value)})
+            .reduce((value, element) => value..addAll(element));
 
     expect(reqNamespaces, equals(requiredNamespaces));
 
@@ -396,7 +395,7 @@ Future<Connection> testConnectMethod({
   ));
   final clientAConnectLatencyMs = DateTime.now().millisecondsSinceEpoch - start;
 
-  PairingTypesStruct? pairingA, pairingB;
+  PairingStruct? pairingA, pairingB;
 
   if (pairingTopic == null) {
     if (qrCodeScanLatencyMs != null) {

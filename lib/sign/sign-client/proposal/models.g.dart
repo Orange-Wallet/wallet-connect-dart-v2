@@ -1,14 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ProposalTypesBaseRequiredNamespace _$ProposalTypesBaseRequiredNamespaceFromJson(
+ProposalBaseRequiredNamespace _$ProposalBaseRequiredNamespaceFromJson(
         Map<String, dynamic> json) =>
-    ProposalTypesBaseRequiredNamespace(
+    ProposalBaseRequiredNamespace(
       chains:
           (json['chains'] as List<dynamic>).map((e) => e as String).toList(),
       methods:
@@ -17,17 +17,17 @@ ProposalTypesBaseRequiredNamespace _$ProposalTypesBaseRequiredNamespaceFromJson(
           (json['events'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$ProposalTypesBaseRequiredNamespaceToJson(
-        ProposalTypesBaseRequiredNamespace instance) =>
+Map<String, dynamic> _$ProposalBaseRequiredNamespaceToJson(
+        ProposalBaseRequiredNamespace instance) =>
     <String, dynamic>{
       'chains': instance.chains,
       'methods': instance.methods,
       'events': instance.events,
     };
 
-ProposalTypesRequiredNamespace _$ProposalTypesRequiredNamespaceFromJson(
+ProposalRequiredNamespace _$ProposalRequiredNamespaceFromJson(
         Map<String, dynamic> json) =>
-    ProposalTypesRequiredNamespace(
+    ProposalRequiredNamespace(
       chains:
           (json['chains'] as List<dynamic>).map((e) => e as String).toList(),
       methods:
@@ -35,13 +35,13 @@ ProposalTypesRequiredNamespace _$ProposalTypesRequiredNamespaceFromJson(
       events:
           (json['events'] as List<dynamic>).map((e) => e as String).toList(),
       extension: (json['extension'] as List<dynamic>?)
-          ?.map((e) => ProposalTypesBaseRequiredNamespace.fromJson(
-              e as Map<String, dynamic>))
+          ?.map((e) =>
+              ProposalBaseRequiredNamespace.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$ProposalTypesRequiredNamespaceToJson(
-    ProposalTypesRequiredNamespace instance) {
+Map<String, dynamic> _$ProposalRequiredNamespaceToJson(
+    ProposalRequiredNamespace instance) {
   final val = <String, dynamic>{
     'chains': instance.chains,
     'methods': instance.methods,
@@ -59,38 +59,36 @@ Map<String, dynamic> _$ProposalTypesRequiredNamespaceToJson(
   return val;
 }
 
-ProposalTypesProposer _$ProposalTypesProposerFromJson(
-        Map<String, dynamic> json) =>
-    ProposalTypesProposer(
+ProposalProposer _$ProposalProposerFromJson(Map<String, dynamic> json) =>
+    ProposalProposer(
       publicKey: json['publicKey'] as String,
       metadata: AppMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$ProposalTypesProposerToJson(
-        ProposalTypesProposer instance) =>
+Map<String, dynamic> _$ProposalProposerToJson(ProposalProposer instance) =>
     <String, dynamic>{
       'publicKey': instance.publicKey,
       'metadata': instance.metadata.toJson(),
     };
 
-ProposalTypesRequestStruct _$ProposalTypesRequestStructFromJson(
+ProposalRequestStruct _$ProposalRequestStructFromJson(
         Map<String, dynamic> json) =>
-    ProposalTypesRequestStruct(
+    ProposalRequestStruct(
       relays: (json['relays'] as List<dynamic>)
           .map(
               (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
-      proposer: ProposalTypesProposer.fromJson(
-          json['proposer'] as Map<String, dynamic>),
+      proposer:
+          ProposalProposer.fromJson(json['proposer'] as Map<String, dynamic>),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
     );
 
-Map<String, dynamic> _$ProposalTypesRequestStructToJson(
-        ProposalTypesRequestStruct instance) =>
+Map<String, dynamic> _$ProposalRequestStructToJson(
+        ProposalRequestStruct instance) =>
     <String, dynamic>{
       'relays': instance.relays.map((e) => e.toJson()).toList(),
       'proposer': instance.proposer.toJson(),
@@ -98,25 +96,25 @@ Map<String, dynamic> _$ProposalTypesRequestStructToJson(
           instance.requiredNamespaces.map((k, e) => MapEntry(k, e.toJson())),
     };
 
-ProposalTypesStruct _$ProposalTypesStructFromJson(Map<String, dynamic> json) =>
-    ProposalTypesStruct(
+ProposalStruct _$ProposalStructFromJson(Map<String, dynamic> json) =>
+    ProposalStruct(
       id: json['id'] as int,
       expiry: json['expiry'] as int,
       relays: (json['relays'] as List<dynamic>)
           .map(
               (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
           .toList(),
-      proposer: ProposalTypesProposer.fromJson(
-          json['proposer'] as Map<String, dynamic>),
+      proposer:
+          ProposalProposer.fromJson(json['proposer'] as Map<String, dynamic>),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       pairingTopic: json['pairingTopic'] as String?,
     );
 
-Map<String, dynamic> _$ProposalTypesStructToJson(ProposalTypesStruct instance) {
+Map<String, dynamic> _$ProposalStructToJson(ProposalStruct instance) {
   final val = <String, dynamic>{
     'relays': instance.relays.map((e) => e.toJson()).toList(),
     'proposer': instance.proposer.toJson(),

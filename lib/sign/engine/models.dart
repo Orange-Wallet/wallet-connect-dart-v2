@@ -1,23 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/types.dart';
-import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
-class EngineTypesUriParameters {
+class EngineUriParameters {
   final String protocol;
   final int version;
   final String topic;
   final String symKey;
   final RelayerProtocolOptions relay;
 
-  EngineTypesUriParameters({
+  EngineUriParameters({
     required this.protocol,
     required this.version,
     required this.topic,
@@ -29,8 +26,8 @@ class EngineTypesUriParameters {
 @JsonSerializable()
 class SessionSettleRequestParams {
   final RelayerProtocolOptions relay;
-  final SessionTypesPublicKeyMetadata controller;
-  final SessionTypesNamespaces namespaces;
+  final SessionPublicKeyMetadata controller;
+  final SessionNamespaces namespaces;
   final int expiry;
 
   SessionSettleRequestParams(
@@ -42,14 +39,16 @@ class SessionSettleRequestParams {
 
   factory SessionSettleRequestParams.fromJson(Map<String, dynamic> json) =>
       _$SessionSettleRequestParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionSettleRequestParamsToJson(this);
 }
 
 @JsonSerializable()
 class SessionSettleParams {
   final RelayerProtocolOptions relay;
-  final SessionTypesPublicKeyMetadata controller;
-  final SessionTypesNamespaces namespaces;
-  final ProposalTypesRequiredNamespaces requiredNamespaces;
+  final SessionPublicKeyMetadata controller;
+  final SessionNamespaces namespaces;
+  final ProposalRequiredNamespaces requiredNamespaces;
   final int expiry;
 
   SessionSettleParams({
@@ -68,7 +67,7 @@ class SessionSettleParams {
 
 @JsonSerializable()
 class SessionConnectParams {
-  final ProposalTypesRequiredNamespaces requiredNamespaces;
+  final ProposalRequiredNamespaces requiredNamespaces;
   final String? pairingTopic;
   final List<RelayerProtocolOptions>? relays;
 
@@ -85,7 +84,7 @@ class SessionConnectParams {
 @JsonSerializable()
 class SessionApproveParams {
   final int id;
-  final SessionTypesNamespaces namespaces;
+  final SessionNamespaces namespaces;
   final String? relayProtocol;
 
   SessionApproveParams({
@@ -115,7 +114,7 @@ class SessionRejectParams {
 @JsonSerializable()
 class SessionUpdateParams {
   final String topic;
-  final SessionTypesNamespaces namespaces;
+  final SessionNamespaces namespaces;
 
   SessionUpdateParams({
     required this.topic,
@@ -176,7 +175,7 @@ class SessionEmitEvent {
   Map<String, dynamic> toJson() => _$SessionEmitEventToJson(this);
 }
 
-enum EngineTypesEvent {
+enum EngineEvent {
   SESSION_CONNECT,
   SESSION_APPROVE,
   SESSION_UPDATE,
@@ -186,22 +185,22 @@ enum EngineTypesEvent {
   SESSION_REQUEST,
 }
 
-extension EngineTypesEventExt on EngineTypesEvent {
+extension EngineEventX on EngineEvent {
   String get value {
     switch (this) {
-      case EngineTypesEvent.SESSION_CONNECT:
+      case EngineEvent.SESSION_CONNECT:
         return "session_connect";
-      case EngineTypesEvent.SESSION_APPROVE:
+      case EngineEvent.SESSION_APPROVE:
         return "session_approve";
-      case EngineTypesEvent.SESSION_UPDATE:
+      case EngineEvent.SESSION_UPDATE:
         return "session_update";
-      case EngineTypesEvent.SESSION_EXTEND:
+      case EngineEvent.SESSION_EXTEND:
         return "session_extend";
-      case EngineTypesEvent.SESSION_PING:
+      case EngineEvent.SESSION_PING:
         return "session_ping";
-      case EngineTypesEvent.PAIRING_PING:
+      case EngineEvent.PAIRING_PING:
         return "pairing_ping";
-      case EngineTypesEvent.SESSION_REQUEST:
+      case EngineEvent.SESSION_REQUEST:
         return "session_request";
       default:
         throw WCException('Invalid EngineTypesEvent');
@@ -250,65 +249,30 @@ extension JsonRpcMethodExtStr on String {
   }
 }
 
-class EngineTypesConnection {
+class EngineConnection {
   final String? uri;
-  final Future<SessionTypesStruct>? approval;
+  final Future<SessionStruct>? approval;
 
-  const EngineTypesConnection({
+  const EngineConnection({
     this.uri,
     this.approval,
   });
 }
 
-class EngineTypesApproved {
+class EngineApproved {
   final String topic;
-  final Future<SessionTypesStruct> acknowledged;
+  final Future<SessionStruct> acknowledged;
 
-  EngineTypesApproved({
+  EngineApproved({
     required this.topic,
     required this.acknowledged,
   });
 }
 
-class EngineTypesAcknowledged {
+class EngineAcknowledged {
   final Future<void> acknowledged;
 
-  EngineTypesAcknowledged({
+  EngineAcknowledged({
     required this.acknowledged,
   });
-}
-
-abstract class IEngine {
-  ISignClient get client;
-
-  Future<void> init();
-
-  Future<EngineTypesConnection> connect(SessionConnectParams params);
-
-  Future<PairingTypesStruct> pair(String uri);
-
-  Future<EngineTypesApproved> approve(SessionApproveParams params);
-
-  Future<void> reject(SessionRejectParams params);
-
-  Future<EngineTypesAcknowledged> update(SessionUpdateParams params);
-
-  Future<EngineTypesAcknowledged> extend(String topic);
-
-  Future<T> request<T>(SessionRequestParams params);
-
-  Future<void> respond(SessionRespondParams params);
-
-  Future<void> ping(String topic);
-
-  Future<void> emit(SessionEmitParams params);
-
-  Future<void> disconnect({
-    required String topic,
-    ErrorResponse? reason,
-  });
-
-  List<SessionTypesStruct> find(params);
-
-  List<PendingRequestTypesStruct> getPendingSessionRequests();
 }

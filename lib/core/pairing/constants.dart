@@ -1,4 +1,4 @@
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 
 const PAIRING_CONTEXT = "pairing";
@@ -11,10 +11,10 @@ const ONE_DAY = 1 * 24 * 60 * 60;
 
 const THIRTY_SECONDS = 30;
 
-PairingJsonRpcOptions getPairingRpcOptions(PairingRpcMethod? method) {
+PairingJsonRpcOptions getPairingRpcOptions(PairingMethod? method) {
   switch (method) {
-    case PairingRpcMethod.WC_PAIRING_DELETE:
-      return PairingJsonRpcOptions(
+    case PairingMethod.WC_PAIRING_DELETE:
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
@@ -26,8 +26,8 @@ PairingJsonRpcOptions getPairingRpcOptions(PairingRpcMethod? method) {
           tag: 1001,
         ),
       );
-    case PairingRpcMethod.WC_PAIRING_PING:
-      return PairingJsonRpcOptions(
+    case PairingMethod.WC_PAIRING_PING:
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: THIRTY_SECONDS,
           prompt: false,
@@ -40,7 +40,7 @@ PairingJsonRpcOptions getPairingRpcOptions(PairingRpcMethod? method) {
         ),
       );
     default:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,

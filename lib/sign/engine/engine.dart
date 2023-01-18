@@ -2,17 +2,19 @@ import 'dart:async';
 
 import 'package:wallet_connect/core/expirer/constants.dart';
 import 'package:wallet_connect/core/expirer/models.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/constants.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
-import 'package:wallet_connect/sign/sign-client/client/types.dart';
-import 'package:wallet_connect/sign/sign-client/jsonrpc/types.dart';
-import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
+import 'package:wallet_connect/sign/engine/i_engine.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/sign/sign-client/client/i_sign_client.dart';
+import 'package:wallet_connect/sign/sign-client/client/models.dart';
+import 'package:wallet_connect/sign/sign-client/jsonrpc/models.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/constants.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
@@ -55,7 +57,7 @@ class Engine with Events implements IEngine {
 
   // ---------- Public ------------------------------------------------ //
   @override
-  Future<EngineTypesConnection> connect(SessionConnectParams params) async {
+  Future<EngineConnection> connect(SessionConnectParams params) async {
     _isInitialized();
     await _isValidConnect(params);
 
@@ -76,24 +78,24 @@ class Engine with Events implements IEngine {
 
     final publicKey = await client.core.crypto.generateKeyPair();
 
-    final proposal = ProposalTypesRequestStruct(
+    final proposal = ProposalRequestStruct(
       requiredNamespaces: params.requiredNamespaces,
       relays: params.relays ??
           [RelayerProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL)],
-      proposer: ProposalTypesProposer(
+      proposer: ProposalProposer(
         publicKey: publicKey,
         metadata: client.metadata,
       ),
     );
 
-    final completer = Completer<SessionTypesStruct>();
+    final completer = Completer<SessionStruct>();
     events.once(
-      engineEvent(EngineTypesEvent.SESSION_CONNECT),
+      engineEvent(EngineEvent.SESSION_CONNECT),
       (data) async {
         if (data is ErrorResponse) {
           completer.completeError(data.toString());
-        } else if (data is SessionTypesStruct) {
-          final SessionTypesStruct session = data;
+        } else if (data is SessionStruct) {
+          final SessionStruct session = data;
           final completeSession = session.copyWith(
             self: session.self.copyWith(publicKey: publicKey),
             requiredNamespaces: params.requiredNamespaces,
@@ -117,7 +119,7 @@ class Engine with Events implements IEngine {
       throw WCException(error.message);
     }
 
-    final id = await _sendRequest<ProposalTypesRequestStruct>(
+    final id = await _sendRequest<ProposalRequestStruct>(
       topic,
       JsonRpcMethod.WC_SESSION_PROPOSE,
       proposal,
@@ -127,7 +129,7 @@ class Engine with Events implements IEngine {
     final expiry = calcExpiry(ttl: FIVE_MINUTES);
     await _setProposal(
       id.toString(),
-      ProposalTypesStruct(
+      ProposalStruct(
         id: id,
         expiry: expiry,
         relays: proposal.relays,
@@ -135,20 +137,20 @@ class Engine with Events implements IEngine {
         requiredNamespaces: proposal.requiredNamespaces,
       ),
     );
-    return EngineTypesConnection(
+    return EngineConnection(
       uri: uri,
       approval: completer.future,
     );
   }
 
   @override
-  Future<PairingTypesStruct> pair(String uri) {
+  Future<PairingStruct> pair(String uri) {
     _isInitialized();
     return client.core.pairing.pair(uri: uri);
   }
 
   @override
-  Future<EngineTypesApproved> approve(SessionApproveParams params) async {
+  Future<EngineApproved> approve(SessionApproveParams params) async {
     _isInitialized();
     await _isValidApprove(params);
 
@@ -171,7 +173,7 @@ class Engine with Events implements IEngine {
       relay: RelayerProtocolOptions(protocol: relayProtocol ?? "irn"),
       namespaces: namespaces,
       requiredNamespaces: requiredNamespaces,
-      controller: SessionTypesPublicKeyMetadata(
+      controller: SessionPublicKeyMetadata(
           publicKey: selfPublicKey, metadata: client.metadata),
       expiry: calcExpiry(ttl: SESSION_EXPIRY),
     );
@@ -183,10 +185,9 @@ class Engine with Events implements IEngine {
       sessionSettle,
       (v) => v.toJson(),
     );
-    final completer = Completer<SessionTypesStruct>();
+    final completer = Completer<SessionStruct>();
     final timer = completer.expirer();
-    events.once(engineEvent(EngineTypesEvent.SESSION_APPROVE, requestId),
-        (data) {
+    events.once(engineEvent(EngineEvent.SESSION_APPROVE, requestId), (data) {
       timer.cancel();
       if (data is ErrorResponse) {
         completer.completeError(data);
@@ -195,7 +196,7 @@ class Engine with Events implements IEngine {
       }
     });
 
-    final session = SessionTypesStruct(
+    final session = SessionStruct(
       topic: sessionTopic,
       relay: sessionSettle.relay,
       expiry: sessionSettle.expiry,
@@ -204,7 +205,7 @@ class Engine with Events implements IEngine {
       namespaces: namespaces,
       requiredNamespaces: requiredNamespaces,
       self: sessionSettle.controller,
-      peer: SessionTypesPublicKeyMetadata(
+      peer: SessionPublicKeyMetadata(
         publicKey: proposer.publicKey,
         metadata: proposer.metadata,
       ),
@@ -238,7 +239,7 @@ class Engine with Events implements IEngine {
     }
 
     // final data = await completer.future;
-    return EngineTypesApproved(
+    return EngineApproved(
       topic: sessionTopic,
       acknowledged: completer.future,
     );
@@ -260,7 +261,7 @@ class Engine with Events implements IEngine {
   }
 
   @override
-  Future<EngineTypesAcknowledged> update(SessionUpdateParams params) async {
+  Future<EngineAcknowledged> update(SessionUpdateParams params) async {
     _isInitialized();
     await _isValidUpdate(params);
     final id = await _sendRequest<RpcSessionUpdateParams>(
@@ -271,7 +272,7 @@ class Engine with Events implements IEngine {
     );
     final completer = Completer<void>();
     final timer = completer.expirer();
-    events.once(engineEvent(EngineTypesEvent.SESSION_UPDATE, id), (data) {
+    events.once(engineEvent(EngineEvent.SESSION_UPDATE, id), (data) {
       timer.cancel();
       if (data is ErrorResponse) {
         completer.completeError(data);
@@ -284,11 +285,11 @@ class Engine with Events implements IEngine {
       (session) => session.copyWith(namespaces: params.namespaces),
     );
 
-    return EngineTypesAcknowledged(acknowledged: completer.future);
+    return EngineAcknowledged(acknowledged: completer.future);
   }
 
   @override
-  Future<EngineTypesAcknowledged> extend(String topic) async {
+  Future<EngineAcknowledged> extend(String topic) async {
     _isInitialized();
     await _isValidExtend(topic);
     final id = await _sendRequest<Map<String, dynamic>>(
@@ -300,7 +301,7 @@ class Engine with Events implements IEngine {
     final completer = Completer<void>();
     final timer = completer.expirer();
     events.once(
-      engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
+      engineEvent(EngineEvent.SESSION_EXTEND, id),
       (data) {
         timer.cancel();
         if (data is ErrorResponse) {
@@ -312,7 +313,7 @@ class Engine with Events implements IEngine {
     );
     await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
 
-    return EngineTypesAcknowledged(acknowledged: completer.future);
+    return EngineAcknowledged(acknowledged: completer.future);
   }
 
   @override
@@ -331,7 +332,7 @@ class Engine with Events implements IEngine {
     final completer = Completer<T>();
     final timer = completer.expirer();
     events.once(
-      engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
+      engineEvent(EngineEvent.SESSION_REQUEST, id),
       (data) {
         timer.cancel();
         if (data is ErrorResponse) {
@@ -383,7 +384,7 @@ class Engine with Events implements IEngine {
       final completer = Completer<void>();
       final timer = completer.expirer();
       events.once(
-        engineEvent(EngineTypesEvent.SESSION_PING, id),
+        engineEvent(EngineEvent.SESSION_PING, id),
         (data) {
           timer.cancel();
           if (data is ErrorResponse) {
@@ -435,7 +436,7 @@ class Engine with Events implements IEngine {
   }
 
   @override
-  List<SessionTypesStruct> find(params) {
+  List<SessionStruct> find(params) {
     _isInitialized();
     return client.session
         .getAll()
@@ -444,7 +445,7 @@ class Engine with Events implements IEngine {
   }
 
   @override
-  List<PendingRequestTypesStruct> getPendingSessionRequests() {
+  List<PendingRequestStruct> getPendingSessionRequests() {
     _isInitialized();
     return client.pendingRequest.getAll();
   }
@@ -499,13 +500,13 @@ class Engine with Events implements IEngine {
     client.core.expirer.set(topic, expiry);
   }
 
-  Future<void> _setProposal(String id, ProposalTypesStruct proposal) async {
+  Future<void> _setProposal(String id, ProposalStruct proposal) async {
     await client.proposal.set(id, proposal);
     client.core.expirer.set(id, proposal.expiry);
   }
 
   setPendingSessionRequest(
-    PendingRequestTypesStruct pendingRequest,
+    PendingRequestStruct pendingRequest,
   ) async {
     final expiry =
         getEngineRpcOptions(JsonRpcMethod.WC_SESSION_REQUEST).req.ttl;
@@ -697,7 +698,7 @@ class Engine with Events implements IEngine {
         relays: request.params!.relays,
       ));
       final expiry = calcExpiry(ttl: FIVE_MINUTES);
-      final proposal = ProposalTypesStruct(
+      final proposal = ProposalStruct(
         id: request.id,
         expiry: expiry,
         relays: request.params!.relays,
@@ -707,7 +708,7 @@ class Engine with Events implements IEngine {
       );
       await _setProposal(request.id.toString(), proposal);
       client.events.emit(
-        SignClientTypesEvent.SESSION_PROPOSAL.value,
+        SignClientEvent.SESSION_PROPOSAL.value,
         {
           'id': id,
           'params': proposal.toJson(),
@@ -774,7 +775,7 @@ class Engine with Events implements IEngine {
       );
       final errorPayload = JsonRpcError.fromJson(payload);
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_CONNECT),
+        engineEvent(EngineEvent.SESSION_CONNECT),
         errorPayload.error,
       );
     }
@@ -792,25 +793,25 @@ class Engine with Events implements IEngine {
             SessionSettleRequestParams.fromJson(json as Map<String, dynamic>),
       );
       _isValidSessionSettleRequest(request.params!);
-      final session = SessionTypesStruct(
+      final session = SessionStruct(
         topic: topic,
         relay: request.params!.relay,
         expiry: request.params!.expiry,
         namespaces: request.params!.namespaces,
         acknowledged: true,
         controller: request.params!.controller.publicKey,
-        self: SessionTypesPublicKeyMetadata(
+        self: SessionPublicKeyMetadata(
           publicKey: "",
           metadata: client.metadata,
         ),
-        peer: SessionTypesPublicKeyMetadata(
+        peer: SessionPublicKeyMetadata(
           publicKey: request.params!.controller.publicKey,
           metadata: request.params!.controller.metadata,
         ),
       );
       await _sendResult<ResultSessionSettle>(id, topic, true, (v) => v);
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_CONNECT),
+        engineEvent(EngineEvent.SESSION_CONNECT),
         session,
       );
     } catch (err) {
@@ -829,14 +830,14 @@ class Engine with Events implements IEngine {
         topic,
         (session) => session.copyWith(acknowledged: true),
       );
-      events.emit(engineEvent(EngineTypesEvent.SESSION_APPROVE, id));
+      events.emit(engineEvent(EngineEvent.SESSION_APPROVE, id));
     } else if (isJsonRpcError(payload)) {
       await client.session.delete(
         topic,
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
       );
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_APPROVE, id),
+        engineEvent(EngineEvent.SESSION_APPROVE, id),
         JsonRpcError.fromJson(payload).error,
       );
     }
@@ -876,10 +877,10 @@ class Engine with Events implements IEngine {
   ) {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
-      events.emit(engineEvent(EngineTypesEvent.SESSION_UPDATE, id));
+      events.emit(engineEvent(EngineEvent.SESSION_UPDATE, id));
     } else if (isJsonRpcError(payload)) {
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_UPDATE, id),
+        engineEvent(EngineEvent.SESSION_UPDATE, id),
         JsonRpcError.fromJson(payload).error,
       );
     }
@@ -894,7 +895,7 @@ class Engine with Events implements IEngine {
       _isValidExtend(topic);
       await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
       await _sendResult(id, topic, true, (v) => v);
-      client.events.emit(SignClientTypesEvent.SESSION_EXTEND.value, {
+      client.events.emit(SignClientEvent.SESSION_EXTEND.value, {
         'id': id,
         'topic': topic,
       });
@@ -910,10 +911,10 @@ class Engine with Events implements IEngine {
   ) {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
-      events.emit(engineEvent(EngineTypesEvent.SESSION_EXTEND, id));
+      events.emit(engineEvent(EngineEvent.SESSION_EXTEND, id));
     } else if (isJsonRpcError(payload)) {
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_EXTEND, id),
+        engineEvent(EngineEvent.SESSION_EXTEND, id),
         JsonRpcError.fromJson(payload).error,
       );
     }
@@ -927,7 +928,7 @@ class Engine with Events implements IEngine {
     try {
       _isValidPing(topic);
       await _sendResult<bool>(id, topic, true, (v) => v);
-      client.events.emit(SignClientTypesEvent.SESSION_PING.value, {
+      client.events.emit(SignClientEvent.SESSION_PING.value, {
         'id': id,
         'topic': topic,
       });
@@ -946,10 +947,10 @@ class Engine with Events implements IEngine {
     // where session_ping listener is not yet _initialized
     Timer(const Duration(milliseconds: 500), () {
       if (isJsonRpcResult(payload)) {
-        events.emit(engineEvent(EngineTypesEvent.SESSION_PING, id));
+        events.emit(engineEvent(EngineEvent.SESSION_PING, id));
       } else if (isJsonRpcError(payload)) {
         events.emit(
-          engineEvent(EngineTypesEvent.SESSION_PING, id),
+          engineEvent(EngineEvent.SESSION_PING, id),
           JsonRpcError.fromJson(payload).error,
         );
       }
@@ -967,7 +968,7 @@ class Engine with Events implements IEngine {
       // RPC request needs to happen before deletion as it utalises session encryption
       await _sendResult<bool>(id, topic, true, (v) => v);
       await _deleteSession(topic);
-      client.events.emit(SignClientTypesEvent.SESSION_DELETE.value, {
+      client.events.emit(SignClientEvent.SESSION_DELETE.value, {
         'id': id,
         'topic': topic,
       });
@@ -990,10 +991,10 @@ class Engine with Events implements IEngine {
         request: params.request,
         chainId: params.chainId,
       ));
-      final pendingRequest = PendingRequestTypesStruct(topic, id, params);
+      final pendingRequest = PendingRequestStruct(topic, id, params);
       await setPendingSessionRequest(pendingRequest);
       client.events.emit(
-        SignClientTypesEvent.SESSION_REQUEST.value,
+        SignClientEvent.SESSION_REQUEST.value,
         pendingRequest.toJson(),
       );
     } catch (err) {
@@ -1009,12 +1010,12 @@ class Engine with Events implements IEngine {
     final int id = payload['id'];
     if (isJsonRpcResult(payload)) {
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
+        engineEvent(EngineEvent.SESSION_REQUEST, id),
         payload['result'],
       );
     } else if (isJsonRpcError(payload)) {
       events.emit(
-        engineEvent(EngineTypesEvent.SESSION_REQUEST, id),
+        engineEvent(EngineEvent.SESSION_REQUEST, id),
         JsonRpcError.fromJson(payload).error,
       );
     }
@@ -1032,7 +1033,7 @@ class Engine with Events implements IEngine {
         event: params.event,
         chainId: params.chainId,
       ));
-      client.events.emit(SignClientTypesEvent.SESSION_REQUEST.value, {
+      client.events.emit(SignClientEvent.SESSION_REQUEST.value, {
         'id': id,
         'topic': topic,
         'params': params.toJson(),
@@ -1067,7 +1068,7 @@ class Engine with Events implements IEngine {
           if (client.session.keys.contains(topic)) {
             await _deleteSession(topic, expirerHasDeleted: true);
             client.events.emit(
-              SignClientTypesEvent.SESSION_EXPIRE.value,
+              SignClientEvent.SESSION_EXPIRE.value,
               {'topic': topic},
             );
           }

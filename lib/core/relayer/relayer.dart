@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/messages/messages.dart';
-import 'package:wallet_connect/core/messages/types.dart';
+import 'package:wallet_connect/core/messages/i_message_tracker.dart';
+import 'package:wallet_connect/core/messages/message_tracker.dart';
+import 'package:wallet_connect/core/publisher/i_publisher.dart';
 import 'package:wallet_connect/core/publisher/publisher.dart';
-import 'package:wallet_connect/core/publisher/types.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/models.dart';

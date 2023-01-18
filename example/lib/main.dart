@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scan/scan.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
-import 'package:wallet_connect/sign/sign-client/client/client.dart';
-import 'package:wallet_connect/sign/sign-client/client/types.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
+import 'package:wallet_connect/sign/sign-client/client/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
@@ -77,14 +77,14 @@ class _MyHomePageState extends State<MyHomePage> {
         icons: ['https://avatars.githubusercontent.com/u/37784886'],
       ),
     );
-    _signClient.on(SignClientTypesEvent.SESSION_PROPOSAL.value, (data) async {
+    _signClient.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
       final eventData = (data as Map<String, dynamic>);
       final id = eventData['id'] as int;
-      final proposal = ProposalTypesStruct.fromJson(
-          eventData['params'] as Map<String, dynamic>);
+      final proposal =
+          ProposalStruct.fromJson(eventData['params'] as Map<String, dynamic>);
       _onSessionRequest(id, proposal);
     });
-    _signClient.on(SignClientTypesEvent.SESSION_REQUEST.value, (data) async {
+    _signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
       final eventData = (data as Map<String, dynamic>);
       log('DATA $eventData');
       final id = eventData['id'] as int;
@@ -312,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
   }
 
-  _onSessionRequest(int id, ProposalTypesStruct proposal) {
+  _onSessionRequest(int id, ProposalStruct proposal) {
     showDialog(
       context: context,
       builder: (_) => Dialog(

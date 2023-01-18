@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-PairingTypesStruct _$PairingTypesStructFromJson(Map<String, dynamic> json) =>
-    PairingTypesStruct(
+PairingStruct _$PairingStructFromJson(Map<String, dynamic> json) =>
+    PairingStruct(
       topic: json['topic'] as String,
       expiry: json['expiry'] as int,
       relay: RelayerProtocolOptions.fromJson(
@@ -18,7 +18,7 @@ PairingTypesStruct _$PairingTypesStructFromJson(Map<String, dynamic> json) =>
           : AppMetadata.fromJson(json['peerMetadata'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PairingTypesStructToJson(PairingTypesStruct instance) {
+Map<String, dynamic> _$PairingStructToJson(PairingStruct instance) {
   final val = <String, dynamic>{
     'topic': instance.topic,
     'expiry': instance.expiry,

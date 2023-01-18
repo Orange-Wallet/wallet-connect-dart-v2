@@ -1,11 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
 @JsonSerializable()
 class RpcSessionRequestParams {
@@ -41,7 +41,7 @@ class RpcSessionEventParams {
 
 @JsonSerializable()
 class RpcSessionUpdateParams {
-  final SessionTypesNamespaces namespaces;
+  final SessionNamespaces namespaces;
 
   const RpcSessionUpdateParams({
     required this.namespaces,
@@ -56,8 +56,8 @@ class RpcSessionUpdateParams {
 @JsonSerializable()
 class RpcSessionProposeParams {
   final List<RelayerProtocolOptions> relays;
-  final ProposalTypesRequiredNamespaces requiredNamespaces;
-  final ProposalTypesProposer proposer;
+  final ProposalRequiredNamespaces requiredNamespaces;
+  final ProposalProposer proposer;
 
   RpcSessionProposeParams({
     required this.relays,
@@ -70,70 +70,6 @@ class RpcSessionProposeParams {
 
   Map<String, dynamic> toJson() => _$RpcSessionProposeParamsToJson(this);
 }
-
-// @JsonSerializable()
-// class RpcSessionDeleteParams {
-//   final int code;
-//   final String message;
-
-//   RpcSessionDeleteParams({
-//     required this.code,
-//     required this.message,
-//   });
-
-//   factory RpcSessionDeleteParams.fromJson(Map<String, dynamic> json) =>
-//       _$RpcSessionDeleteParamsFromJson(json);
-
-//   Map<String, dynamic> toJson() => _$RpcSessionDeleteParamsToJson(this);
-// }
-
-// export interface RequestParams {
-//   wc_pairingDelete: {
-//     code: number;
-//     message: string;
-//   };
-//   wc_pairingPing: Record<string, unknown>;
-//   wc_sessionPropose: {
-//     relays: RelayerTypes.ProtocolOptions[];
-//     requiredNamespaces: ProposalTypes.RequiredNamespaces;
-//     proposer: {
-//       publicKey: string;
-//       metadata: SignClientTypes.Metadata;
-//     };
-//   };
-//   wc_sessionSettle: {
-//     relay: RelayerTypes.ProtocolOptions;
-//     namespaces: SessionTypes.Namespaces;
-//     expiry: number;
-//     controller: {
-//       publicKey: string;
-//       metadata: SignClientTypes.Metadata;
-//     };
-//   };
-//   wc_sessionUpdate: {
-//     namespaces: SessionTypes.Namespaces;
-//   };
-//   wc_sessionExtend: Record<string, unknown>;
-//   wc_sessionDelete: {
-//     code: number;
-//     message: string;
-//   };
-//   wc_sessionPing: Record<string, unknown>;
-//   wc_sessionRequest: {
-//     request: {
-//       method: string;
-//       params: any;
-//     };
-//     chainId: string;
-//   };
-//   wc_sessionEvent: {
-//     event: {
-//       name: string;
-//       data: unknown;
-//     };
-//     chainId: string;
-//   };
-// }
 
 typedef ResultPairingDelete = bool;
 typedef ResultPairingPing = bool;

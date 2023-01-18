@@ -1,8 +1,8 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/crypto/i_crypto.dart';
 import 'package:wallet_connect/core/expirer/i_expirer.dart';
-import 'package:wallet_connect/core/history/types.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/history/models.dart';
+import 'package:wallet_connect/core/pairing/i_pairing.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 import 'package:wallet_connect/wc_utils/misc/heartbeat/types.dart';

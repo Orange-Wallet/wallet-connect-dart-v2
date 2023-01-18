@@ -21,10 +21,6 @@ class Expirer with Events implements IExpirer {
 
   final String version = EXPIRER_STORAGE_VERSION;
 
-  List<ExpirerExpiration> _cached;
-
-  bool _initialized;
-
   final String storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
@@ -32,6 +28,10 @@ class Expirer with Events implements IExpirer {
 
   @override
   final Logger logger;
+
+  List<ExpirerExpiration> _cached;
+
+  bool _initialized;
 
   Expirer({required this.core, Logger? logger})
       : logger = logger ?? Logger(),

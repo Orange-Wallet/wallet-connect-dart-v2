@@ -6,12 +6,12 @@ import 'package:example/utils/eip155_data.dart';
 import 'package:example/utils/solana_data.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 class SessionRequestView extends StatefulWidget {
-  final ProposalTypesStruct proposal;
-  final void Function(SessionTypesNamespaces) onApprove;
+  final ProposalStruct proposal;
+  final void Function(SessionNamespaces) onApprove;
   final void Function() onReject;
 
   const SessionRequestView({
@@ -130,7 +130,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
                             Theme.of(context).colorScheme.secondary,
                       ),
                       onPressed: () {
-                        final SessionTypesNamespaces params = {};
+                        final SessionNamespaces params = {};
                         for (final entry
                             in widget.proposal.requiredNamespaces.entries) {
                           final List<String> accounts = [];
@@ -146,7 +146,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
                               }
                             }
                           }
-                          params[entry.key] = SessionTypesNamespace(
+                          params[entry.key] = SessionNamespace(
                             accounts: accounts,
                             methods: entry.value.methods,
                             events: entry.value.events,
@@ -184,7 +184,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
 
 class NamespaceView extends StatefulWidget {
   final String type;
-  final ProposalTypesRequiredNamespace namespace;
+  final ProposalRequiredNamespace namespace;
   final List<Account> selectedAccounts;
 
   const NamespaceView({

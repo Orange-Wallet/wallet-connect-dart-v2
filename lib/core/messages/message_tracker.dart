@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/messages/constants.dart';
-import 'package:wallet_connect/core/messages/types.dart';
+import 'package:wallet_connect/core/messages/i_message_tracker.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -10,18 +10,21 @@ import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 class MessageTracker implements IMessageTracker {
   @override
   Map<String, MessageRecord> messages;
+
   @override
   final String name = MESSAGES_CONTEXT;
 
   final String version = MESSAGES_STORAGE_VERSION;
 
-  bool _initialized = false;
-  final _storagePrefix = CORE_STORAGE_PREFIX;
+  final storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
   final Logger logger;
+
   @override
   final ICore core;
+
+  bool _initialized = false;
 
   MessageTracker({
     required this.core,
@@ -40,8 +43,11 @@ class MessageTracker implements IMessageTracker {
         }
 
         logger.d('Successfully Restored records for $name');
-        logger.i(
-            {'type': "method", 'method': "restore", 'size': messages.length});
+        logger.v({
+          'type': "method",
+          'method': "restore",
+          'size': messages.length,
+        });
       } catch (e) {
         logger.d('Failed to Restore records for $name');
         logger.e(e.toString());
@@ -51,7 +57,7 @@ class MessageTracker implements IMessageTracker {
     }
   }
 
-  get storageKey => '$_storagePrefix$version//$name';
+  String get storageKey => '$storagePrefix$version//$name';
 
   @override
   Future<String> set(String topic, String message) async {

@@ -1,7 +1,7 @@
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 const TEST_RELAY_URL =
     String.fromEnvironment('TEST_RELAY_URL', defaultValue: "ws://0.0.0.0:5555");
@@ -65,16 +65,16 @@ const TEST_ACCOUNTS = [
   TEST_AVALANCHE_ACCOUNT,
 ];
 
-const ProposalTypesRequiredNamespaces TEST_REQUIRED_NAMESPACES = {
-  'eip155': ProposalTypesRequiredNamespace(
+const ProposalRequiredNamespaces TEST_REQUIRED_NAMESPACES = {
+  'eip155': ProposalRequiredNamespace(
     methods: TEST_METHODS,
     chains: TEST_CHAINS,
     events: TEST_EVENTS,
   ),
 };
 
-const SessionTypesNamespaces TEST_NAMESPACES = {
-  'eip155': SessionTypesNamespace(
+const SessionNamespaces TEST_NAMESPACES = {
+  'eip155': SessionNamespace(
     methods: TEST_METHODS,
     accounts: TEST_ACCOUNTS,
     events: TEST_EVENTS,

@@ -1,6 +1,6 @@
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/utils/namespaces.dart';
@@ -16,8 +16,8 @@ class ErrorObject {
 // -- protocol validation -------------------------------------------------- //
 
 bool isSessionCompatible(
-  SessionTypesStruct session,
-  ProposalTypesRequiredNamespaces requiredNamespaces,
+  SessionStruct session,
+  ProposalRequiredNamespaces requiredNamespaces,
 ) {
   final sessionKeys = session.namespaces.keys.toList();
   final paramsKeys = requiredNamespaces.keys.toList();
@@ -101,9 +101,8 @@ ErrorObject? isValidExtension(
   String method,
 ) {
   if (namespace.extension != null) {
-    if ((namespace is SessionTypesNamespace &&
-            (namespace.extension!.isEmpty)) ||
-        (namespace is ProposalTypesRequiredNamespace &&
+    if ((namespace is SessionNamespace && (namespace.extension!.isEmpty)) ||
+        (namespace is ProposalRequiredNamespace &&
             (namespace.extension!.isEmpty))) {
       final error = getInternalError(
         InternalErrorKey.MISSING_OR_INVALID,
@@ -142,7 +141,7 @@ ErrorObject? isValidChains(
 }
 
 ErrorObject? isValidNamespaceChains(
-  ProposalTypesRequiredNamespaces namespaces,
+  ProposalRequiredNamespaces namespaces,
   String method,
 ) {
   ErrorObject? error;
@@ -198,7 +197,7 @@ ErrorObject? isValidAccounts(List<String> accounts, String context) {
 }
 
 ErrorObject? isValidNamespaceAccounts(
-  SessionTypesNamespaces input,
+  SessionNamespaces input,
   String method,
 ) {
   ErrorObject? error;
@@ -231,18 +230,18 @@ ErrorObject? isValidActions(
   String context,
 ) {
   ErrorObject? error;
-  if ((namespace is SessionTypesBaseNamespace &&
+  if ((namespace is SessionBaseNamespace &&
           !isValidNamespaceMethodsOrEvents(namespace.methods)) ||
-      (namespace is ProposalTypesBaseRequiredNamespace &&
+      (namespace is ProposalBaseRequiredNamespace &&
           !isValidNamespaceMethodsOrEvents(namespace.methods))) {
     error = getSdkError(
       SdkErrorKey.UNSUPPORTED_METHODS,
       context:
           '$context, methods should be an array of strings or empty array for no methods',
     );
-  } else if ((namespace is SessionTypesBaseNamespace &&
+  } else if ((namespace is SessionBaseNamespace &&
           !isValidNamespaceMethodsOrEvents(namespace.events)) ||
-      (namespace is ProposalTypesBaseRequiredNamespace &&
+      (namespace is ProposalBaseRequiredNamespace &&
           !isValidNamespaceMethodsOrEvents(namespace.events))) {
     error = getSdkError(
       SdkErrorKey.UNSUPPORTED_EVENTS,
@@ -259,8 +258,7 @@ ErrorObject? isValidNamespaceActions(
   String method,
 ) {
   ErrorObject? error;
-  if (input is SessionTypesNamespaces ||
-      input is ProposalTypesRequiredNamespaces) {
+  if (input is SessionNamespaces || input is ProposalRequiredNamespaces) {
     input.values.forEach((namespace) {
       if (error != null) return;
       final validActionsError = isValidActions(namespace, '$method, namespace');
@@ -285,7 +283,7 @@ ErrorObject? isValidNamespaceActions(
 }
 
 ErrorObject? isValidRequiredNamespaces(
-  ProposalTypesRequiredNamespaces? input,
+  ProposalRequiredNamespaces? input,
   String method,
 ) {
   ErrorObject? error;
@@ -309,7 +307,7 @@ ErrorObject? isValidRequiredNamespaces(
 }
 
 ErrorObject? isValidNamespaces(
-  SessionTypesNamespaces? input,
+  SessionNamespaces? input,
   String method,
 ) {
   ErrorObject? error;
@@ -362,7 +360,7 @@ bool isValidErrorReason(ErrorResponse? input) {
 }
 
 bool isValidNamespacesChainId(
-  SessionTypesNamespaces namespaces,
+  SessionNamespaces namespaces,
   String chainId,
 ) {
   if (!isValidChainId(chainId)) return false;
@@ -373,7 +371,7 @@ bool isValidNamespacesChainId(
 }
 
 bool isValidNamespacesRequest(
-  SessionTypesNamespaces namespaces,
+  SessionNamespaces namespaces,
   String chainId,
   String method,
 ) {
@@ -382,7 +380,7 @@ bool isValidNamespacesRequest(
 }
 
 bool isValidNamespacesEvent(
-  SessionTypesNamespaces namespaces,
+  SessionNamespaces namespaces,
   String chainId,
   String eventName,
 ) {
@@ -391,8 +389,8 @@ bool isValidNamespacesEvent(
 }
 
 ErrorObject? isConformingNamespaces(
-  ProposalTypesRequiredNamespaces requiredNamespaces,
-  SessionTypesNamespaces namespaces,
+  ProposalRequiredNamespaces requiredNamespaces,
+  SessionNamespaces namespaces,
   String context,
 ) {
   ErrorObject? error;

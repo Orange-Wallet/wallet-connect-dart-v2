@@ -1,7 +1,7 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/history/constants.dart';
-import 'package:wallet_connect/core/history/types.dart';
+import 'package:wallet_connect/core/history/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -12,18 +12,23 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   Map<int, JsonRpcRecord> records;
 
   final String name = HISTORY_CONTEXT;
+
   final String version = HISTORY_STORAGE_VERSION;
 
-  List<JsonRpcRecord> _cached;
-  bool _initialized;
-  final _storagePrefix = CORE_STORAGE_PREFIX;
+  final String storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
   final ICore core;
+
   @override
   final Logger logger;
+
   @override
   final EventEmitter<String> events;
+
+  List<JsonRpcRecord> _cached;
+
+  bool _initialized;
 
   JsonRpcHistory({
     required this.core,
@@ -46,12 +51,14 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
     }
   }
 
-  String get storageKey => '$_storagePrefix$version//$name';
+  String get storageKey => '$storagePrefix$version//$name';
 
   @override
   int get size => records.length;
+
   @override
   List<int> get keys => records.keys.toList();
+
   @override
   List<JsonRpcRecord> get values => records.values.toList();
 

@@ -1,4 +1,4 @@
-import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
 const SDK_TYPE = "js";
@@ -124,6 +124,6 @@ ExpirerTarget parseExpirerTarget(String target) {
 
 // -- events ---------------------------------------------- //
 
-String engineEvent(EngineTypesEvent event, [dynamic id]) {
+String engineEvent(EngineEvent event, [dynamic id]) {
   return '${event.value}${id != null ? ':$id' : ''}';
 }

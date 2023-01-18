@@ -41,11 +41,13 @@ class Subscriber with Events implements ISubscriber {
   @override
   final EventEmitter<String> events;
 
+  final String storagePrefix = CORE_STORAGE_PREFIX;
+
   List<SubscriberActive> _cached;
+
   bool _initialized;
 
   final int _pendingSubInterval = 20;
-  final String _storagePrefix = CORE_STORAGE_PREFIX;
 
   Subscriber({
     required this.relayer,
@@ -70,7 +72,7 @@ class Subscriber with Events implements ISubscriber {
     }
   }
 
-  String get storageKey => '$_storagePrefix$version//$name';
+  String get storageKey => '$storagePrefix$version//$name';
 
   @override
   int get length => subscriptions.length;
@@ -324,7 +326,7 @@ class Subscriber with Events implements ISubscriber {
       'type': "method",
       'method': "setSubscription",
       'id': id,
-      'subscription': subscription
+      'subscription': subscription.toJson(),
     });
     _addSubscription(id, subscription);
   }

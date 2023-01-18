@@ -1,8 +1,8 @@
 import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 const TEST_PAIRING_TOPIC =
     "c9e6d30fb34afe70a15c14e9337ba8e4d5a35dd695c39b94884b0ee60c69d168";
@@ -72,29 +72,29 @@ const TEST_EXPIRY_7D = 1650478882376;
 
 const TEST_EXPIRY_30D = 1652466082376;
 
-final TEST_SESSION = SessionTypesStruct(
+final TEST_SESSION = SessionStruct(
   expiry: TEST_EXPIRY_7D,
   topic: TEST_SESSION_TOPIC,
   relay: TEST_RELAY_OPTIONS,
   acknowledged: true,
   controller: TEST_KEY_PAIRS_A.publicKey,
-  self: SessionTypesPublicKeyMetadata(
+  self: SessionPublicKeyMetadata(
     publicKey: TEST_KEY_PAIRS_A.publicKey,
     metadata: TEST_SESSION_METADATA,
   ),
-  peer: SessionTypesPublicKeyMetadata(
+  peer: SessionPublicKeyMetadata(
     publicKey: TEST_KEY_PAIRS_B.publicKey,
     metadata: TEST_SESSION_METADATA,
   ),
   requiredNamespaces: {
-    TEST_ETHEREUM_NAMESPACE: ProposalTypesRequiredNamespace(
+    TEST_ETHEREUM_NAMESPACE: ProposalRequiredNamespace(
       chains: TEST_CHAINS,
       methods: TEST_METHODS,
       events: TEST_EVENTS,
     ),
   },
   namespaces: {
-    TEST_ETHEREUM_NAMESPACE: SessionTypesNamespace(
+    TEST_ETHEREUM_NAMESPACE: SessionNamespace(
       accounts: TEST_ACCOUNTS,
       methods: TEST_METHODS,
       events: TEST_EVENTS,

@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
 @JsonSerializable()
 class JsonRpcRecord {

@@ -30,18 +30,24 @@ class RelayerProtocolOptions {
   int get hashCode => protocol.hashCode ^ data.hashCode;
 }
 
+@JsonSerializable()
 class RelayerPublishOptions {
   final RelayerProtocolOptions? relay;
   final int? ttl;
   final bool? prompt;
   final int? tag;
 
-  RelayerPublishOptions({
+  const RelayerPublishOptions({
     this.relay,
     this.ttl,
     this.prompt,
     this.tag,
   });
+
+  factory RelayerPublishOptions.fromJson(Map<String, dynamic> json) =>
+      _$RelayerPublishOptionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RelayerPublishOptionsToJson(this);
 }
 
 @JsonSerializable()

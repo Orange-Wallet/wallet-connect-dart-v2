@@ -2,42 +2,53 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/core.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/engine/engine.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/engine/i_engine.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/constants.dart';
-import 'package:wallet_connect/sign/sign-client/client/types.dart';
-import 'package:wallet_connect/sign/sign-client/pendingRequest/pending_request.dart';
-import 'package:wallet_connect/sign/sign-client/pendingRequest/types.dart';
+import 'package:wallet_connect/sign/sign-client/client/i_sign_client.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/i_pending_request.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/pending_request.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/i_proposal.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/proposal.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
+import 'package:wallet_connect/sign/sign-client/session/i_session.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/session.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 class SignClient with Events implements ISignClient {
   final String protocol = SIGN_CLIENT_PROTOCOL;
+
   final int version = SIGN_CLIENT_VERSION;
 
   @override
   final String name;
+
   @override
   final AppMetadata metadata;
 
   @override
   final ICore core;
+
   @override
   final Logger logger;
+
   @override
   final EventEmitter<String> events;
+
   @override
   late final IEngine engine;
+
   @override
   late final ISession session;
+
   @override
   late final IProposal proposal;
+
   @override
   late final IPendingRequest pendingRequest;
 
@@ -89,55 +100,14 @@ class SignClient with Events implements ISignClient {
     return client;
   }
 
-  // constructor(opts?: SignClientTypes.Options) {
-  //   super(opts);
-
-  //   name = opts?.name || SignClientDefault.name;
-  //   metadata = opts?.metadata || getAppMetadata();
-
-  //   const logger =
-  //     typeof opts?.logger !== "undefined" && typeof opts?.logger !== "string"
-  //       ? opts.logger
-  //       : pino(getDefaultLoggerOptions({ level: opts?.logger || SignClientDefault.logger }));
-
-  //   core = opts?.core || new Core(opts);
-  //   logger = generateChildLogger(logger, name);
-  //   session = new Session(core, logger);
-  //   proposal = new Proposal(core, logger);
-  //   pendingRequest = new PendingRequest(core, logger);
-  //   engine = new Engine(this);
-  // }
-
-  IStore<String, PairingTypesStruct> get pairing => core.pairing.pairings;
-
-  // ---------- Events ----------------------------------------------- //
-
-  // public on: ISignClientEvents["on"] = (name, listener) => {
-  //   return events.on(name, listener);
-  // };
-
-  // public once: ISignClientEvents["once"] = (name, listener) => {
-  //   return events.once(name, listener);
-  // };
-
-  // public off: ISignClientEvents["off"] = (name, listener) => {
-  //   return events.off(name, listener);
-  // };
-
-  // public removeListener: ISignClientEvents["removeListener"] = (name, listener) => {
-  //   return events.removeListener(name, listener);
-  // };
-
-  // public removeAllListeners: ISignClientEvents["removeAllListeners"] = (name) => {
-  //   return events.removeAllListeners(name);
-  // };
+  IStore<String, PairingStruct> get pairing => core.pairing.pairings;
 
   // ---------- Engine ----------------------------------------------- //
 
   @override
-  Future<EngineTypesConnection> connect(SessionConnectParams params) async {
+  Future<EngineConnection> connect(SessionConnectParams params) {
     try {
-      return await engine.connect(params);
+      return engine.connect(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -145,9 +115,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<PairingTypesStruct> pair(String uri) async {
+  Future<PairingStruct> pair(String uri) {
     try {
-      return await engine.pair(uri);
+      return engine.pair(uri);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -155,9 +125,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<EngineTypesApproved> approve(SessionApproveParams params) async {
+  Future<EngineApproved> approve(SessionApproveParams params) {
     try {
-      return await engine.approve(params);
+      return engine.approve(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -165,9 +135,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<void> reject(SessionRejectParams params) async {
+  Future<void> reject(SessionRejectParams params) {
     try {
-      return await engine.reject(params);
+      return engine.reject(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -175,7 +145,7 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<EngineTypesAcknowledged> update(SessionUpdateParams params) async {
+  Future<EngineAcknowledged> update(SessionUpdateParams params) {
     try {
       return engine.update(params);
     } catch (error) {
@@ -185,7 +155,7 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<EngineTypesAcknowledged> extend(String topic) async {
+  Future<EngineAcknowledged> extend(String topic) {
     try {
       return engine.extend(topic);
     } catch (error) {
@@ -195,9 +165,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<T> request<T>(SessionRequestParams params) async {
+  Future<T> request<T>(SessionRequestParams params) {
     try {
-      return await engine.request<T>(params);
+      return engine.request<T>(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -205,9 +175,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<void> respond(SessionRespondParams params) async {
+  Future<void> respond(SessionRespondParams params) {
     try {
-      return await engine.respond(params);
+      return engine.respond(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -215,9 +185,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<void> ping(String topic) async {
+  Future<void> ping(String topic) {
     try {
-      return await engine.ping(topic);
+      return engine.ping(topic);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -225,9 +195,9 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  Future<void> emit(SessionEmitParams params) async {
+  Future<void> emit(SessionEmitParams params) {
     try {
-      return await engine.emit(params);
+      return engine.emit(params);
     } catch (error) {
       logger.e(error is ErrorResponse ? error.message : error.toString());
       rethrow;
@@ -238,9 +208,9 @@ class SignClient with Events implements ISignClient {
   Future<void> disconnect({
     required String topic,
     ErrorResponse? reason,
-  }) async {
+  }) {
     try {
-      return await engine.disconnect(
+      return engine.disconnect(
         topic: topic,
         reason: reason,
       );
@@ -251,7 +221,7 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  List<SessionTypesStruct> find(params) {
+  List<SessionStruct> find(params) {
     try {
       return engine.find(params);
     } catch (error) {
@@ -261,7 +231,7 @@ class SignClient with Events implements ISignClient {
   }
 
   @override
-  List<PendingRequestTypesStruct> getPendingSessionRequests() {
+  List<PendingRequestStruct> getPendingSessionRequests() {
     try {
       return engine.getPendingSessionRequests();
     } catch (error) {

@@ -1,4 +1,4 @@
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 List<String> getAccountsChains(List<String> accounts) {
   final List<String> chains = [];
@@ -10,7 +10,7 @@ List<String> getAccountsChains(List<String> accounts) {
   return chains;
 }
 
-List<String> getNamespacesChains(SessionTypesNamespaces namespaces) {
+List<String> getNamespacesChains(SessionNamespaces namespaces) {
   final List<String> chains = [];
   namespaces.values.forEach((namespace) {
     chains.addAll(getAccountsChains(namespace.accounts));
@@ -25,7 +25,7 @@ List<String> getNamespacesChains(SessionTypesNamespaces namespaces) {
 }
 
 List<String> getNamespacesMethodsForChainId(
-  SessionTypesNamespaces namespaces,
+  SessionNamespaces namespaces,
   String chainId,
 ) {
   final List<String> methods = [];
@@ -46,7 +46,7 @@ List<String> getNamespacesMethodsForChainId(
 }
 
 List<String> getNamespacesEventsForChainId(
-  SessionTypesNamespaces namespaces,
+  SessionNamespaces namespaces,
   String chainId,
 ) {
   final List<String> events = [];

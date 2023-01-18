@@ -1,21 +1,21 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-PendingRequestTypesStruct _$PendingRequestTypesStructFromJson(
+PendingRequestStruct _$PendingRequestStructFromJson(
         Map<String, dynamic> json) =>
-    PendingRequestTypesStruct(
+    PendingRequestStruct(
       json['topic'] as String,
       json['id'] as int,
       RpcSessionRequestParams.fromJson(json['params'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PendingRequestTypesStructToJson(
-        PendingRequestTypesStruct instance) =>
+Map<String, dynamic> _$PendingRequestStructToJson(
+        PendingRequestStruct instance) =>
     <String, dynamic>{
       'topic': instance.topic,
       'id': instance.id,

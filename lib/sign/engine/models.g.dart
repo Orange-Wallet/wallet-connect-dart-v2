@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -10,11 +10,11 @@ SessionSettleRequestParams _$SessionSettleRequestParamsFromJson(
         Map<String, dynamic> json) =>
     SessionSettleRequestParams(
       RelayerProtocolOptions.fromJson(json['relay'] as Map<String, dynamic>),
-      SessionTypesPublicKeyMetadata.fromJson(
+      SessionPublicKeyMetadata.fromJson(
           json['controller'] as Map<String, dynamic>),
       (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       json['expiry'] as int,
     );
@@ -32,16 +32,16 @@ SessionSettleParams _$SessionSettleParamsFromJson(Map<String, dynamic> json) =>
     SessionSettleParams(
       relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
-      controller: SessionTypesPublicKeyMetadata.fromJson(
+      controller: SessionPublicKeyMetadata.fromJson(
           json['controller'] as Map<String, dynamic>),
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       expiry: json['expiry'] as int,
     );
@@ -62,8 +62,8 @@ SessionConnectParams _$SessionConnectParamsFromJson(
     SessionConnectParams(
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       pairingTopic: json['pairingTopic'] as String?,
       relays: (json['relays'] as List<dynamic>?)
@@ -95,8 +95,8 @@ SessionApproveParams _$SessionApproveParamsFromJson(
     SessionApproveParams(
       id: json['id'] as int,
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       relayProtocol: json['relayProtocol'] as String?,
     );
@@ -135,8 +135,8 @@ SessionUpdateParams _$SessionUpdateParamsFromJson(Map<String, dynamic> json) =>
     SessionUpdateParams(
       topic: json['topic'] as String,
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
     );
 

@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/keychain/constants.dart';
-import 'package:wallet_connect/core/keychain/types.dart';
+import 'package:wallet_connect/core/keychain/i_key_chain.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
@@ -15,14 +15,15 @@ class KeyChain implements IKeyChain {
 
   final version = KEYCHAIN_STORAGE_VERSION;
 
-  bool _initialized = false;
-  final _storagePrefix = CORE_STORAGE_PREFIX;
+  final storagePrefix = CORE_STORAGE_PREFIX;
 
   @override
   final ICore core;
 
   @override
   final Logger logger;
+
+  bool _initialized = false;
 
   KeyChain({
     required this.core,
@@ -31,7 +32,7 @@ class KeyChain implements IKeyChain {
         keychain = {};
 
   @override
-  init() async {
+  Future<void> init() async {
     if (!_initialized) {
       final keychain = await _getKeyChain();
       if (keychain != null) {
@@ -41,23 +42,23 @@ class KeyChain implements IKeyChain {
     }
   }
 
-  String get storageKey => '$_storagePrefix$version//$name';
+  String get storageKey => '$storagePrefix$version//$name';
 
   @override
-  has(String tag) {
+  bool has(String tag) {
     _isInitialized();
     return keychain.containsKey(tag);
   }
 
   @override
-  set(String tag, String key) async {
+  Future<void> set(String tag, String key) async {
     _isInitialized();
     keychain[tag] = key;
     await _persist();
   }
 
   @override
-  get(tag) {
+  String get(String tag) {
     _isInitialized();
     final key = keychain[tag];
     if (key == null) {
@@ -69,7 +70,7 @@ class KeyChain implements IKeyChain {
   }
 
   @override
-  del(tag) async {
+  Future<void> del(String tag) async {
     _isInitialized();
     keychain.remove(tag);
     await _persist();
@@ -86,11 +87,11 @@ class KeyChain implements IKeyChain {
     return keychain;
   }
 
-  _persist() async {
+  Future<void> _persist() async {
     await _setKeyChain(keychain);
   }
 
-  _isInitialized() {
+  void _isInitialized() {
     if (!_initialized) {
       final error =
           getInternalError(InternalErrorKey.NOT_INITIALIZED, context: name);

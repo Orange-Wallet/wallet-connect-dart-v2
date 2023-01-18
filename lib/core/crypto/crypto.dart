@@ -7,8 +7,8 @@ import 'package:wallet_connect/core/crypto/constants.dart';
 import 'package:wallet_connect/core/crypto/i_crypto.dart';
 import 'package:wallet_connect/core/crypto/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/keychain/keychain.dart';
-import 'package:wallet_connect/core/keychain/types.dart';
+import 'package:wallet_connect/core/keychain/key_chain.dart';
+import 'package:wallet_connect/core/keychain/i_key_chain.dart';
 import 'package:wallet_connect/utils/crypto.dart' as utils;
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -28,6 +28,8 @@ class Crypto implements ICrypto {
   @override
   final Logger logger;
 
+  bool _initialized;
+
   Crypto({
     required this.core,
     Logger? logger,
@@ -35,8 +37,6 @@ class Crypto implements ICrypto {
   })  : logger = logger ?? Logger(),
         keychain = keychain ?? KeyChain(core: core),
         _initialized = false;
-
-  bool _initialized;
 
   @override
   Future<void> init() async {

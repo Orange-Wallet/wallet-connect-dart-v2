@@ -1,6 +1,6 @@
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
 const ENGINE_CONTEXT = "engine";
@@ -12,7 +12,7 @@ const THIRTY_SECONDS = 30;
 PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
   switch (method) {
     case JsonRpcMethod.WC_SESSION_PROPOSE:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
@@ -25,7 +25,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_SETTLE:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: false,
@@ -38,7 +38,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_REQUEST:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
@@ -51,7 +51,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_DELETE:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
@@ -64,7 +64,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_PING:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
@@ -77,7 +77,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_EVENT:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: FIVE_MINUTES,
           prompt: true,
@@ -90,7 +90,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_UPDATE:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: ONE_DAY,
           prompt: false,
@@ -103,7 +103,7 @@ PairingJsonRpcOptions getEngineRpcOptions(JsonRpcMethod method) {
         ),
       );
     case JsonRpcMethod.WC_SESSION_EXTEND:
-      return PairingJsonRpcOptions(
+      return const PairingJsonRpcOptions(
         req: RelayerPublishOptions(
           ttl: THIRTY_SECONDS,
           prompt: false,

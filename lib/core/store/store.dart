@@ -3,8 +3,8 @@ import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/store/constants.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
-import 'package:wallet_connect/sign/sign-client/session/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
@@ -62,11 +62,11 @@ class Store<K, V> implements IStore<K, V> {
       await _restore();
 
       for (final value in _cached) {
-        if (value is ProposalTypesStruct
+        if (value is ProposalStruct
             //  && value.proposer.publicKey != null
             ) {
           map[value.id as K] = value;
-        } else if (value is SessionTypesStruct
+        } else if (value is SessionStruct
             //  && value.topic != null
             ) {
           map[value.topic as K] = value;
@@ -96,7 +96,12 @@ class Store<K, V> implements IStore<K, V> {
   Future<void> set(K key, V value) async {
     _isInitialized();
     logger.d('Setting value');
-    logger.i({'type': "method", 'method': "set", 'key': key, 'value': value});
+    logger.v({
+      'type': "method",
+      'method': "set",
+      'key': key,
+      'value': toJson(value),
+    });
     map[key] = value;
     await _persist();
   }
@@ -105,7 +110,11 @@ class Store<K, V> implements IStore<K, V> {
   V get(K key) {
     _isInitialized();
     logger.d('Getting value');
-    logger.i({'type': "method", 'method': "get", 'key': key});
+    logger.v({
+      'type': "method",
+      'method': "get",
+      'key': key,
+    });
     final value = _getData(key);
     return value;
   }
@@ -123,11 +132,11 @@ class Store<K, V> implements IStore<K, V> {
     _isInitialized();
     final value = update(_getData(key));
     logger.d('Updating value');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "update",
       'key': key,
-      'update': update,
+      'updatedValue': toJson(value),
     });
     map[key] = value;
     await _persist();
@@ -138,11 +147,11 @@ class Store<K, V> implements IStore<K, V> {
     _isInitialized();
     if (!map.containsKey(key)) return;
     logger.d('Deleting value');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "delete",
       'key': key,
-      'reason': reason,
+      'reason': reason.toJson(),
     });
     map.remove(key);
     await _persist();
@@ -190,10 +199,10 @@ class Store<K, V> implements IStore<K, V> {
       }
       _cached = persisted?.map((e) => fromJson(e)).toList() ?? [];
       logger.d('Successfully Restored value for $name');
-      logger.i({
+      logger.v({
         'type': "method",
         'method': "restore",
-        'value': values,
+        'value': values.map((e) => toJson(e)).toList(),
       });
     } catch (e) {
       logger.d('Failed to Restore value for $name');

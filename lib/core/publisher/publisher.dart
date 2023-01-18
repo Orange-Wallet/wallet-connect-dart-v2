@@ -1,6 +1,7 @@
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/publisher/constants.dart';
-import 'package:wallet_connect/core/publisher/types.dart';
+import 'package:wallet_connect/core/publisher/i_publisher.dart';
+import 'package:wallet_connect/core/publisher/models.dart';
 import 'package:wallet_connect/core/relayer/i_relayer.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
@@ -10,23 +11,22 @@ import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
 import 'package:wallet_connect/wc_utils/relay/types.dart';
 
 class Publisher implements IPublisher {
-  // @override
-  // final EventSubject events;
   @override
   final String name = PUBLISHER_CONTEXT;
+
   @override
   final IRelayer relayer;
+
   @override
   final Logger logger;
 
+  final Map<String, PublisherParams> _queue;
+
   Publisher({required this.relayer, Logger? logger})
-      :
-        // events = EventSubject(),
-        logger = logger ?? Logger() {
+      : logger = logger ?? Logger(),
+        _queue = {} {
     _registerEventListeners();
   }
-
-  Map<String, PublisherTypesParams> queue = {};
 
   @override
   Future<void> publish({
@@ -35,17 +35,21 @@ class Publisher implements IPublisher {
     RelayerPublishOptions? opts,
   }) async {
     logger.d('Publishing Payload');
-    logger.i({
+    logger.v({
       'type': "method",
       'method': "publish",
-      'params': {topic, message, opts}
+      'params': {
+        'topic': topic,
+        'message': message,
+        'opts': opts?.toJson(),
+      },
     });
     try {
       final ttl = opts?.ttl ?? PUBLISHER_DEFAULT_TTL;
       final relay = getRelayProtocolName(opts);
       final prompt = opts?.prompt ?? false;
       final tag = opts?.tag ?? 0;
-      final params = PublisherTypesParams(
+      final params = PublisherParams(
         topic: topic,
         message: message,
         opts: RelayerPublishOptions(
@@ -56,14 +60,18 @@ class Publisher implements IPublisher {
         ),
       );
       final hash = await hashMessage(message);
-      queue[hash] = params;
+      _queue[hash] = params;
       await _rpcPublish(topic, message, ttl, relay, prompt, tag);
       _onPublish(hash);
       logger.d('Successfully Published Payload');
-      logger.i({
+      logger.v({
         'type': "method",
         'method': "publish",
-        'params': {topic, message, opts}
+        'params': {
+          'topic': topic,
+          'message': message,
+          'opts': opts?.toJson(),
+        },
       });
     } catch (e) {
       logger.d('Failed to Publish Payload');
@@ -74,7 +82,7 @@ class Publisher implements IPublisher {
 
   // ---------- Private ----------------------------------------------- //
 
-  _rpcPublish(
+  Future<dynamic> _rpcPublish(
     String topic,
     String message,
     int ttl,
@@ -95,7 +103,7 @@ class Publisher implements IPublisher {
       paramsToJson: (value) => value.toJson(),
     );
     logger.d('Outgoing Relay Payload');
-    logger.i({
+    logger.v({
       'type': "message",
       'direction': "outgoing",
       'request': request.toJson(),
@@ -103,12 +111,12 @@ class Publisher implements IPublisher {
     return relayer.provider.request(request: request);
   }
 
-  _onPublish(String hash) {
-    queue.remove(hash);
+  void _onPublish(String hash) {
+    _queue.remove(hash);
   }
 
-  _checkQueue() {
-    queue.values.forEach((params) async {
+  void _checkQueue() {
+    _queue.values.forEach((params) async {
       final hash = await hashMessage(params.message);
       await _rpcPublish(
         params.topic,
@@ -122,7 +130,7 @@ class Publisher implements IPublisher {
     });
   }
 
-  _registerEventListeners() {
+  void _registerEventListeners() {
     relayer.core.heartbeat.on(HeartbeatEvents.pulse, (_) {
       _checkQueue();
     });

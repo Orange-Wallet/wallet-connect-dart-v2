@@ -25,5 +25,6 @@ class SubscriberActive extends SubscriberParams {
   factory SubscriberActive.fromJson(Map<String, dynamic> json) =>
       _$SubscriberActiveFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$SubscriberActiveToJson(this);
 }

@@ -7,15 +7,17 @@ import 'package:wallet_connect/core/expirer/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/pairing/constants.dart';
-import 'package:wallet_connect/core/pairing/types.dart';
+import 'package:wallet_connect/core/pairing/i_pairing.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/relayer/constants.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/core/store/store.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/utils/crypto.dart';
 import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/misc.dart';
+import 'package:wallet_connect/utils/timeout_completer.dart';
 import 'package:wallet_connect/utils/uri.dart';
 import 'package:wallet_connect/utils/validator.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/types.dart';
@@ -34,19 +36,21 @@ class Pairing with Events implements IPairing {
   final EventEmitter<String> events;
 
   @override
-  final IStore<String, PairingTypesStruct> pairings;
+  final IStore<String, PairingStruct> pairings;
 
   final storagePrefix = CORE_STORAGE_PREFIX;
-
-  bool _initialized;
-  List<int> _ignoredPayloadTypes;
-  List<String> _registeredMethods;
 
   @override
   final ICore core;
 
   @override
   final Logger logger;
+
+  bool _initialized;
+
+  final List<int> _ignoredPayloadTypes = [TYPE_1];
+
+  List<String> _registeredMethods;
 
   final FIVE_MINUTES = 5 * 60; // 5mins in secs
   final THIRTY_DAYS = 30 * 24 * 60 * 60; // 30days in secs
@@ -59,12 +63,10 @@ class Pairing with Events implements IPairing {
           logger: logger,
           name: PAIRING_CONTEXT,
           storagePrefix: CORE_STORAGE_PREFIX,
-          fromJson: (v) =>
-              PairingTypesStruct.fromJson(v as Map<String, dynamic>),
+          fromJson: (v) => PairingStruct.fromJson(v as Map<String, dynamic>),
           toJson: (v) => v.toJson(),
         ),
         _initialized = false,
-        _ignoredPayloadTypes = [TYPE_1],
         _registeredMethods = [];
 
   @override
@@ -83,24 +85,24 @@ class Pairing with Events implements IPairing {
   void register(List<String> methods) {
     _isInitialized();
     _registeredMethods = [
-      ...[..._registeredMethods, ...methods].toSet()
+      ...<String>{..._registeredMethods, ...methods}
     ];
   }
 
   @override
-  Future<PairingTopicUriData> create() async {
+  Future<PairingCreated> create() async {
     _isInitialized();
     final symKey = generateRandomBytes32();
     final topic = await core.crypto.setSymKey(symKey: symKey);
     final expiry = calcExpiry(ttl: FIVE_MINUTES);
     final relay = RelayerProtocolOptions(protocol: RELAYER_DEFAULT_PROTOCOL);
-    final pairing = PairingTypesStruct(
+    final pairing = PairingStruct(
       topic: topic,
       expiry: expiry,
       relay: relay,
       active: false,
     );
-    final uri = formatUri(EngineTypesUriParameters(
+    final uri = formatUri(EngineUriParameters(
       protocol: core.protocol,
       version: core.version,
       topic: topic,
@@ -111,11 +113,11 @@ class Pairing with Events implements IPairing {
     await core.relayer.subscribe(topic: topic);
     core.expirer.set(topic, expiry);
 
-    return PairingTopicUriData(topic: topic, uri: uri);
+    return PairingCreated(topic: topic, uri: uri);
   }
 
   @override
-  Future<PairingTypesStruct> pair({
+  Future<PairingStruct> pair({
     required String uri,
     bool activatePairing = false,
   }) async {
@@ -123,7 +125,7 @@ class Pairing with Events implements IPairing {
     _isValidPair(uri);
     final uriParams = parseUri(uri);
     final expiry = calcExpiry(ttl: FIVE_MINUTES);
-    final pairing = PairingTypesStruct(
+    final pairing = PairingStruct(
       topic: uriParams.topic,
       expiry: expiry,
       relay: uriParams.relay,
@@ -162,9 +164,11 @@ class Pairing with Events implements IPairing {
     await _isValidPairingTopic(topic);
     if (pairings.keys.contains(topic)) {
       final id = await _sendRequest(
-          topic, PairingRpcMethod.WC_PAIRING_PING, {}, (_) => {});
+          topic, PairingMethod.WC_PAIRING_PING, {}, (_) => {});
       final completer = Completer<void>();
-      events.once(engineEvent(EngineTypesEvent.PAIRING_PING, id), (data) {
+      final timer = completer.expirer();
+      events.once(engineEvent(EngineEvent.PAIRING_PING, id), (data) {
+        timer.cancel();
         if (data is ErrorResponse) {
           completer.completeError(data);
         } else {
@@ -176,22 +180,26 @@ class Pairing with Events implements IPairing {
   }
 
   @override
-  Future<void> updateExpiry(
-      {required String topic, required int expiry}) async {
+  Future<void> updateExpiry({
+    required String topic,
+    required int expiry,
+  }) async {
     _isInitialized();
     await pairings.update(topic, (value) => value.copyWith(expiry: expiry));
   }
 
   @override
-  Future<void> updateMetadata(
-      {required String topic, required AppMetadata metadata}) async {
+  Future<void> updateMetadata({
+    required String topic,
+    required AppMetadata metadata,
+  }) async {
     _isInitialized();
     await pairings.update(
         topic, (value) => value.copyWith(peerMetadata: metadata));
   }
 
   @override
-  List<PairingTypesStruct> getPairings() {
+  List<PairingStruct> getPairings() {
     _isInitialized();
     return pairings.values;
   }
@@ -203,7 +211,7 @@ class Pairing with Events implements IPairing {
     if (pairings.keys.contains(topic)) {
       await _sendRequest<ErrorResponse>(
         topic,
-        PairingRpcMethod.WC_PAIRING_DELETE,
+        PairingMethod.WC_PAIRING_DELETE,
         getSdkError(SdkErrorKey.USER_DISCONNECTED),
         (e) => e.toJson(),
       );
@@ -215,7 +223,7 @@ class Pairing with Events implements IPairing {
 
   Future<int> _sendRequest<T>(
     String topic,
-    PairingRpcMethod method,
+    PairingMethod method,
     T params,
     Object? Function(T)? paramsToJson,
   ) async {
@@ -251,7 +259,7 @@ class Pairing with Events implements IPairing {
     );
     final record = core.history.get(topic: topic, id: id);
     final opts = getPairingRpcOptions(
-            (record.request['method'] as String).pairingRpcMethod)
+            (record.request['method'] as String).toPairingMethod())
         .res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     core.history.resolve(payload.toJson());
@@ -265,7 +273,7 @@ class Pairing with Events implements IPairing {
     );
     final record = core.history.get(topic: topic, id: id);
     final opts = getPairingRpcOptions(
-            (record.request['method'] as String).pairingRpcMethod)
+            (record.request['method'] as String).toPairingMethod())
         .res;
     await core.relayer.publish(topic: topic, message: message, opts: opts);
     core.history.resolve(payload.toJson());
@@ -333,12 +341,13 @@ class Pairing with Events implements IPairing {
     required Map<String, dynamic> payload,
   }) {
     final int id = payload['id'];
-    final String reqMethod = payload['method'];
+    final String method = payload['method'];
+    final PairingMethod? reqMethod = method.toPairingMethod();
 
     switch (reqMethod) {
-      case "wc_pairingPing":
+      case PairingMethod.WC_PAIRING_PING:
         return _onPairingPingRequest(topic: topic, id: id);
-      case "wc_pairingDelete":
+      case PairingMethod.WC_PAIRING_DELETE:
         return _onPairingDeleteRequest(topic: topic, id: id);
       default:
         return _onUnknownRpcMethodRequest(topic: topic, payload: payload);
@@ -351,13 +360,14 @@ class Pairing with Events implements IPairing {
   }) async {
     final int id = payload['id'];
     final record = core.history.get(topic: topic, id: id);
-    final String resMethod = record.request['method'];
+    final String method = record.request['method'];
+    final PairingMethod? resMethod = method.toPairingMethod();
 
     switch (resMethod) {
-      case "wc_pairingPing":
+      case PairingMethod.WC_PAIRING_PING:
         return _onPairingPingResponse(topic: topic, payload: payload);
       default:
-        return _onUnknownRpcMethodResponse(resMethod);
+        return _onUnknownRpcMethodResponse(method);
     }
   }
 
@@ -368,8 +378,7 @@ class Pairing with Events implements IPairing {
     try {
       _isValidPairingTopic(topic);
       await _sendResult<bool>(id, topic, true, (v) => v);
-      events.emit(
-          EngineTypesEvent.PAIRING_PING.value, {'id': id, 'topic': topic});
+      events.emit(EngineEvent.PAIRING_PING.value, {'id': id, 'topic': topic});
     } catch (err) {
       await _sendError(id, topic, err);
       logger.e(err);
@@ -386,12 +395,12 @@ class Pairing with Events implements IPairing {
     Timer(const Duration(milliseconds: 500), () {
       if (isJsonRpcResult(payload)) {
         events.emit(engineEvent(
-          EngineTypesEvent.PAIRING_PING,
+          EngineEvent.PAIRING_PING,
           id,
         ));
       } else if (isJsonRpcError(payload)) {
         events.emit(
-          engineEvent(EngineTypesEvent.PAIRING_PING, id),
+          engineEvent(EngineEvent.PAIRING_PING, id),
           JsonRpcError.fromJson(payload).error,
         );
       }
@@ -454,7 +463,7 @@ class Pairing with Events implements IPairing {
         if (topic != null) {
           if (pairings.keys.contains(topic)) {
             await _deletePairing(topic: topic, expirerHasDeleted: true);
-            events.emit("pairing_expire", {topic});
+            events.emit("pairing_expire", {'topic': topic});
           }
         }
       }

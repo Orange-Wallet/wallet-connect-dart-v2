@@ -1,14 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-SessionTypesBaseNamespace _$SessionTypesBaseNamespaceFromJson(
+SessionBaseNamespace _$SessionBaseNamespaceFromJson(
         Map<String, dynamic> json) =>
-    SessionTypesBaseNamespace(
+    SessionBaseNamespace(
       accounts:
           (json['accounts'] as List<dynamic>).map((e) => e as String).toList(),
       methods:
@@ -17,17 +17,16 @@ SessionTypesBaseNamespace _$SessionTypesBaseNamespaceFromJson(
           (json['events'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$SessionTypesBaseNamespaceToJson(
-        SessionTypesBaseNamespace instance) =>
+Map<String, dynamic> _$SessionBaseNamespaceToJson(
+        SessionBaseNamespace instance) =>
     <String, dynamic>{
       'accounts': instance.accounts,
       'methods': instance.methods,
       'events': instance.events,
     };
 
-SessionTypesNamespace _$SessionTypesNamespaceFromJson(
-        Map<String, dynamic> json) =>
-    SessionTypesNamespace(
+SessionNamespace _$SessionNamespaceFromJson(Map<String, dynamic> json) =>
+    SessionNamespace(
       accounts:
           (json['accounts'] as List<dynamic>).map((e) => e as String).toList(),
       methods:
@@ -35,13 +34,11 @@ SessionTypesNamespace _$SessionTypesNamespaceFromJson(
       events:
           (json['events'] as List<dynamic>).map((e) => e as String).toList(),
       extension: (json['extension'] as List<dynamic>?)
-          ?.map((e) =>
-              SessionTypesBaseNamespace.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => SessionBaseNamespace.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$SessionTypesNamespaceToJson(
-    SessionTypesNamespace instance) {
+Map<String, dynamic> _$SessionNamespaceToJson(SessionNamespace instance) {
   final val = <String, dynamic>{
     'accounts': instance.accounts,
     'methods': instance.methods,
@@ -59,22 +56,22 @@ Map<String, dynamic> _$SessionTypesNamespaceToJson(
   return val;
 }
 
-SessionTypesPublicKeyMetadata _$SessionTypesPublicKeyMetadataFromJson(
+SessionPublicKeyMetadata _$SessionPublicKeyMetadataFromJson(
         Map<String, dynamic> json) =>
-    SessionTypesPublicKeyMetadata(
+    SessionPublicKeyMetadata(
       publicKey: json['publicKey'] as String,
       metadata: AppMetadata.fromJson(json['metadata'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SessionTypesPublicKeyMetadataToJson(
-        SessionTypesPublicKeyMetadata instance) =>
+Map<String, dynamic> _$SessionPublicKeyMetadataToJson(
+        SessionPublicKeyMetadata instance) =>
     <String, dynamic>{
       'publicKey': instance.publicKey,
       'metadata': instance.metadata.toJson(),
     };
 
-SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
-    SessionTypesStruct(
+SessionStruct _$SessionStructFromJson(Map<String, dynamic> json) =>
+    SessionStruct(
       topic: json['topic'] as String,
       relay: RelayerProtocolOptions.fromJson(
           json['relay'] as Map<String, dynamic>),
@@ -82,21 +79,21 @@ SessionTypesStruct _$SessionTypesStructFromJson(Map<String, dynamic> json) =>
       acknowledged: json['acknowledged'] as bool,
       controller: json['controller'] as String,
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
-      self: SessionTypesPublicKeyMetadata.fromJson(
+      self: SessionPublicKeyMetadata.fromJson(
           json['self'] as Map<String, dynamic>),
-      peer: SessionTypesPublicKeyMetadata.fromJson(
+      peer: SessionPublicKeyMetadata.fromJson(
           json['peer'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SessionTypesStructToJson(SessionTypesStruct instance) {
+Map<String, dynamic> _$SessionStructToJson(SessionStruct instance) {
   final val = <String, dynamic>{
     'topic': instance.topic,
     'relay': instance.relay.toJson(),

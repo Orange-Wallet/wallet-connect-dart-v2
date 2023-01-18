@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'types.dart';
+part of 'models.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -39,8 +39,8 @@ RpcSessionUpdateParams _$RpcSessionUpdateParamsFromJson(
         Map<String, dynamic> json) =>
     RpcSessionUpdateParams(
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, SessionTypesNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) =>
+            MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
     );
 
@@ -59,11 +59,11 @@ RpcSessionProposeParams _$RpcSessionProposeParamsFromJson(
           .toList(),
       requiredNamespaces:
           (json['requiredNamespaces'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k,
-            ProposalTypesRequiredNamespace.fromJson(e as Map<String, dynamic>)),
+        (k, e) => MapEntry(
+            k, ProposalRequiredNamespace.fromJson(e as Map<String, dynamic>)),
       ),
-      proposer: ProposalTypesProposer.fromJson(
-          json['proposer'] as Map<String, dynamic>),
+      proposer:
+          ProposalProposer.fromJson(json['proposer'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RpcSessionProposeParamsToJson(

@@ -2,33 +2,32 @@ import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/core/store/i_store.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/types.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 
-part 'types.g.dart';
+part 'models.g.dart';
 
 @JsonSerializable()
-class SessionTypesBaseNamespace {
+class SessionBaseNamespace {
   final List<String> accounts;
   final List<String> methods;
   final List<String> events;
 
-  const SessionTypesBaseNamespace({
+  const SessionBaseNamespace({
     required this.accounts,
     required this.methods,
     required this.events,
   });
 
-  factory SessionTypesBaseNamespace.fromJson(Map<String, dynamic> json) =>
-      _$SessionTypesBaseNamespaceFromJson(json);
+  factory SessionBaseNamespace.fromJson(Map<String, dynamic> json) =>
+      _$SessionBaseNamespaceFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SessionTypesBaseNamespaceToJson(this);
+  Map<String, dynamic> toJson() => _$SessionBaseNamespaceToJson(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is SessionTypesBaseNamespace &&
+    return other is SessionBaseNamespace &&
         listEquals(other.accounts, accounts) &&
         listEquals(other.methods, methods) &&
         listEquals(other.events, events);
@@ -39,27 +38,27 @@ class SessionTypesBaseNamespace {
 }
 
 @JsonSerializable()
-class SessionTypesNamespace extends SessionTypesBaseNamespace {
-  final List<SessionTypesBaseNamespace>? extension;
+class SessionNamespace extends SessionBaseNamespace {
+  final List<SessionBaseNamespace>? extension;
 
-  const SessionTypesNamespace({
+  const SessionNamespace({
     required super.accounts,
     required super.methods,
     required super.events,
     this.extension,
   });
 
-  factory SessionTypesNamespace.fromJson(Map<String, dynamic> json) =>
-      _$SessionTypesNamespaceFromJson(json);
+  factory SessionNamespace.fromJson(Map<String, dynamic> json) =>
+      _$SessionNamespaceFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$SessionTypesNamespaceToJson(this);
+  Map<String, dynamic> toJson() => _$SessionNamespaceToJson(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is SessionTypesNamespace &&
+    return other is SessionNamespace &&
         listEquals(other.accounts, accounts) &&
         listEquals(other.methods, methods) &&
         listEquals(other.events, events) &&
@@ -74,28 +73,28 @@ class SessionTypesNamespace extends SessionTypesBaseNamespace {
       extension.hashCode;
 }
 
-typedef SessionTypesNamespaces = Map<String, SessionTypesNamespace>;
+typedef SessionNamespaces = Map<String, SessionNamespace>;
 
 @JsonSerializable()
-class SessionTypesPublicKeyMetadata {
+class SessionPublicKeyMetadata {
   final String publicKey;
   final AppMetadata metadata;
 
-  SessionTypesPublicKeyMetadata({
+  SessionPublicKeyMetadata({
     required this.publicKey,
     required this.metadata,
   });
 
-  factory SessionTypesPublicKeyMetadata.fromJson(Map<String, dynamic> json) =>
-      _$SessionTypesPublicKeyMetadataFromJson(json);
+  factory SessionPublicKeyMetadata.fromJson(Map<String, dynamic> json) =>
+      _$SessionPublicKeyMetadataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SessionTypesPublicKeyMetadataToJson(this);
+  Map<String, dynamic> toJson() => _$SessionPublicKeyMetadataToJson(this);
 
-  SessionTypesPublicKeyMetadata copyWith({
+  SessionPublicKeyMetadata copyWith({
     String? publicKey,
     AppMetadata? metadata,
   }) {
-    return SessionTypesPublicKeyMetadata(
+    return SessionPublicKeyMetadata(
       publicKey: publicKey ?? this.publicKey,
       metadata: metadata ?? this.metadata,
     );
@@ -105,7 +104,7 @@ class SessionTypesPublicKeyMetadata {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is SessionTypesPublicKeyMetadata &&
+    return other is SessionPublicKeyMetadata &&
         other.publicKey == publicKey &&
         other.metadata == metadata;
   }
@@ -115,18 +114,18 @@ class SessionTypesPublicKeyMetadata {
 }
 
 @JsonSerializable()
-class SessionTypesStruct {
+class SessionStruct {
   final String topic;
   final RelayerProtocolOptions relay;
   final int expiry;
   final bool acknowledged;
   final String controller;
-  final SessionTypesNamespaces namespaces;
-  final ProposalTypesRequiredNamespaces? requiredNamespaces;
-  final SessionTypesPublicKeyMetadata self;
-  final SessionTypesPublicKeyMetadata peer;
+  final SessionNamespaces namespaces;
+  final ProposalRequiredNamespaces? requiredNamespaces;
+  final SessionPublicKeyMetadata self;
+  final SessionPublicKeyMetadata peer;
 
-  const SessionTypesStruct({
+  const SessionStruct({
     required this.topic,
     required this.relay,
     required this.expiry,
@@ -138,23 +137,23 @@ class SessionTypesStruct {
     required this.peer,
   });
 
-  factory SessionTypesStruct.fromJson(Map<String, dynamic> json) =>
-      _$SessionTypesStructFromJson(json);
+  factory SessionStruct.fromJson(Map<String, dynamic> json) =>
+      _$SessionStructFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SessionTypesStructToJson(this);
+  Map<String, dynamic> toJson() => _$SessionStructToJson(this);
 
-  SessionTypesStruct copyWith({
+  SessionStruct copyWith({
     String? topic,
     RelayerProtocolOptions? relay,
     int? expiry,
     bool? acknowledged,
     String? controller,
-    SessionTypesNamespaces? namespaces,
-    ProposalTypesRequiredNamespaces? requiredNamespaces,
-    SessionTypesPublicKeyMetadata? self,
-    SessionTypesPublicKeyMetadata? peer,
+    SessionNamespaces? namespaces,
+    ProposalRequiredNamespaces? requiredNamespaces,
+    SessionPublicKeyMetadata? self,
+    SessionPublicKeyMetadata? peer,
   }) {
-    return SessionTypesStruct(
+    return SessionStruct(
       topic: topic ?? this.topic,
       relay: relay ?? this.relay,
       expiry: expiry ?? this.expiry,
@@ -167,5 +166,3 @@ class SessionTypesStruct {
     );
   }
 }
-
-typedef ISession = IStore<String, SessionTypesStruct>;

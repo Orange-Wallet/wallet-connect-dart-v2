@@ -1,5 +1,5 @@
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/engine/types.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
 
 // -- uri -------------------------------------------------- //
 
@@ -19,13 +19,13 @@ RelayerProtocolOptions parseRelayParams({
   return RelayerProtocolOptions.fromJson(relay);
 }
 
-EngineTypesUriParameters parseUri(String str) {
+EngineUriParameters parseUri(String str) {
   final uri = Uri.parse(str);
   final protocol = uri.scheme;
   final path = uri.path;
   final requiredValues = path.split("@");
   final queryParams = uri.queryParameters;
-  final result = EngineTypesUriParameters(
+  final result = EngineUriParameters(
     protocol: protocol,
     topic: requiredValues[0],
     version: int.parse(requiredValues[1]),
@@ -51,7 +51,7 @@ Map<String, dynamic> formatRelayParams({
   return params;
 }
 
-String formatUri(EngineTypesUriParameters params) {
+String formatUri(EngineUriParameters params) {
   return Uri(
     scheme: params.protocol,
     path: '${params.topic}@${params.version}',
