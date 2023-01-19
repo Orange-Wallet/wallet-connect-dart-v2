@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
 import 'package:wallet_connect/core/store/constants.dart';
 import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
@@ -69,6 +72,8 @@ class Store<K, V> implements IStore<K, V> {
         } else if (value is SessionStruct
             //  && value.topic != null
             ) {
+          map[value.topic as K] = value;
+        } else if (value is PairingStruct) {
           map[value.topic as K] = value;
         }
         // else if (getKey && value != null ) {
@@ -159,13 +164,12 @@ class Store<K, V> implements IStore<K, V> {
 
   // ---------- Private ----------------------------------------------- //
 
-  Future<void> _setDataStore(List<dynamic> values) async {
-    await core.storage.setItem<List<dynamic>>(storageKey, values);
-  }
+  Future<void> _setDataStore(List<dynamic> values) =>
+      core.storage.setItem(storageKey, values);
 
   Future<List<dynamic>?> _getDataStore() async {
-    final value = await core.storage.getItem<List<dynamic>>(storageKey);
-    return value;
+    final value = await core.storage.getItem(storageKey);
+    return List<dynamic>.from(value ?? []);
   }
 
   V _getData(K key) {
@@ -182,7 +186,7 @@ class Store<K, V> implements IStore<K, V> {
   }
 
   Future<void> _persist() async {
-    await _setDataStore(values.map((e) => toJson(e)).toList());
+    await _setDataStore(values);
   }
 
   Future<void> _restore() async {
@@ -197,16 +201,16 @@ class Store<K, V> implements IStore<K, V> {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      _cached = persisted?.map((e) => fromJson(e)).toList() ?? [];
+      _cached = persisted?.map((e) => e as V).toList() ?? [];
       logger.d('Successfully Restored value for $name');
       logger.v({
         'type': "method",
         'method': "restore",
         'value': values.map((e) => toJson(e)).toList(),
       });
-    } catch (e) {
+    } catch (e, t) {
       logger.d('Failed to Restore value for $name');
-      logger.e(e.toString());
+      logger.e('$e\n$t');
     }
   }
 

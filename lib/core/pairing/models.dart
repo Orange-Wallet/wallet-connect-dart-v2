@@ -1,18 +1,22 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/core/store/i_store.dart';
 
 part 'models.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 7)
 class PairingStruct {
+  @HiveField(0)
   final String topic;
+  @HiveField(1)
   final int expiry;
+  @HiveField(2)
   final RelayerProtocolOptions relay;
+  @HiveField(3)
   final bool active;
+  @HiveField(4)
   final AppMetadata? peerMetadata;
 
   PairingStruct({
@@ -103,3 +107,42 @@ class PairingCreated {
 
   PairingCreated({required this.topic, required this.uri});
 }
+
+// @HiveType(typeId: 7)
+// class PairingStore {
+//   @HiveField(0)
+//   final String topic;
+//   @HiveField(1)
+//   final int expiry;
+//   @HiveField(2)
+//   final RelayerProtocolOptions relay;
+//   @HiveField(3)
+//   final bool active;
+//   @HiveField(4)
+//   final Map<String, dynamic>? peerMetadata;
+
+//   PairingStore(
+//     this.topic,
+//     this.expiry,
+//     this.relay,
+//     this.active,
+//     this.peerMetadata,
+//   );
+
+//   factory PairingStore.fromData(PairingStruct data) => PairingStore(
+//         data.topic,
+//         data.expiry,
+//         data.relay,
+//         data.active,
+//         data.peerMetadata?.toJson(),
+//       );
+
+//   PairingStruct toData() => PairingStruct(
+//         topic: topic,
+//         expiry: expiry,
+//         relay: relay,
+//         active: active,
+//         peerMetadata:
+//             peerMetadata != null ? AppMetadata.fromJson(peerMetadata!) : null,
+//       );
+// }

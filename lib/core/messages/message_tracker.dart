@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
@@ -96,18 +98,16 @@ class MessageTracker implements IMessageTracker {
 
   // ---------- Private ----------------------------------------------- //
 
-  Future<void> _setRelayerMessages(Map<String, MessageRecord> messages) async {
-    await core.storage.setItem<Map<String, MessageRecord>>(
-      storageKey,
-      messages,
-    );
-  }
+  Future<void> _setRelayerMessages(Map<String, MessageRecord> messages) =>
+      core.storage.setItem(storageKey, jsonEncode(messages));
 
   Future<Map<String, MessageRecord>?> _getRelayerMessages() async {
-    final messages = await core.storage.getItem<Map<String, MessageRecord>>(
-      storageKey,
-    );
-    return messages;
+    final messages = await core.storage.getItem(storageKey);
+    return messages == null
+        ? null
+        : Map<String, MessageRecord>.from(Map<String, dynamic>.from(
+            jsonDecode(messages)
+                .map((k, v) => MapEntry(k, Map<String, String>.from(v)))));
   }
 
   Future<void> _persist() async {

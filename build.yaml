@@ -2,6 +2,9 @@ targets:
   $default:
     builders:
       json_serializable:
+        generate_for:
+          include:
+            - lib/**
         options:
           # Options configure how source code is generated for every
           # `@JsonSerializable`-annotated class in the package.
@@ -19,3 +22,7 @@ targets:
           generic_argument_factories: false
           ignore_unannotated: false
           include_if_null: false
+      hive_generator:
+        generate_for:
+          include:
+            - lib/**

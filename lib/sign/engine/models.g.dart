@@ -147,6 +147,23 @@ Map<String, dynamic> _$SessionUpdateParamsToJson(
       'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
     };
 
+SessionRequestParams _$SessionRequestParamsFromJson(
+        Map<String, dynamic> json) =>
+    SessionRequestParams(
+      topic: json['topic'] as String,
+      request: RequestArguments<dynamic>.fromJson(
+          json['request'] as Map<String, dynamic>, (value) => value),
+      chainId: json['chainId'] as String,
+    );
+
+Map<String, dynamic> _$SessionRequestParamsToJson(
+        SessionRequestParams instance) =>
+    <String, dynamic>{
+      'topic': instance.topic,
+      'request': instance.request.toJson(),
+      'chainId': instance.chainId,
+    };
+
 SessionEmitEvent _$SessionEmitEventFromJson(Map<String, dynamic> json) =>
     SessionEmitEvent(
       name: json['name'] as String,

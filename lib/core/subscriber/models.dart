@@ -1,3 +1,4 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 
@@ -13,13 +14,20 @@ class SubscriberParams extends RelayerSubscribeOptions {
 }
 
 @JsonSerializable()
-class SubscriberActive extends SubscriberParams {
+@HiveType(typeId: 2)
+class SubscriberActive extends SubscriberParams with HiveObjectMixin {
+  @HiveField(0)
   final String id;
+  // @override
+  @HiveField(1)
+  final RelayerProtocolOptions relay;
+  @HiveField(2)
+  final String topic;
 
   SubscriberActive({
     required this.id,
-    required RelayerProtocolOptions relay,
-    required String topic,
+    required this.relay,
+    required this.topic,
   }) : super(relay: relay, topic: topic);
 
   factory SubscriberActive.fromJson(Map<String, dynamic> json) =>

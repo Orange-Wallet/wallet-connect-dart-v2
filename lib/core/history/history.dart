@@ -166,15 +166,12 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
   // ---------- Private ----------------------------------------------- //
 
   Future<void> _setJsonRpcRecords(List<JsonRpcRecord> records) async {
-    final recordsJson = records.map((e) => e.toJson()).toList();
-    await core.storage
-        .setItem<List<Map<String, dynamic>>>(storageKey, recordsJson);
+    await core.storage.setItem(storageKey, records);
   }
 
   Future<List<JsonRpcRecord>> _getJsonRpcRecords() async {
-    final records =
-        await core.storage.getItem<List<Map<String, dynamic>>>(storageKey);
-    return records?.map((e) => JsonRpcRecord.fromJson(e)).toList() ?? [];
+    final List? records = await core.storage.getItem(storageKey);
+    return records?.map((e) => e as JsonRpcRecord).toList() ?? [];
   }
 
   JsonRpcRecord _getRecord(int id) {
@@ -214,9 +211,9 @@ class JsonRpcHistory with Events implements IJsonRpcHistory {
         'method': "_restore",
         'records': values.map((e) => e.toJson()).toList(),
       });
-    } catch (e) {
+    } catch (e, t) {
       logger.d('Failed to Restore records for $name');
-      logger.e(e.toString());
+      logger.e('$e\n$t');
     }
   }
 

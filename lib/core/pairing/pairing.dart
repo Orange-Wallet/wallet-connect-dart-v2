@@ -63,7 +63,7 @@ class Pairing with Events implements IPairing {
           logger: logger,
           name: PAIRING_CONTEXT,
           storagePrefix: CORE_STORAGE_PREFIX,
-          fromJson: (v) => PairingStruct.fromJson(v as Map<String, dynamic>),
+          fromJson: (v) => PairingStruct.fromJson(v),
           toJson: (v) => v.toJson(),
         ),
         _initialized = false,

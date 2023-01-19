@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
@@ -7,9 +8,13 @@ import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 part 'models.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 8)
 class SessionBaseNamespace {
+  @HiveField(0)
   final List<String> accounts;
+  @HiveField(1)
   final List<String> methods;
+  @HiveField(2)
   final List<String> events;
 
   const SessionBaseNamespace({
@@ -38,7 +43,9 @@ class SessionBaseNamespace {
 }
 
 @JsonSerializable()
+@HiveType(typeId: 9)
 class SessionNamespace extends SessionBaseNamespace {
+  @HiveField(3)
   final List<SessionBaseNamespace>? extension;
 
   const SessionNamespace({
@@ -76,8 +83,11 @@ class SessionNamespace extends SessionBaseNamespace {
 typedef SessionNamespaces = Map<String, SessionNamespace>;
 
 @JsonSerializable()
+@HiveType(typeId: 15)
 class SessionPublicKeyMetadata {
+  @HiveField(0)
   final String publicKey;
+  @HiveField(1)
   final AppMetadata metadata;
 
   SessionPublicKeyMetadata({
@@ -114,15 +124,25 @@ class SessionPublicKeyMetadata {
 }
 
 @JsonSerializable()
+@HiveType(typeId: 6)
 class SessionStruct {
+  @HiveField(0)
   final String topic;
+  @HiveField(1)
   final RelayerProtocolOptions relay;
+  @HiveField(2)
   final int expiry;
+  @HiveField(3)
   final bool acknowledged;
+  @HiveField(4)
   final String controller;
+  @HiveField(5)
   final SessionNamespaces namespaces;
+  @HiveField(6)
   final ProposalRequiredNamespaces? requiredNamespaces;
+  @HiveField(7)
   final SessionPublicKeyMetadata self;
+  @HiveField(8)
   final SessionPublicKeyMetadata peer;
 
   const SessionStruct({
@@ -166,3 +186,63 @@ class SessionStruct {
     );
   }
 }
+
+// @HiveType(typeId: 6)
+// class SessionStore extends HiveObject {
+//   @HiveField(0)
+//   final String topic;
+//   @HiveField(1)
+//   final RelayerProtocolOptions relay;
+//   @HiveField(2)
+//   final int expiry;
+//   @HiveField(3)
+//   final bool acknowledged;
+//   @HiveField(4)
+//   final String controller;
+//   @HiveField(5)
+//   final Map<String, dynamic> namespaces;
+//   @HiveField(6)
+//   final Map<String, dynamic>? requiredNamespaces;
+//   @HiveField(7)
+//   final Map<String, dynamic> self;
+//   @HiveField(8)
+//   final Map<String, dynamic> peer;
+
+//   SessionStore(
+//     this.topic,
+//     this.relay,
+//     this.expiry,
+//     this.acknowledged,
+//     this.controller,
+//     this.namespaces,
+//     this.requiredNamespaces,
+//     this.self,
+//     this.peer,
+//   );
+
+//   factory SessionStore.fromData(SessionStruct data) => SessionStore(
+//         data.topic,
+//         data.relay,
+//         data.expiry,
+//         data.acknowledged,
+//         data.controller,
+//         data.namespaces.map((k, v) => MapEntry(k, v.toJson())),
+//         data.requiredNamespaces?.map((k, v) => MapEntry(k, v.toJson())),
+//         data.self.toJson(),
+//         data.peer.toJson(),
+//       );
+
+//   SessionStruct toData() => SessionStruct(
+//         topic: topic,
+//         relay: relay,
+//         expiry: expiry,
+//         acknowledged: acknowledged,
+//         controller: controller,
+//         namespaces:
+//             namespaces.map((k, v) => MapEntry(k, SessionNamespace.fromJson(v))),
+//         requiredNamespaces: requiredNamespaces
+//             ?.map((k, v) => MapEntry(k, ProposalRequiredNamespace.fromJson(v))),
+//         self: SessionPublicKeyMetadata.fromJson(self),
+//         peer: SessionPublicKeyMetadata.fromJson(peer),
+//       );
+// }

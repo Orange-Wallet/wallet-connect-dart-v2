@@ -3,6 +3,50 @@
 part of 'models.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class PendingRequestStructAdapter extends TypeAdapter<PendingRequestStruct> {
+  @override
+  final int typeId = 4;
+
+  @override
+  PendingRequestStruct read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return PendingRequestStruct(
+      fields[0] as String,
+      fields[1] as int,
+      fields[2] as RpcSessionRequestParams,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, PendingRequestStruct obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.topic)
+      ..writeByte(1)
+      ..write(obj.id)
+      ..writeByte(2)
+      ..write(obj.params);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PendingRequestStructAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

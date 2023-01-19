@@ -303,20 +303,14 @@ class Subscriber with Events implements ISubscriber {
     await relayer.messages.del(topic);
   }
 
-  Future<void> _setRelayerSubscriptions(
-      List<SubscriberActive> subscriptions) async {
-    await relayer.core.storage.setItem<List<SubscriberActive>>(
-      storageKey,
-      subscriptions,
-    );
-  }
+  Future<void> _setRelayerSubscriptions(List<SubscriberActive> subscriptions) =>
+      relayer.core.storage.setItem(storageKey, subscriptions);
 
   Future<List<SubscriberActive>?> _getRelayerSubscriptions() async {
-    final subscriptions =
-        await relayer.core.storage.getItem<List<SubscriberActive>>(
-      storageKey,
-    );
-    return subscriptions;
+    final subscriptions = await relayer.core.storage.getItem(storageKey);
+    return subscriptions == null
+        ? null
+        : List.from(subscriptions).map((e) => e as SubscriberActive).toList();
   }
 
   void _setSubscription(String id, SubscriberActive subscription) {

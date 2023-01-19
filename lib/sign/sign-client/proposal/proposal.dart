@@ -8,7 +8,7 @@ class Proposal extends Store<String, ProposalStruct> {
       : super(
           name: PROPOSAL_CONTEXT,
           storagePrefix: SIGN_CLIENT_STORAGE_PREFIX,
-          fromJson: (v) => ProposalStruct.fromJson(v as Map<String, dynamic>),
+          fromJson: (v) => ProposalStruct.fromJson(v),
           toJson: (v) => v.toJson(),
         );
 }

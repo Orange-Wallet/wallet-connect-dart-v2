@@ -1,10 +1,14 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'models.g.dart';
 
 @JsonSerializable()
-class ExpirerExpiration {
+@HiveType(typeId: 1)
+class ExpirerExpiration extends HiveObject {
+  @HiveField(0)
   final String target;
+  @HiveField(1)
   final int expiry;
 
   ExpirerExpiration({

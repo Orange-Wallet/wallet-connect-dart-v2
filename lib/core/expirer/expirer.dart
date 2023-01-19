@@ -130,14 +130,14 @@ class Expirer with Events implements IExpirer {
   }
 
   Future<void> _setExpirations(List<ExpirerExpiration> expirations) async {
-    await core.storage
-        .setItem<List<ExpirerExpiration>>(storageKey, expirations);
+    await core.storage.setItem(storageKey, expirations);
   }
 
   Future<List<ExpirerExpiration>?> _getExpirations() async {
-    final expirations =
-        await core.storage.getItem<List<ExpirerExpiration>>(storageKey);
-    return expirations;
+    final expirations = await core.storage.getItem(storageKey);
+    return List.from(expirations ?? [])
+        .map((e) => e as ExpirerExpiration)
+        .toList();
   }
 
   Future<void> _persist() async {

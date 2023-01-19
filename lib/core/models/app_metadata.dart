@@ -1,13 +1,19 @@
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'app_metadata.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 13)
 class AppMetadata {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String description;
+  @HiveField(2)
   final String url;
+  @HiveField(3)
   final List<String> icons;
 
   const AppMetadata({

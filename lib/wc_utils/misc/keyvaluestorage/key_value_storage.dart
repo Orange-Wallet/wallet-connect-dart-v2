@@ -1,6 +1,20 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
+import 'package:wallet_connect/core/history/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/core/subscriber/models.dart';
+import 'package:wallet_connect/sign/sign-client/jsonrpc/models.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/i_key_value_storage.dart';
 
 const DB_NAME = "walletconnect.db";
@@ -27,6 +41,28 @@ class KeyValueStorage implements IKeyValueStorage {
     try {
       if (!_inMemory) {
         await Hive.initFlutter();
+
+        Hive.registerAdapter(JsonRpcRecordAdapter(), override: true);
+        Hive.registerAdapter(ExpirerExpirationAdapter(), override: true);
+        Hive.registerAdapter(RelayerProtocolOptionsAdapter(), override: true);
+        Hive.registerAdapter(AppMetadataAdapter(), override: true);
+        Hive.registerAdapter(PairingStructAdapter(), override: true);
+        Hive.registerAdapter(SubscriberActiveAdapter(), override: true);
+        Hive.registerAdapter(RpcSessionRequestParamsAdapter(), override: true);
+        Hive.registerAdapter(PendingRequestStructAdapter(), override: true);
+        Hive.registerAdapter(ProposalBaseRequiredNamespaceAdapter(),
+            override: true);
+        Hive.registerAdapter(ProposalRequiredNamespaceAdapter(),
+            override: true);
+        Hive.registerAdapter(ProposalProposerAdapter(), override: true);
+        Hive.registerAdapter(ProposalRequestStructAdapter(), override: true);
+        Hive.registerAdapter(ProposalStructAdapter(), override: true);
+        Hive.registerAdapter(SessionBaseNamespaceAdapter(), override: true);
+        Hive.registerAdapter(SessionNamespaceAdapter(), override: true);
+        Hive.registerAdapter(SessionPublicKeyMetadataAdapter(), override: true);
+        Hive.registerAdapter(SessionStructAdapter(), override: true);
+        Hive.registerAdapter(RequestArgumentsAdapter(), override: true);
+
         _box = await Hive.openBox(_dbName);
         _box.keys.forEach((key) {
           _data[key] = _box.get(key);
@@ -62,15 +98,17 @@ class KeyValueStorage implements IKeyValueStorage {
   }
 
   @override
-  Future<T?> getItem<T>(String key) async {
+  Future<dynamic> getItem(String key) async {
     await _initilization();
-    final item = _data[key] as T?;
-    return item;
+    // log('GET_ITEM: $key ${_data[key].runtimeType}\n${_data[key]}');
+    // final item = _data[key] is Map ? Map.from(_data[key]) : _data[key] as T?;
+    return _data[key];
   }
 
   @override
-  Future<void> setItem<T>(String key, T value) async {
+  Future<void> setItem(String key, dynamic value) async {
     await _initilization();
+    // log('SET_ITEM: $key $value');
     if (_inMemory) {
       _data[key] = value;
     } else {

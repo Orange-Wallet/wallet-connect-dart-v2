@@ -8,8 +8,7 @@ class PendingRequest extends Store<int, PendingRequestStruct> {
       : super(
           name: REQUEST_CONTEXT,
           storagePrefix: SIGN_CLIENT_STORAGE_PREFIX,
-          fromJson: (v) =>
-              PendingRequestStruct.fromJson(v as Map<String, dynamic>),
+          fromJson: (v) => PendingRequestStruct.fromJson(v),
           toJson: (v) => v.toJson(),
         );
 }

@@ -8,7 +8,7 @@ class Session extends Store<String, SessionStruct> {
       : super(
           name: SESSION_CONTEXT,
           storagePrefix: SIGN_CLIENT_STORAGE_PREFIX,
-          fromJson: (v) => SessionStruct.fromJson(v as Map<String, dynamic>),
+          fromJson: (v) => SessionStruct.fromJson(v),
           toJson: (v) => v.toJson(),
         );
 }

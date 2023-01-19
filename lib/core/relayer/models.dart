@@ -1,10 +1,14 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'models.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 3)
 class RelayerProtocolOptions {
+  @HiveField(0)
   final String protocol;
+  @HiveField(1)
   final String? data;
 
   const RelayerProtocolOptions({

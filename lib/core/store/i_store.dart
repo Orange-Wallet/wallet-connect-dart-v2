@@ -4,7 +4,7 @@ import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 
 typedef StoreObjToJson<V> = dynamic Function(V);
 
-typedef StoreObjFromJson<V> = V Function(Object?);
+typedef StoreObjFromJson<V> = V Function(dynamic);
 
 abstract class IStore<K, V> {
   Map<K, V> get map;

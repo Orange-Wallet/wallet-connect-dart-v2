@@ -125,16 +125,20 @@ class SessionUpdateParams {
       _$SessionUpdateParamsFromJson(json);
 }
 
+@JsonSerializable()
 class SessionRequestParams {
   final String topic;
   final RequestArguments request;
   final String chainId;
 
-  SessionRequestParams({
+  const SessionRequestParams({
     required this.topic,
     required this.request,
     required this.chainId,
   });
+
+  factory SessionRequestParams.fromJson(Map<String, dynamic> json) =>
+      _$SessionRequestParamsFromJson(json);
 }
 
 class SessionRespondParams {

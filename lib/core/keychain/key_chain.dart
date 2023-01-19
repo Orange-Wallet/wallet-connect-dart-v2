@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
@@ -79,12 +81,13 @@ class KeyChain implements IKeyChain {
   // ---------- Private ----------------------------------------------- //
 
   Future _setKeyChain(Map<String, String> keychain) =>
-      core.storage.setItem<Map<String, String>>(storageKey, keychain);
+      core.storage.setItem(storageKey, jsonEncode(keychain));
 
-  Future _getKeyChain() async {
-    final keychain =
-        await core.storage.getItem<Map<String, String>>(storageKey);
-    return keychain;
+  Future<Map<String, String>?> _getKeyChain() async {
+    final keychain = await core.storage.getItem(storageKey);
+    return keychain == null
+        ? null
+        : Map<String, String>.from(jsonDecode(keychain));
   }
 
   Future<void> _persist() async {

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
@@ -6,9 +7,13 @@ import 'package:wallet_connect/core/relayer/models.dart';
 part 'models.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 10)
 class ProposalBaseRequiredNamespace {
+  @HiveField(0)
   final List<String> chains;
+  @HiveField(1)
   final List<String> methods;
+  @HiveField(2)
   final List<String> events;
 
   const ProposalBaseRequiredNamespace({
@@ -37,7 +42,9 @@ class ProposalBaseRequiredNamespace {
 }
 
 @JsonSerializable()
+@HiveType(typeId: 11)
 class ProposalRequiredNamespace extends ProposalBaseRequiredNamespace {
+  @HiveField(3)
   final List<ProposalBaseRequiredNamespace>? extension;
 
   const ProposalRequiredNamespace({
@@ -72,8 +79,11 @@ class ProposalRequiredNamespace extends ProposalBaseRequiredNamespace {
 typedef ProposalRequiredNamespaces = Map<String, ProposalRequiredNamespace>;
 
 @JsonSerializable()
+@HiveType(typeId: 12)
 class ProposalProposer {
+  @HiveField(0)
   final String publicKey;
+  @HiveField(1)
   final AppMetadata metadata;
 
   ProposalProposer({
@@ -88,9 +98,13 @@ class ProposalProposer {
 }
 
 @JsonSerializable()
+@HiveType(typeId: 14)
 class ProposalRequestStruct {
+  @HiveField(0)
   final List<RelayerProtocolOptions> relays;
+  @HiveField(1)
   final ProposalProposer proposer;
+  @HiveField(2)
   final ProposalRequiredNamespaces requiredNamespaces;
 
   ProposalRequestStruct({
@@ -106,9 +120,13 @@ class ProposalRequestStruct {
 }
 
 @JsonSerializable()
+@HiveType(typeId: 5)
 class ProposalStruct extends ProposalRequestStruct {
+  @HiveField(3)
   final int id;
+  @HiveField(4)
   final int expiry;
+  @HiveField(5)
   final String? pairingTopic;
 
   ProposalStruct({
@@ -126,3 +144,41 @@ class ProposalStruct extends ProposalRequestStruct {
   @override
   Map<String, dynamic> toJson() => _$ProposalStructToJson(this);
 }
+
+// @HiveType(typeId: 5)
+// class ProposalStore extends HiveObject {
+//   @HiveField(0)
+//   final int id;
+//   @HiveField(1)
+//   final int expiry;
+//   @HiveField(2)
+//   final List<RelayerProtocolOptions> relays;
+//   @HiveField(3)
+//   final Map<String, dynamic> proposer;
+//   @HiveField(4)
+//   final Map<String, dynamic> requiredNamespaces;
+//   @HiveField(5)
+//   final String? pairingTopic;
+
+//   ProposalStore(this.id, this.expiry, this.relays, this.proposer,
+//       this.requiredNamespaces, this.pairingTopic);
+
+//   factory ProposalStore.fromData(ProposalStruct data) => ProposalStore(
+//         data.id,
+//         data.expiry,
+//         data.relays,
+//         data.proposer.toJson(),
+//         data.requiredNamespaces.map((k, v) => MapEntry(k, v.toJson())),
+//         data.pairingTopic,
+//       );
+
+//   ProposalStruct toData() => ProposalStruct(
+//         id: id,
+//         expiry: expiry,
+//         relays: relays,
+//         proposer: ProposalProposer.fromJson(proposer),
+//         requiredNamespaces: requiredNamespaces
+//             .map((k, v) => MapEntry(k, ProposalRequiredNamespace.fromJson(v))),
+//         pairingTopic: pairingTopic,
+//       );
+// }
