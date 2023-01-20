@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'models.g.dart';

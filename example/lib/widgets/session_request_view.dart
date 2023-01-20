@@ -125,7 +125,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
                     height: 40.0,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
+                        primary: Colors.white,
                         backgroundColor:
                             Theme.of(context).colorScheme.secondary,
                       ),
@@ -165,7 +165,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
                     height: 40.0,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
+                        primary: Colors.white,
                         backgroundColor: Colors.red.shade300,
                       ),
                       onPressed: widget.onReject,

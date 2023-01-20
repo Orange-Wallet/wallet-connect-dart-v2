@@ -18,7 +18,6 @@ class SubscriberParams extends RelayerSubscribeOptions {
 class SubscriberActive extends SubscriberParams with HiveObjectMixin {
   @HiveField(0)
   final String id;
-  // @override
   @HiveField(1)
   final RelayerProtocolOptions relay;
   @HiveField(2)

@@ -11,7 +11,6 @@ import 'package:wallet_connect/sign/sign-client/client/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 
 void main() {
@@ -269,7 +268,7 @@ class _ConnectPageState extends State<ConnectPage> {
                               });
                             },
                             style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
+                              primary: Colors.white,
                               textStyle:
                                   const TextStyle(fontWeight: FontWeight.w500),
                             ),
@@ -328,7 +327,7 @@ class _ConnectPageState extends State<ConnectPage> {
                     _qrScanHandler(_uriController.text);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
+                    primary: Colors.white,
                     textStyle: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                   child: const Padding(
@@ -420,7 +419,7 @@ class _ConnectPageState extends State<ConnectPage> {
               children: [
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
+                    primary: Colors.white,
                     backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                   onPressed: () {
@@ -457,7 +456,7 @@ class _ConnectPageState extends State<ConnectPage> {
               children: [
                 TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
+                    primary: Colors.white,
                     backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                   onPressed: () {
@@ -505,11 +504,22 @@ class SessionsPage extends StatelessWidget {
               : ListView.separated(
                   itemBuilder: (_, idx) {
                     return ListTile(
-                      title: Text(sessions[idx].self.metadata.name),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      tileColor: Colors.blueGrey.shade100,
+                      title: Text(sessions[idx].peer.metadata.name),
+                      subtitle: Text(
+                        sessions[idx].peer.metadata.url,
+                        style: const TextStyle(color: Colors.blueAccent),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded),
                     );
                   },
                   separatorBuilder: (_, __) => const Divider(),
                   itemCount: sessions.length,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 16.0),
                 ),
         ),
       ],

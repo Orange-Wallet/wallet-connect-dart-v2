@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart' as crypto;

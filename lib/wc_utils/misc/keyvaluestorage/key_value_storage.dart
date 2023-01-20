@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wallet_connect/core/expirer/models.dart';

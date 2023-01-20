@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
-import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart';
 
