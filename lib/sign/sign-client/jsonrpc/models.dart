@@ -10,69 +10,85 @@ part 'models.g.dart';
 
 @JsonSerializable()
 @HiveType(typeId: 16)
-class RpcSessionRequestParams {
+class RequestSessionRequest {
   @HiveField(0)
   final RequestArguments request;
   @HiveField(1)
   final String chainId;
 
-  const RpcSessionRequestParams({
+  const RequestSessionRequest({
     required this.request,
     required this.chainId,
   });
 
-  factory RpcSessionRequestParams.fromJson(Map<String, dynamic> json) =>
-      _$RpcSessionRequestParamsFromJson(json);
+  factory RequestSessionRequest.fromJson(Map<String, dynamic> json) =>
+      _$RequestSessionRequestFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RpcSessionRequestParamsToJson(this);
+  Map<String, dynamic> toJson() => _$RequestSessionRequestToJson(this);
 }
 
 @JsonSerializable()
-class RpcSessionEventParams {
+class RequestSessionEvent {
   final SessionEmitEvent event;
   final String chainId;
 
-  const RpcSessionEventParams({
+  const RequestSessionEvent({
     required this.event,
     required this.chainId,
   });
 
-  factory RpcSessionEventParams.fromJson(Map<String, dynamic> json) =>
-      _$RpcSessionEventParamsFromJson(json);
+  factory RequestSessionEvent.fromJson(Map<String, dynamic> json) =>
+      _$RequestSessionEventFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RpcSessionEventParamsToJson(this);
+  Map<String, dynamic> toJson() => _$RequestSessionEventToJson(this);
 }
 
 @JsonSerializable()
-class RpcSessionUpdateParams {
+class RequestSessionUpdate {
   final SessionNamespaces namespaces;
 
-  const RpcSessionUpdateParams({
+  const RequestSessionUpdate({
     required this.namespaces,
   });
 
-  factory RpcSessionUpdateParams.fromJson(Map<String, dynamic> json) =>
-      _$RpcSessionUpdateParamsFromJson(json);
+  factory RequestSessionUpdate.fromJson(Map<String, dynamic> json) =>
+      _$RequestSessionUpdateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RpcSessionUpdateParamsToJson(this);
+  Map<String, dynamic> toJson() => _$RequestSessionUpdateToJson(this);
 }
 
 @JsonSerializable()
-class RpcSessionProposeParams {
+class RequestSessionDelete {
+  final int code;
+  final String message;
+
+  const RequestSessionDelete({
+    required this.code,
+    required this.message,
+  });
+
+  factory RequestSessionDelete.fromJson(Map<String, dynamic> json) =>
+      _$RequestSessionDeleteFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RequestSessionDeleteToJson(this);
+}
+
+@JsonSerializable()
+class RequestSessionPropose {
   final List<RelayerProtocolOptions> relays;
   final ProposalRequiredNamespaces requiredNamespaces;
   final ProposalProposer proposer;
 
-  RpcSessionProposeParams({
+  RequestSessionPropose({
     required this.relays,
     required this.requiredNamespaces,
     required this.proposer,
   });
 
-  factory RpcSessionProposeParams.fromJson(Map<String, dynamic> json) =>
-      _$RpcSessionProposeParamsFromJson(json);
+  factory RequestSessionPropose.fromJson(Map<String, dynamic> json) =>
+      _$RequestSessionProposeFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RpcSessionProposeParamsToJson(this);
+  Map<String, dynamic> toJson() => _$RequestSessionProposeToJson(this);
 }
 
 typedef ResultPairingDelete = bool;

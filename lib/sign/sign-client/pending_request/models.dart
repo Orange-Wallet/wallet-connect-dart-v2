@@ -12,7 +12,7 @@ class PendingRequestStruct {
   @HiveField(1)
   final int id;
   @HiveField(2)
-  final RpcSessionRequestParams params;
+  final RequestSessionRequest params;
 
   PendingRequestStruct(this.topic, this.id, this.params);
 

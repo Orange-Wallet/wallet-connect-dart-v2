@@ -266,10 +266,10 @@ class Engine with Events implements IEngine {
   Future<EngineAcknowledged> update(SessionUpdateParams params) async {
     _isInitialized();
     await _isValidUpdate(params);
-    final id = await _sendRequest<RpcSessionUpdateParams>(
+    final id = await _sendRequest<RequestSessionUpdate>(
       params.topic,
       JsonRpcMethod.WC_SESSION_UPDATE,
-      RpcSessionUpdateParams(namespaces: params.namespaces),
+      RequestSessionUpdate(namespaces: params.namespaces),
       (v) => v.toJson(),
     );
     final completer = Completer<void>();
@@ -322,10 +322,10 @@ class Engine with Events implements IEngine {
   Future<T> request<T>(SessionRequestParams params) async {
     _isInitialized();
     await _isValidRequest(params);
-    final id = await _sendRequest<RpcSessionRequestParams>(
+    final id = await _sendRequest<RequestSessionRequest>(
       params.topic,
       JsonRpcMethod.WC_SESSION_REQUEST,
-      RpcSessionRequestParams(
+      RequestSessionRequest(
         request: params.request,
         chainId: params.chainId,
       ),
@@ -406,10 +406,10 @@ class Engine with Events implements IEngine {
   Future<void> emit(SessionEmitParams params) async {
     _isInitialized();
     await _isValidEmit(params);
-    await _sendRequest<RpcSessionEventParams>(
+    await _sendRequest<RequestSessionEvent>(
       params.topic,
       JsonRpcMethod.WC_SESSION_EVENT,
-      RpcSessionEventParams(
+      RequestSessionEvent(
         event: params.event,
         chainId: params.chainId,
       ),
@@ -690,10 +690,9 @@ class Engine with Events implements IEngine {
   ) async {
     final int id = payload['id'];
     try {
-      final request = JsonRpcRequest<RpcSessionProposeParams>.fromJson(
+      final request = JsonRpcRequest<RequestSessionPropose>.fromJson(
         payload,
-        (json) =>
-            RpcSessionProposeParams.fromJson(json as Map<String, dynamic>),
+        (json) => RequestSessionPropose.fromJson(json as Map<String, dynamic>),
       );
       _isValidConnect(SessionConnectParams(
         requiredNamespaces: request.params!.requiredNamespaces,
@@ -850,7 +849,7 @@ class Engine with Events implements IEngine {
     Map<String, dynamic> payload,
   ) async {
     final int id = payload['id'];
-    final params = RpcSessionUpdateParams.fromJson(payload['params']);
+    final params = RequestSessionUpdate.fromJson(payload['params']);
 
     try {
       _isValidUpdate(SessionUpdateParams(
@@ -987,7 +986,7 @@ class Engine with Events implements IEngine {
     final int id = payload['id'];
 
     try {
-      final params = RpcSessionRequestParams.fromJson(payload['params']);
+      final params = RequestSessionRequest.fromJson(payload['params']);
       _isValidRequest(SessionRequestParams(
         topic: topic,
         request: params.request,
@@ -1028,7 +1027,7 @@ class Engine with Events implements IEngine {
     Map<String, dynamic> payload,
   ) async {
     final int id = payload['id'];
-    final params = RpcSessionEventParams.fromJson(payload['params']);
+    final params = RequestSessionEvent.fromJson(payload['params']);
     try {
       _isValidEmit(SessionEmitParams(
         topic: topic,

@@ -46,7 +46,7 @@ class KeyValueStorage implements IKeyValueStorage {
         Hive.registerAdapter(AppMetadataAdapter(), override: true);
         Hive.registerAdapter(PairingStructAdapter(), override: true);
         Hive.registerAdapter(SubscriberActiveAdapter(), override: true);
-        Hive.registerAdapter(RpcSessionRequestParamsAdapter(), override: true);
+        Hive.registerAdapter(RequestSessionRequestAdapter(), override: true);
         Hive.registerAdapter(PendingRequestStructAdapter(), override: true);
         Hive.registerAdapter(ProposalBaseRequiredNamespaceAdapter(),
             override: true);

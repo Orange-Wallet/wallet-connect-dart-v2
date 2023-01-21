@@ -6,25 +6,24 @@ part of 'models.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class RpcSessionRequestParamsAdapter
-    extends TypeAdapter<RpcSessionRequestParams> {
+class RequestSessionRequestAdapter extends TypeAdapter<RequestSessionRequest> {
   @override
   final int typeId = 16;
 
   @override
-  RpcSessionRequestParams read(BinaryReader reader) {
+  RequestSessionRequest read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return RpcSessionRequestParams(
+    return RequestSessionRequest(
       request: fields[0] as RequestArguments<dynamic>,
       chainId: fields[1] as String,
     );
   }
 
   @override
-  void write(BinaryWriter writer, RpcSessionRequestParams obj) {
+  void write(BinaryWriter writer, RequestSessionRequest obj) {
     writer
       ..writeByte(2)
       ..writeByte(0)
@@ -39,7 +38,7 @@ class RpcSessionRequestParamsAdapter
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RpcSessionRequestParamsAdapter &&
+      other is RequestSessionRequestAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -48,53 +47,66 @@ class RpcSessionRequestParamsAdapter
 // JsonSerializableGenerator
 // **************************************************************************
 
-RpcSessionRequestParams _$RpcSessionRequestParamsFromJson(
+RequestSessionRequest _$RequestSessionRequestFromJson(
         Map<String, dynamic> json) =>
-    RpcSessionRequestParams(
+    RequestSessionRequest(
       request: RequestArguments<dynamic>.fromJson(
           json['request'] as Map<String, dynamic>, (value) => value),
       chainId: json['chainId'] as String,
     );
 
-Map<String, dynamic> _$RpcSessionRequestParamsToJson(
-        RpcSessionRequestParams instance) =>
+Map<String, dynamic> _$RequestSessionRequestToJson(
+        RequestSessionRequest instance) =>
     <String, dynamic>{
       'request': instance.request.toJson(),
       'chainId': instance.chainId,
     };
 
-RpcSessionEventParams _$RpcSessionEventParamsFromJson(
-        Map<String, dynamic> json) =>
-    RpcSessionEventParams(
+RequestSessionEvent _$RequestSessionEventFromJson(Map<String, dynamic> json) =>
+    RequestSessionEvent(
       event: SessionEmitEvent.fromJson(json['event'] as Map<String, dynamic>),
       chainId: json['chainId'] as String,
     );
 
-Map<String, dynamic> _$RpcSessionEventParamsToJson(
-        RpcSessionEventParams instance) =>
+Map<String, dynamic> _$RequestSessionEventToJson(
+        RequestSessionEvent instance) =>
     <String, dynamic>{
       'event': instance.event.toJson(),
       'chainId': instance.chainId,
     };
 
-RpcSessionUpdateParams _$RpcSessionUpdateParamsFromJson(
+RequestSessionUpdate _$RequestSessionUpdateFromJson(
         Map<String, dynamic> json) =>
-    RpcSessionUpdateParams(
+    RequestSessionUpdate(
       namespaces: (json['namespaces'] as Map<String, dynamic>).map(
         (k, e) =>
             MapEntry(k, SessionNamespace.fromJson(e as Map<String, dynamic>)),
       ),
     );
 
-Map<String, dynamic> _$RpcSessionUpdateParamsToJson(
-        RpcSessionUpdateParams instance) =>
+Map<String, dynamic> _$RequestSessionUpdateToJson(
+        RequestSessionUpdate instance) =>
     <String, dynamic>{
       'namespaces': instance.namespaces.map((k, e) => MapEntry(k, e.toJson())),
     };
 
-RpcSessionProposeParams _$RpcSessionProposeParamsFromJson(
+RequestSessionDelete _$RequestSessionDeleteFromJson(
         Map<String, dynamic> json) =>
-    RpcSessionProposeParams(
+    RequestSessionDelete(
+      code: json['code'] as int,
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$RequestSessionDeleteToJson(
+        RequestSessionDelete instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'message': instance.message,
+    };
+
+RequestSessionPropose _$RequestSessionProposeFromJson(
+        Map<String, dynamic> json) =>
+    RequestSessionPropose(
       relays: (json['relays'] as List<dynamic>)
           .map(
               (e) => RelayerProtocolOptions.fromJson(e as Map<String, dynamic>))
@@ -108,8 +120,8 @@ RpcSessionProposeParams _$RpcSessionProposeParamsFromJson(
           ProposalProposer.fromJson(json['proposer'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$RpcSessionProposeParamsToJson(
-        RpcSessionProposeParams instance) =>
+Map<String, dynamic> _$RequestSessionProposeToJson(
+        RequestSessionPropose instance) =>
     <String, dynamic>{
       'relays': instance.relays.map((e) => e.toJson()).toList(),
       'requiredNamespaces':

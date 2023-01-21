@@ -19,7 +19,7 @@ class PendingRequestStructAdapter extends TypeAdapter<PendingRequestStruct> {
     return PendingRequestStruct(
       fields[0] as String,
       fields[1] as int,
-      fields[2] as RpcSessionRequestParams,
+      fields[2] as RequestSessionRequest,
     );
   }
 
@@ -55,7 +55,7 @@ PendingRequestStruct _$PendingRequestStructFromJson(
     PendingRequestStruct(
       json['topic'] as String,
       json['id'] as int,
-      RpcSessionRequestParams.fromJson(json['params'] as Map<String, dynamic>),
+      RequestSessionRequest.fromJson(json['params'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PendingRequestStructToJson(
