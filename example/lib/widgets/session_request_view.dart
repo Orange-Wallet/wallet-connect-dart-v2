@@ -2,8 +2,7 @@ import 'dart:developer';
 
 import 'package:example/models/accounts.dart';
 import 'package:example/utils/constants.dart';
-import 'package:example/utils/eip155_data.dart';
-import 'package:example/utils/solana_data.dart';
+import 'package:example/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
@@ -323,17 +322,4 @@ class _NamespaceViewState extends State<NamespaceView> {
       ),
     );
   }
-}
-
-String getChainName(String value) {
-  try {
-    if (value.startsWith('eip155')) {
-      return Eip155Data.chains[value]!.name;
-    } else if (value.startsWith('solana')) {
-      return SolanaData.chains[value]!.name;
-    }
-  } catch (e) {
-    debugPrint('Invalid chain');
-  }
-  return 'Unknown';
 }

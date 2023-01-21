@@ -1,17 +1,11 @@
-import 'dart:developer';
-
-import 'package:example/utils/eip155_data.dart';
-import 'package:example/widgets/session_request_view.dart';
+import 'package:example/pages/accounts_page.dart';
+import 'package:example/pages/connect_page.dart';
+import 'package:example/pages/pairings_page.dart';
+import 'package:example/pages/sessions_page.dart';
+import 'package:example/pages/settings_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:scan/scan.dart';
 import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 
 void main() {
   runApp(const MyApp());
@@ -87,21 +81,23 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       extendBodyBehindAppBar: true,
-      body: Padding(
-        padding: const EdgeInsets.only(top: kToolbarHeight),
-        child: initializing
-            ? const Center(
+      body: initializing
+          ? const Padding(
+              padding: EdgeInsets.only(top: kToolbarHeight),
+              child: Center(
                 child: CircularProgressIndicator(),
-              )
-            : PageView(
-                controller: _pageController,
-                children: [
-                  ConnectPage(signClient: _signClient!),
-                  SessionsPage(signClient: _signClient!),
-                  PairingsPage(signClient: _signClient!),
-                ],
               ),
-      ),
+            )
+          : PageView(
+              controller: _pageController,
+              children: [
+                const AccountsPage(),
+                SessionsPage(signClient: _signClient!),
+                ConnectPage(signClient: _signClient!),
+                PairingsPage(signClient: _signClient!),
+                const SettingsPage(),
+              ],
+            ),
       floatingActionButton: Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
@@ -112,7 +108,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            _pageController.animateToPage(
+              2,
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeInBack,
+            );
+          },
           backgroundColor: Colors.transparent,
           child: const Icon(
             Icons.account_balance_wallet_rounded,
@@ -124,35 +126,59 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
-        elevation: 1.0,
-        child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
-          elevation: .0,
-          type: BottomNavigationBarType.fixed,
-          unselectedItemColor: Colors.grey,
-          selectedItemColor: secondaryColor,
-          currentIndex: _activePage,
-          onTap: (idx) => _pageController.animateToPage(
-            idx,
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.easeInBack,
-          ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined),
+        elevation: 6.0,
+        color: Theme.of(context).colorScheme.background,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            BottomNavItem(
+              onTap: () {
+                _pageController.animateToPage(
+                  0,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInBack,
+                );
+              },
+              active: _activePage == 0,
               label: 'Accounts',
+              icon: Icons.account_circle_outlined,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.device_hub),
+            BottomNavItem(
+              onTap: () {
+                _pageController.animateToPage(
+                  1,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInBack,
+                );
+              },
+              active: _activePage == 1,
               label: 'Sessions',
+              icon: Icons.device_hub,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.link),
+            const SizedBox(width: 16.0),
+            BottomNavItem(
+              onTap: () {
+                _pageController.animateToPage(
+                  3,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInBack,
+                );
+              },
+              active: _activePage == 3,
               label: 'Pairings',
+              icon: Icons.link,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings_outlined),
+            BottomNavItem(
+              onTap: () {
+                _pageController.animateToPage(
+                  4,
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInBack,
+                );
+              },
+              active: _activePage == 4,
               label: 'Settings',
+              icon: Icons.settings_outlined,
             ),
           ],
         ),
@@ -161,423 +187,50 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class ConnectPage extends StatefulWidget {
-  final SignClient signClient;
+class BottomNavItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool active;
+  final VoidCallback onTap;
 
-  const ConnectPage({
-    super.key,
-    required this.signClient,
-  });
-
-  @override
-  State<ConnectPage> createState() => _ConnectPageState();
-}
-
-class _ConnectPageState extends State<ConnectPage> {
-  late TextEditingController _uriController;
-
-  // final _web3client = Web3Client(rpcUri, http.Client());
-
-  late bool _scanView;
-
-  @override
-  void initState() {
-    _scanView = false;
-    _uriController = TextEditingController();
-    _initializeListeners();
-    super.initState();
-  }
-
-  _initializeListeners() async {
-    widget.signClient.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
-      final eventData = (data as Map<String, dynamic>);
-      final id = eventData['id'] as int;
-      final proposal =
-          ProposalStruct.fromJson(eventData['params'] as Map<String, dynamic>);
-      _onSessionRequest(id, proposal);
-    });
-    widget.signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
-      final eventData = (data as Map<String, dynamic>);
-      log('DATA $eventData');
-      final id = eventData['id'] as int;
-      final sessionRequest = SessionRequestParams.fromJson(
-        eventData['params'] as Map<String, dynamic>,
-      );
-
-      if (sessionRequest.request.method == Eip155Methods.PERSONAL_SIGN.value) {
-        final requestParams = sessionRequest.request.params as List<String>;
-        final dataToSign = requestParams[0];
-        final address = requestParams[1];
-      }
-    });
-  }
+  const BottomNavItem({
+    Key? key,
+    required this.label,
+    required this.icon,
+    required this.active,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(.0, 8.0, .0, 16.0),
-          child: Text(
-            'Wallet Connect',
-            style: TextStyle(
-              color: primaryColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: onTap,
+      customBorder:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      highlightColor: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: active
+                  ? Theme.of(context).colorScheme.secondary
+                  : Theme.of(context).colorScheme.secondary.withOpacity(0.7),
             ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20.0, .0, 20.0, 20.0),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300, width: 2.0),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: _scanView
-                  ? ScanView(
-                      controller: ScanController(),
-                      scanAreaScale: 1,
-                      scanLineColor: Colors.green.shade400,
-                      onCapture: (data) {
-                        _qrScanHandler(data);
-                      },
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.qr_code_2_rounded,
-                          size: 100.0,
-                          color: Colors.grey.shade500,
-                        ),
-                        const SizedBox(height: 16.0),
-                        Container(
-                          height: 42.0,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                                colors: [primaryColor, secondaryColor]),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _scanView = true;
-                              });
-                            },
-                            style: TextButton.styleFrom(
-                              primary: Colors.white,
-                              textStyle:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('Scan QR code'),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ),
-        const Text(
-          'or connect with Wallet Connect uri',
-          style: TextStyle(color: Colors.grey),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: TextFormField(
-            controller: _uriController,
-            onTap: () {
-              Clipboard.getData('text/plain').then((value) {
-                if (_uriController.text.isEmpty &&
-                    value?.text != null &&
-                    Uri.tryParse(value!.text!) != null) {
-                  _uriController.text = value.text!;
-                }
-              });
-            },
-            decoration: InputDecoration(
-              focusColor: secondaryColor,
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade300, width: 2.0),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: secondaryColor, width: 2.5),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade300, width: 2.0),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              hintText: 'Enter uri',
-              suffixIcon: Container(
-                margin: const EdgeInsets.only(right: 5.0),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [primaryColor, secondaryColor]),
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    _qrScanHandler(_uriController.text);
-                  },
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    textStyle: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Connect'),
-                  ),
-                ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              style: TextStyle(
+                color: active
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).colorScheme.secondary.withOpacity(0.7),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 20.0),
-      ],
-    );
-  }
-
-  _qrScanHandler(String value) {
-    if (Uri.tryParse(value) != null) {
-      widget.signClient.pair(value);
-    }
-  }
-
-  _connectToPreviousSession() {
-    // final _sessionSaved = _prefs.getString('session');
-    // debugPrint('_sessionSaved $_sessionSaved');
-    // _sessionStore = _sessionSaved != null
-    //     ? WCSessionStore.fromJson(jsonDecode(_sessionSaved))
-    //     : null;
-    // if (_sessionStore != null) {
-    //   debugPrint('_sessionStore $_sessionStore');
-    //   widget.signClient.connectFromSessionStore(_sessionStore!);
-    // } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('No previous session found.'),
-    ));
-    // }
-  }
-
-  _onSwitchNetwork(int id, int chainId) async {
-    // await widget.signClient.updateSession(chainId: chainId);
-    // widget.signClient.approveRequest<Null>(id: id, result: null);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Changed network to $chainId.'),
-    ));
-  }
-
-  _onSessionRequest(int id, ProposalStruct proposal) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        child: SessionRequestView(
-          proposal: proposal,
-          onApprove: (namespaces) async {
-            final params = SessionApproveParams(
-              id: id,
-              namespaces: namespaces,
-            );
-            //  final approved = await
-            widget.signClient.approve(params);
-            // await approved.acknowledged;
-            Navigator.pop(context);
-          },
-          onReject: () {
-            widget.signClient.reject(SessionRejectParams(
-              id: id,
-              reason: formatErrorMessage(
-                  error: getSdkError(SdkErrorKey.USER_DISCONNECTED)),
-            ));
-            Navigator.pop(context);
-          },
+          ],
         ),
       ),
-    );
-  }
-
-  _onSessionError(dynamic message) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return SimpleDialog(
-          title: Text("Error"),
-          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Some Error Occured. $message'),
-            ),
-            Row(
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('CLOSE'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _onSessionClosed(int? code, String? reason) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return SimpleDialog(
-          title: Text("Session Ended"),
-          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Some Error Occured. ERROR CODE: $code'),
-            ),
-            if (reason != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text('Failure Reason: $reason'),
-              ),
-            Row(
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('CLOSE'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class SessionsPage extends StatelessWidget {
-  final SignClient signClient;
-
-  const SessionsPage({
-    super.key,
-    required this.signClient,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final sessions = signClient.session.getAll();
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(.0, 8.0, .0, 16.0),
-          child: Text(
-            'Sessions',
-            style: TextStyle(
-              color: primaryColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const Divider(height: 1.0),
-        Expanded(
-          child: sessions.isEmpty
-              ? const Center(child: Text('No sessions found.'))
-              : ListView.separated(
-                  itemBuilder: (_, idx) {
-                    return ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      tileColor: Colors.blueGrey.shade100,
-                      title: Text(sessions[idx].peer.metadata.name),
-                      subtitle: Text(
-                        sessions[idx].peer.metadata.url,
-                        style: const TextStyle(color: Colors.blueAccent),
-                      ),
-                      trailing: const Icon(Icons.arrow_forward_ios_rounded),
-                    );
-                  },
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemCount: sessions.length,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
-                ),
-        ),
-      ],
-    );
-  }
-}
-
-class PairingsPage extends StatelessWidget {
-  final SignClient signClient;
-
-  const PairingsPage({
-    super.key,
-    required this.signClient,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final pairings = signClient.pairing.values;
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(.0, 8.0, .0, 16.0),
-          child: Text(
-            'Pairings',
-            style: TextStyle(
-              color: primaryColor,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const Divider(height: 1.0),
-        Expanded(
-          child: pairings.isEmpty
-              ? const Center(child: Text('No pairings found.'))
-              : ListView.separated(
-                  itemBuilder: (_, idx) {
-                    return ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      tileColor: Colors.blueGrey.shade100,
-                      title:
-                          Text(pairings[idx].peerMetadata?.name ?? 'Unnamed'),
-                      subtitle: Text(
-                        pairings[idx].peerMetadata?.url ?? '',
-                        style: const TextStyle(color: Colors.blueAccent),
-                      ),
-                      trailing: Icon(Icons.delete_outline_outlined),
-                    );
-                  },
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemCount: pairings.length,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
-                ),
-        ),
-      ],
     );
   }
 }

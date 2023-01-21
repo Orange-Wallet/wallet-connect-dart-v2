@@ -10,11 +10,11 @@ class Constants {
       details: [
         AccountDetails(
           address: '0x516D18c6b8f7f18b4Ce721c8435651427a652487',
-          chain: 'eip155',
+          chain: 'eip155:1',
         ),
         AccountDetails(
           address: '9UHaMxmfS2eaLCDTxwCU2ok3ReofvgdhxxRtLum7KKf5',
-          chain: 'solana',
+          chain: 'solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ',
         ),
       ],
     ),
@@ -26,11 +26,11 @@ class Constants {
       details: [
         AccountDetails(
           address: '0x6455aD57e7819062201aEc706D247507194ed238',
-          chain: 'eip155',
+          chain: 'eip155:1',
         ),
         AccountDetails(
           address: '84ha8EZUTwpj36VTe8TzZU6oWz3qn2Yghw7FTxsBm6dr',
-          chain: 'solana',
+          chain: 'solana:4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZ',
         ),
       ],
     ),
