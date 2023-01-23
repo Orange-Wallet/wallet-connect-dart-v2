@@ -128,7 +128,7 @@ class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
 
   const JsonRpcResult({
     required this.id,
-    required this.jsonrpc,
+    this.jsonrpc = '2.0',
     this.result,
     this.resultToJson,
   });

@@ -1,19 +1,13 @@
-import 'dart:developer';
-
 import 'package:example/main.dart';
-import 'package:example/utils/eip155_data.dart';
 import 'package:example/widgets/custom_app_bar.dart';
 import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scan/scan.dart';
 import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/models.dart';
 import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/sign/sign-client/jsonrpc/models.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 
 class ConnectPage extends StatefulWidget {
@@ -31,68 +25,13 @@ class ConnectPage extends StatefulWidget {
 class _ConnectPageState extends State<ConnectPage> {
   late TextEditingController _uriController;
 
-  // final _web3client = Web3Client(rpcUri, http.Client());
-
   late bool _scanView;
 
   @override
   void initState() {
     _scanView = false;
     _uriController = TextEditingController();
-    _initializeListeners();
     super.initState();
-  }
-
-  _initializeListeners() async {
-    widget.signClient.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => RequestSessionPropose.fromJson(v as Map<String, dynamic>),
-      );
-
-      log('SESSION_PROPOSAL: ${eventData.toJson()}');
-
-      // _onSessionRequest(eventData.id, eventData.params!);
-    });
-
-    widget.signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => RequestSessionRequest.fromJson(v as Map<String, dynamic>),
-      );
-      log('SESSION_REQUEST: ${eventData.toJson()}');
-
-      if (eventData.params!.request.method ==
-          Eip155Methods.PERSONAL_SIGN.value) {
-        final requestParams = eventData.params!.request.params as List<String>;
-        final dataToSign = requestParams[0];
-        final address = requestParams[1];
-      }
-    });
-
-    widget.signClient.on(SignClientEvent.SESSION_EVENT.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => RequestSessionEvent.fromJson(v as Map<String, dynamic>),
-      );
-      log('SESSION_EVENT: ${eventData.toJson()}');
-    });
-
-    widget.signClient.on(SignClientEvent.SESSION_PING.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => v,
-      );
-      log('SESSION_PING: ${eventData.toJson()}');
-    });
-
-    widget.signClient.on(SignClientEvent.SESSION_DELETE.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => RequestSessionDelete.fromJson(v as Map<String, dynamic>),
-      );
-      log('SESSION_DELETE: ${eventData.toJson()}');
-    });
   }
 
   @override

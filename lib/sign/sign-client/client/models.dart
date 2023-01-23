@@ -1,3 +1,15 @@
+class SignClientEventParams<T> {
+  final int? id;
+  final String? topic;
+  final T? params;
+
+  SignClientEventParams({
+    this.id,
+    this.topic,
+    this.params,
+  });
+}
+
 enum SignClientEvent {
   SESSION_PROPOSAL,
   SESSION_UPDATE,
@@ -28,7 +40,7 @@ extension SignClientEventX on SignClientEvent {
   }
 }
 
-extension StringX on String {
+extension SignClientEventStringX on String {
   SignClientEvent get signClientEvent {
     return _signClientTypesEventMap.entries
         .where((element) => element.value == this)

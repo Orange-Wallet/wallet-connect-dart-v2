@@ -1,11 +1,16 @@
+import 'dart:developer';
+
+import 'package:example/models/ethereum/wc_ethereum_sign_message.dart';
 import 'package:example/pages/accounts_page.dart';
 import 'package:example/pages/connect_page.dart';
 import 'package:example/pages/pairings_page.dart';
 import 'package:example/pages/sessions_page.dart';
 import 'package:example/pages/settings_page.dart';
+import 'package:example/utils/eip155_data.dart';
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
+import 'package:http/http.dart' as http;
+import 'package:wallet_connect/wallet_connect.dart';
+import 'package:web3dart/web3dart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,6 +51,7 @@ class _HomePageState extends State<HomePage> {
   int _activePage = 0;
   SignClient? _signClient;
   late bool initializing;
+  final _web3client = Web3Client('', http.Client());
 
   @override
   void initState() {
@@ -71,6 +77,69 @@ class _HomePageState extends State<HomePage> {
       ),
       database: 'wallet.db',
     );
+
+    _signClient!.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
+      final eventData = data as SignClientEventParams<RequestSessionPropose>;
+      log('SESSION_PROPOSAL: $eventData');
+
+      // _onSessionRequest(eventData.id, eventData.params!);
+    });
+
+    _signClient!.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
+      final eventData = data as SignClientEventParams<RequestSessionRequest>;
+      log('SESSION_REQUEST: $eventData');
+      final pairing = _signClient!.pairing.get(eventData.topic!);
+
+      switch (eventData.params!.request.method.toEip155Method()) {
+        case Eip155Methods.PERSONAL_SIGN:
+          final requestParams =
+              eventData.params!.request.params as List<String>;
+          final message = WCEthereumSignMessage(
+            raw: requestParams,
+            type: WCSignType.PERSONAL_MESSAGE,
+          );
+          return _onSign(eventData.id!, eventData.topic!, pairing, message);
+        case Eip155Methods.ETH_SIGN:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SIGN_TYPED_DATA:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SIGN_TYPED_DATA_V3:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SIGN_TYPED_DATA_V4:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SIGN_TRANSACTION:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SEND_TRANSACTION:
+          // TODO: Handle this case.
+          break;
+        case Eip155Methods.ETH_SEND_RAW_TRANSACTION:
+          // TODO: Handle this case.
+          break;
+        default:
+          debugPrint('Unsupported request.');
+      }
+    });
+
+    _signClient!.on(SignClientEvent.SESSION_EVENT.value, (data) async {
+      final eventData = data as SignClientEventParams<RequestSessionEvent>;
+      log('SESSION_EVENT: $eventData');
+    });
+
+    _signClient!.on(SignClientEvent.SESSION_PING.value, (data) async {
+      final eventData = data as SignClientEventParams<void>;
+      log('SESSION_PING: $eventData');
+    });
+
+    _signClient!.on(SignClientEvent.SESSION_DELETE.value, (data) async {
+      final eventData = data as SignClientEventParams<void>;
+      log('SESSION_DELETE: $eventData');
+    });
+
     setState(() {
       initializing = false;
     });
@@ -184,6 +253,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  _onSign(
+    int id,
+    String topic,
+    PairingStruct pairing,
+    WCEthereumSignMessage message,
+  ) {
+    // TBD
   }
 }
 

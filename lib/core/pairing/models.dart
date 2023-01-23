@@ -86,7 +86,7 @@ extension PairingMethodX on PairingMethod {
   }
 }
 
-extension StringX on String {
+extension PairingMethodStringX on String {
   PairingMethod? toPairingMethod() {
     final entries =
         _pairingMethodMap.entries.where((element) => element.value == this);

@@ -710,10 +710,10 @@ class Engine with Events implements IEngine {
       await _setProposal(request.id.toString(), proposal);
       client.events.emit(
         SignClientEvent.SESSION_PROPOSAL.value,
-        {
-          'id': id,
-          'params': proposal.toJson(),
-        },
+        SignClientEventParams<ProposalStruct>(
+          id: id,
+          params: proposal,
+        ),
       );
     } catch (err) {
       await _sendError(id, topic, err);
@@ -896,10 +896,13 @@ class Engine with Events implements IEngine {
       _isValidExtend(topic);
       await _setExpiry(topic, calcExpiry(ttl: SESSION_EXPIRY));
       await _sendResult(id, topic, true, (v) => v);
-      client.events.emit(SignClientEvent.SESSION_EXTEND.value, {
-        'id': id,
-        'topic': topic,
-      });
+      client.events.emit(
+        SignClientEvent.SESSION_EXTEND.value,
+        SignClientEventParams<void>(
+          id: id,
+          topic: topic,
+        ),
+      );
     } catch (err) {
       await _sendError(id, topic, err);
       client.logger.e(err);
@@ -929,10 +932,13 @@ class Engine with Events implements IEngine {
     try {
       _isValidPing(topic);
       await _sendResult<bool>(id, topic, true, (v) => v);
-      client.events.emit(SignClientEvent.SESSION_PING.value, {
-        'id': id,
-        'topic': topic,
-      });
+      client.events.emit(
+        SignClientEvent.SESSION_PING.value,
+        SignClientEventParams<void>(
+          id: id,
+          topic: topic,
+        ),
+      );
     } catch (err) {
       await _sendError(id, topic, err);
       client.logger.e(err);
@@ -969,10 +975,12 @@ class Engine with Events implements IEngine {
       // RPC request needs to happen before deletion as it utalises session encryption
       await _sendResult<bool>(id, topic, true, (v) => v);
       await _deleteSession(topic);
-      client.events.emit(SignClientEvent.SESSION_DELETE.value, {
-        'id': id,
-        'topic': topic,
-      });
+      client.events.emit(
+          SignClientEvent.SESSION_DELETE.value,
+          SignClientEventParams<void>(
+            id: id,
+            topic: topic,
+          ));
     } catch (err) {
       await _sendError(id, topic, err);
       client.logger.e(err);
@@ -992,11 +1000,14 @@ class Engine with Events implements IEngine {
         request: params.request,
         chainId: params.chainId,
       ));
-      final pendingRequest = PendingRequestStruct(topic, id, params);
-      await setPendingSessionRequest(pendingRequest);
+      await setPendingSessionRequest(PendingRequestStruct(topic, id, params));
       client.events.emit(
         SignClientEvent.SESSION_REQUEST.value,
-        pendingRequest.toJson(),
+        SignClientEventParams<RequestSessionRequest>(
+          id: id,
+          topic: topic,
+          params: params,
+        ),
       );
     } catch (err) {
       await _sendError(id, topic, err);
@@ -1034,11 +1045,13 @@ class Engine with Events implements IEngine {
         event: params.event,
         chainId: params.chainId,
       ));
-      client.events.emit(SignClientEvent.SESSION_REQUEST.value, {
-        'id': id,
-        'topic': topic,
-        'params': params.toJson(),
-      });
+      client.events.emit(
+          SignClientEvent.SESSION_REQUEST.value,
+          SignClientEventParams<RequestSessionEvent>(
+            id: id,
+            topic: topic,
+            params: params,
+          ));
     } catch (err) {
       await _sendError(id, topic, err);
       client.logger.e(err);
@@ -1070,7 +1083,7 @@ class Engine with Events implements IEngine {
             await _deleteSession(topic, expirerHasDeleted: true);
             client.events.emit(
               SignClientEvent.SESSION_EXPIRE.value,
-              {'topic': topic},
+              SignClientEventParams<void>(topic: topic),
             );
           }
         } else if (id != null) {

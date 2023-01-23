@@ -75,3 +75,11 @@ enum Eip155Methods {
 extension Eip155MethodsX on Eip155Methods {
   String? get value => Eip155Data.methods[this];
 }
+
+extension StringX on String {
+  Eip155Methods? toEip155Method() {
+    final entries =
+        Eip155Data.methods.entries.where((element) => element.value == this);
+    return (entries.isNotEmpty) ? entries.first.key : null;
+  }
+}
