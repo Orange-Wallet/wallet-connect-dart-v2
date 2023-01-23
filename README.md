@@ -11,24 +11,26 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
+# Getting started
+
+<br>
+
 ### This SDK is built with inspiration from official [WalletConnect SDK 2.0](https://docs.walletconnect.com/2.0).
 
 <br>
 
-### This SDK is in beta and have limited functionality :
+# Index
 
-- Initialize
-- Pair
-- Session Approval
-- Session Request
-  <!-- - Session Rejection -->
-  <!-- - Session Disconnect -->
-
-<br>
-
-# Getting started
-
-<br>
+1. [Usage](#usage)
+2. [Initialization](#initialization)
+3. [Pairing via QR](#pairing-via-qr-code)
+4. [Pairing Via URI](#pairing-via-uri)
+5. [Session Approval and Rejection](#session-approval-and-rejection)
+6. [Responding to Session Requests](#responding-to-session-requests)
+7. [Delete Session](#session-delete)
+8. [Extend Session](#extend-a-session)
+9. [Update Session](#updating-a-session​)
+10. [Session Emit](#emit-a-session)
 
 ## Usage
 
@@ -36,7 +38,7 @@ To configure your app to use latest version of `wallet-connect-v2`, see [example
 
 <br>
 
-### Initialization
+## Initialization
 
 Create a new instance of `SignClient` and initialize it with a `projectId`, `relayUrl` and `metadata` created from installation.
 You can opt to use `Hive` to save session details or they will be saved in memory by default.
@@ -70,7 +72,7 @@ We have used [ScanView](https://pub.dev/packages/scan) for this you can use any 
      onCapture: (data) {
        _qrScanHandler(data);
      },
-   )
+   );
    ```
 2. Convert the Scanned data to URI
    ```
@@ -88,12 +90,12 @@ We have used [ScanView](https://pub.dev/packages/scan) for this you can use any 
 Directly use `pair` functionality from `SignClient` instance
 
 ```
-_signClient.pair(value);
+await _signClient.pair(value);
 ```
 
 <br>
 
-### Session Approval
+### Session Approval and Rejection
 
 The `SignClientEvent.SESSION_PROPOSAL` event is emitted when a dapp initiates a new session with a user's wallet. The event will include a proposal object with information about the dapp and requested permissions. The wallet should display a prompt for the user to approve or reject the session. If approved, call approveSession and pass in the proposal.id and requested namespaces.
 
@@ -146,8 +148,70 @@ _signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
         final address = requestParams[1];
         // use specific function for personal sign
       }
-
     });
+```
+
+<br>
+
+## Session Delete
+
+If either the dapp or the wallet decides to disconnect the session, the `SignClientEvent.SESSION_DELETE` event will be emitted. The wallet should listen for this event in order to update the UI.
+
+To disconnect a session from the wallet, call the `disconnect` function and pass in the topic and reason. You can optionally send the reason for disconnect to dapp.
+
+```
+await _signClient.disconnect(topic: "TOPIC");
+```
+
+Here is how to listen to `SignClientEvent.SESSION_DELETE` event:
+
+```
+_signClient.on(SignClientEvent.SESSION_DELETE.value, (data) async {
+      final eventData = JsonRpcRequest.fromJson(
+        data as Map<String, dynamic>,
+        (v) => RequestSessionDelete.fromJson(v as Map<String, dynamic>),
+      );
+      log('SESSION_DELETE: ${eventData.toJson()}');
+      // Do other thing with the info.
+    });
+```
+
+<br>
+
+## Extend a Session
+
+To extend the session, call the `extend` method and pass in the new topic. The `SignClientEvent.SESSION_UPDATE` event will be emitted from the wallet.
+
+```
+await _signClient.extend("TOPIC");
+```
+
+<br>
+
+## Updating a Session​
+
+The `SignClientEvent.SESSION_UPDATE` event is emitted from the wallet when the session is updated by calling `update`.
+To update a session, pass in the new `SessionUpdateParams`
+
+```
+await _signClient.update(params);
+```
+
+<br>
+
+## Emit a Session
+
+To emit sesssion events, call the `emit` and pass in the params. It takes `SessionEmitParams` as a parameter.
+
+```
+SessionEmitParams params = SessionEmitParams(
+    topic: "TOPIC",
+    event: SessionEmitEvent(
+      name: "NAME",
+      data: ["DATA_1"],
+    ),
+    chainId: "CHAIN_ID");
+await _signClient.emit(params);
 ```
 
 <br>
