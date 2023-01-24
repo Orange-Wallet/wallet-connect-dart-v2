@@ -1,5 +1,5 @@
-import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect_v2/core/relayer/models.dart';
+import 'package:wallet_connect_v2/sign/engine/models.dart';
 
 // -- uri -------------------------------------------------- //
 

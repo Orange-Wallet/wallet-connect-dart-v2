@@ -3,16 +3,16 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/crypto/constants.dart';
-import 'package:wallet_connect/core/crypto/i_crypto.dart';
-import 'package:wallet_connect/core/crypto/models.dart';
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/keychain/i_key_chain.dart';
-import 'package:wallet_connect/core/keychain/key_chain.dart';
-import 'package:wallet_connect/utils/crypto.dart' as utils;
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart'
+import 'package:wallet_connect_v2/core/crypto/constants.dart';
+import 'package:wallet_connect_v2/core/crypto/i_crypto.dart';
+import 'package:wallet_connect_v2/core/crypto/models.dart';
+import 'package:wallet_connect_v2/core/i_core.dart';
+import 'package:wallet_connect_v2/core/keychain/i_key_chain.dart';
+import 'package:wallet_connect_v2/core/keychain/key_chain.dart';
+import 'package:wallet_connect_v2/utils/crypto.dart' as utils;
+import 'package:wallet_connect_v2/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/relay_auth/relay_auth.dart'
     as relay_auth;
 
 class Crypto implements ICrypto {

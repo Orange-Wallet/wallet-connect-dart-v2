@@ -4,7 +4,7 @@ import 'package:example/models/accounts.dart';
 import 'package:example/utils/constants.dart';
 import 'package:example/utils/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/wallet_connect.dart';
+import 'package:wallet_connect_v2/wallet_connect.dart';
 
 class SessionRequestView extends StatefulWidget {
   final RequestSessionPropose proposal;

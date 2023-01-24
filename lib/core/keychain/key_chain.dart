@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/keychain/constants.dart';
-import 'package:wallet_connect/core/keychain/i_key_chain.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_v2/core/constants.dart';
+import 'package:wallet_connect_v2/core/i_core.dart';
+import 'package:wallet_connect_v2/core/keychain/constants.dart';
+import 'package:wallet_connect_v2/core/keychain/i_key_chain.dart';
+import 'package:wallet_connect_v2/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
 
 class KeyChain implements IKeyChain {
   @override

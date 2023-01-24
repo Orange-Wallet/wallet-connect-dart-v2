@@ -10,7 +10,7 @@ import 'package:example/utils/eip155_data.dart';
 import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:wallet_connect/wallet_connect.dart';
+import 'package:wallet_connect_v2/wallet_connect.dart';
 import 'package:web3dart/web3dart.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
 
 bool isJsonRpcPayload(dynamic payload) {
   return (payload is Map &&

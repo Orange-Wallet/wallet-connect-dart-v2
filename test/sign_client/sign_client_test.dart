@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:test/test.dart';
-import 'package:wallet_connect/core/pairing/models.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/sign/sign-client/client/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/utils/uri.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect_v2/core/pairing/models.dart';
+import 'package:wallet_connect_v2/sign/engine/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/client/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/client/sign_client.dart';
+import 'package:wallet_connect_v2/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect_v2/utils/error.dart';
+import 'package:wallet_connect_v2/utils/uri.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/format.dart';
 
 import 'mock_data.dart';
 

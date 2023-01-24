@@ -1,5 +1,5 @@
 // Client will sign a unique identifier as the subject
-import 'package:wallet_connect/wc_utils/relay_auth/models.dart';
+import 'package:wallet_connect_v2/wc_utils/relay_auth/models.dart';
 
 const TEST_SUBJECT =
     "c479fe5dc464e771e78b193d239a65b58d278cad1c34bfb0b5716e5bb514928e";

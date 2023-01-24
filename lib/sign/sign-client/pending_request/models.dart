@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect/sign/sign-client/jsonrpc/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/jsonrpc/models.dart';
 
 part 'models.g.dart';
 
