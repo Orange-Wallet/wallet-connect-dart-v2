@@ -163,7 +163,7 @@ class JsonRpcError implements JsonRpcResponse<ErrorResponse> {
 
   JsonRpcError({
     required this.id,
-    required this.jsonrpc,
+    this.jsonrpc = '2.0',
     this.error,
   });
 

@@ -4,7 +4,6 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart' as crypto;
-import 'package:flutter/foundation.dart';
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:pointycastle/key_derivators/hkdf.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
@@ -137,8 +136,7 @@ Future<String> decrypt({
     );
     final message = box.decrypt(decoded.sealed);
     return utf8.decode(message);
-  } catch (e, trace) {
-    debugPrint('ERROR $e, $trace');
+  } catch (e) {
     throw WCException("Failed to decrypt");
   }
 }

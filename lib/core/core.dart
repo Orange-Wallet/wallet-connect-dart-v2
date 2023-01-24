@@ -117,11 +117,10 @@ class Core with Events implements ICore {
       await pairing.init();
       _initialized = true;
       logger.i('Core Initilization Success');
-    } catch (error, trace) {
+    } catch (error) {
       logger.w(
           'Core Initilization Failure at epoch ${DateTime.now().millisecondsSinceEpoch}',
           error);
-      logger.e(trace.toString());
       rethrow;
     }
   }

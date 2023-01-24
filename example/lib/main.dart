@@ -1,17 +1,23 @@
 import 'dart:developer';
 
+import 'package:eth_sig_util/eth_sig_util.dart';
+import 'package:example/models/accounts.dart';
 import 'package:example/models/ethereum/wc_ethereum_sign_message.dart';
+import 'package:example/models/ethereum/wc_ethereum_transaction.dart';
 import 'package:example/pages/accounts_page.dart';
 import 'package:example/pages/connect_page.dart';
 import 'package:example/pages/pairings_page.dart';
 import 'package:example/pages/sessions_page.dart';
 import 'package:example/pages/settings_page.dart';
+import 'package:example/utils/constants.dart';
 import 'package:example/utils/eip155_data.dart';
+import 'package:example/utils/hd_key_utils.dart';
 import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:wallet_connect/wallet_connect.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:wallet_connect/wallet_connect.dart';
 
 void main() {
   runApp(const MyApp());
@@ -94,32 +100,79 @@ class _HomePageState extends State<HomePage> {
       switch (eventData.params!.request.method.toEip155Method()) {
         case Eip155Methods.PERSONAL_SIGN:
           final requestParams =
-              eventData.params!.request.params as List<String>;
+              (eventData.params!.request.params as List).cast<String>();
+          final dataToSign = requestParams[0];
+          final address = requestParams[1];
           final message = WCEthereumSignMessage(
-            raw: requestParams,
+            data: dataToSign,
+            address: address,
             type: WCSignType.PERSONAL_MESSAGE,
           );
           return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN:
-          // TODO: Handle this case.
-          break;
+          final requestParams =
+              (eventData.params!.request.params as List).cast<String>();
+          final dataToSign = requestParams[1];
+          final address = requestParams[0];
+          final message = WCEthereumSignMessage(
+            data: dataToSign,
+            address: address,
+            type: WCSignType.MESSAGE,
+          );
+          return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN_TYPED_DATA:
-          // TODO: Handle this case.
-          break;
+          final requestParams =
+              (eventData.params!.request.params as List).cast<String>();
+          final dataToSign = requestParams[1];
+          final address = requestParams[0];
+          final message = WCEthereumSignMessage(
+            data: dataToSign,
+            address: address,
+            type: WCSignType.TYPED_MESSAGE_V4,
+          );
+          return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN_TYPED_DATA_V3:
-          // TODO: Handle this case.
-          break;
+          final requestParams =
+              (eventData.params!.request.params as List).cast<String>();
+          final dataToSign = requestParams[1];
+          final address = requestParams[0];
+          final message = WCEthereumSignMessage(
+            data: dataToSign,
+            address: address,
+            type: WCSignType.TYPED_MESSAGE_V3,
+          );
+          return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN_TYPED_DATA_V4:
-          // TODO: Handle this case.
-          break;
+          final requestParams =
+              (eventData.params!.request.params as List).cast<String>();
+          final dataToSign = requestParams[1];
+          final address = requestParams[0];
+          final message = WCEthereumSignMessage(
+            data: dataToSign,
+            address: address,
+            type: WCSignType.TYPED_MESSAGE_V4,
+          );
+          return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN_TRANSACTION:
-          // TODO: Handle this case.
-          break;
+          final ethereumTransaction = WCEthereumTransaction.fromJson(
+              eventData.params!.request.params.first);
+          return _onSignTransaction(
+            eventData.id!,
+            int.parse(eventData.params!.chainId.split(':').last),
+            session,
+            ethereumTransaction,
+          );
         case Eip155Methods.ETH_SEND_TRANSACTION:
-          // TODO: Handle this case.
-          break;
+          final ethereumTransaction = WCEthereumTransaction.fromJson(
+              eventData.params!.request.params.first);
+          return _onSendTransaction(
+            eventData.id!,
+            int.parse(eventData.params!.chainId.split(':').last),
+            session,
+            ethereumTransaction,
+          );
         case Eip155Methods.ETH_SEND_RAW_TRANSACTION:
-          // TODO: Handle this case.
+          // TODO
           break;
         default:
           debugPrint('Unsupported request.');
@@ -139,6 +192,7 @@ class _HomePageState extends State<HomePage> {
     _signClient!.on(SignClientEvent.SESSION_DELETE.value, (data) async {
       final eventData = data as SignClientEventParams<void>;
       log('SESSION_DELETE: $eventData');
+      _onSessionClosed(9999, 'Ended.');
     });
 
     setState(() {
@@ -256,30 +310,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _connectToPreviousSession() {
-    // final _sessionSaved = _prefs.getString('session');
-    // debugPrint('_sessionSaved $_sessionSaved');
-    // _sessionStore = _sessionSaved != null
-    //     ? WCSessionStore.fromJson(jsonDecode(_sessionSaved))
-    //     : null;
-    // if (_sessionStore != null) {
-    //   debugPrint('_sessionStore $_sessionStore');
-    //   widget.signClient.connectFromSessionStore(_sessionStore!);
-    // } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('No previous session found.'),
-    ));
-    // }
-  }
-
-  _onSwitchNetwork(int id, int chainId) async {
-    // await widget.signClient.updateSession(chainId: chainId);
-    // widget.signClient.approveRequest<Null>(id: id, result: null);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Changed network to $chainId.'),
-    ));
-  }
-
   _onSessionRequest(int id, RequestSessionPropose proposal) {
     showDialog(
       context: context,
@@ -308,44 +338,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _onSessionError(dynamic message) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return SimpleDialog(
-          title: Text("Error"),
-          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Some Error Occured. $message'),
-            ),
-            Row(
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('CLOSE'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   _onSessionClosed(int? code, String? reason) {
     showDialog(
       context: context,
       builder: (_) {
         return SimpleDialog(
-          title: Text("Session Ended"),
+          title: const Text("Session Ended"),
           contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
           children: [
             Padding(
@@ -367,7 +365,269 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text('CLOSE'),
+                  child: const Text('CLOSE'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _onSignTransaction(
+    int id,
+    int chainId,
+    SessionStruct session,
+    WCEthereumTransaction ethereumTransaction,
+  ) {
+    _onTransaction(
+      id: id,
+      session: session,
+      ethereumTransaction: ethereumTransaction,
+      title: 'Sign Transaction',
+      onConfirm: () async {
+        final account = _getAccountFromAddr(ethereumTransaction.from);
+        final privateKey = HDKeyUtils.getPrivateKey(account.mnemonic);
+        final creds = EthPrivateKey.fromHex(privateKey);
+        final tx = await _web3client.signTransaction(
+          creds,
+          _wcEthTxToWeb3Tx(ethereumTransaction),
+          chainId: chainId,
+        );
+        _signClient!
+            .respond(
+          SessionRespondParams(
+            topic: session.topic,
+            response: JsonRpcResult<String>(
+              id: id,
+              result: bytesToHex(tx),
+            ),
+          ),
+        )
+            .then((value) {
+          Navigator.pop(context);
+        });
+      },
+      onReject: () {
+        _signClient!
+            .respond(SessionRespondParams(
+          topic: session.topic,
+          response: JsonRpcError(id: id),
+        ))
+            .then((value) {
+          Navigator.pop(context);
+        });
+      },
+    );
+  }
+
+  _onSendTransaction(
+    int id,
+    int chainId,
+    SessionStruct session,
+    WCEthereumTransaction ethereumTransaction,
+  ) {
+    _onTransaction(
+      id: id,
+      session: session,
+      ethereumTransaction: ethereumTransaction,
+      title: 'Send Transaction',
+      onConfirm: () async {
+        final account = _getAccountFromAddr(ethereumTransaction.from);
+        final privateKey = HDKeyUtils.getPrivateKey(account.mnemonic);
+        final creds = EthPrivateKey.fromHex(privateKey);
+        final txHash = await _web3client.sendTransaction(
+          creds,
+          _wcEthTxToWeb3Tx(ethereumTransaction),
+          chainId: chainId,
+        );
+        debugPrint('txHash $txHash');
+        _signClient!
+            .respond(
+          SessionRespondParams(
+            topic: session.topic,
+            response: JsonRpcResult<String>(
+              id: id,
+              result: txHash,
+            ),
+          ),
+        )
+            .then((value) {
+          Navigator.pop(context);
+        });
+      },
+      onReject: () {
+        _signClient!
+            .respond(SessionRespondParams(
+          topic: session.topic,
+          response: JsonRpcError(id: id),
+        ))
+            .then((value) {
+          Navigator.pop(context);
+        });
+      },
+    );
+  }
+
+  _onTransaction({
+    required int id,
+    required SessionStruct session,
+    required WCEthereumTransaction ethereumTransaction,
+    required String title,
+    required VoidCallback onConfirm,
+    required VoidCallback onReject,
+  }) async {
+    BigInt gasPrice = BigInt.parse(ethereumTransaction.gasPrice ?? '0');
+    if (gasPrice == BigInt.zero) {
+      gasPrice = await _web3client.estimateGas();
+    }
+    showDialog(
+      context: context,
+      builder: (_) {
+        return SimpleDialog(
+          title: Column(
+            children: [
+              if (session.peer.metadata.icons.isNotEmpty)
+                Container(
+                  height: 100.0,
+                  width: 100.0,
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Image.network(session.peer.metadata.icons.first),
+                ),
+              Text(
+                session.peer.metadata.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 20.0,
+                ),
+              ),
+            ],
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
+          children: [
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Receipient',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    '${ethereumTransaction.to}',
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  const Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Transaction Fee',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${(EtherAmount.fromUnitAndValue(EtherUnit.wei, ethereumTransaction.maxFeePerGas ?? ethereumTransaction.gasPrice).getInEther) * BigInt.parse(ethereumTransaction.gas ?? '0')} ETH',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  const Expanded(
+                    flex: 2,
+                    child: Text(
+                      'Transaction Amount',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${EtherAmount.fromUnitAndValue(EtherUnit.wei, ethereumTransaction.value).getInEther} ETH',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Data',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  children: [
+                    Text(
+                      '${ethereumTransaction.data}',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                    onPressed: onConfirm,
+                    child: const Text('CONFIRM'),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                    onPressed: onReject,
+                    child: const Text('REJECT'),
+                  ),
                 ),
               ],
             ),
@@ -383,7 +643,175 @@ class _HomePageState extends State<HomePage> {
     SessionStruct session,
     WCEthereumSignMessage message,
   ) {
-    // TBD
+    showDialog(
+      context: context,
+      builder: (_) {
+        return SimpleDialog(
+          title: Column(
+            children: [
+              if (session.peer.metadata.icons.isNotEmpty)
+                Container(
+                  height: 100.0,
+                  width: 100.0,
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Image.network(session.peer.metadata.icons.first),
+                ),
+              Text(
+                session.peer.metadata.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 20.0,
+                ),
+              ),
+            ],
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
+          children: [
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: const Text(
+                'Sign Message',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
+            Theme(
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Message',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  children: [
+                    Text(
+                      message.data,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                    onPressed: () async {
+                      final account = _getAccountFromAddr(message.address);
+                      final privateKey =
+                          HDKeyUtils.getPrivateKey(account.mnemonic);
+                      final creds = EthPrivateKey.fromHex(privateKey);
+                      String signedDataHex;
+                      if (message.type == WCSignType.TYPED_MESSAGE_V1) {
+                        signedDataHex = EthSigUtil.signTypedData(
+                          privateKey: privateKey,
+                          jsonData: message.data,
+                          version: TypedDataVersion.V1,
+                        );
+                      } else if (message.type == WCSignType.TYPED_MESSAGE_V3) {
+                        signedDataHex = EthSigUtil.signTypedData(
+                          privateKey: privateKey,
+                          jsonData: message.data,
+                          version: TypedDataVersion.V3,
+                        );
+                      } else if (message.type == WCSignType.TYPED_MESSAGE_V4) {
+                        signedDataHex = EthSigUtil.signTypedData(
+                          privateKey: privateKey,
+                          jsonData: message.data,
+                          version: TypedDataVersion.V4,
+                        );
+                      } else {
+                        final encodedMessage = hexToBytes(message.data);
+                        final signedData =
+                            await creds.signPersonalMessage(encodedMessage);
+                        signedDataHex = bytesToHex(signedData, include0x: true);
+                      }
+                      debugPrint('SIGNED $signedDataHex');
+                      _signClient!
+                          .respond(
+                        SessionRespondParams(
+                          topic: topic,
+                          response: JsonRpcResult<String>(
+                            id: id,
+                            result: signedDataHex,
+                          ),
+                        ),
+                      )
+                          .then((value) {
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: const Text('SIGN'),
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                    onPressed: () {
+                      _signClient!
+                          .respond(SessionRespondParams(
+                        topic: session.topic,
+                        response: JsonRpcError(id: id),
+                      ))
+                          .then((value) {
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: const Text('REJECT'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Account _getAccountFromAddr(String address) {
+    return Constants.accounts
+        .where((element) => element.details.any((element) =>
+            element.address.toLowerCase() == address.toLowerCase()))
+        .first;
+  }
+
+  Transaction _wcEthTxToWeb3Tx(WCEthereumTransaction ethereumTransaction) {
+    return Transaction(
+      from: EthereumAddress.fromHex(ethereumTransaction.from),
+      to: EthereumAddress.fromHex(ethereumTransaction.to!),
+      maxGas: ethereumTransaction.gasLimit != null
+          ? int.tryParse(ethereumTransaction.gasLimit!)
+          : null,
+      gasPrice: ethereumTransaction.gasPrice != null
+          ? EtherAmount.inWei(BigInt.parse(ethereumTransaction.gasPrice!))
+          : null,
+      value: EtherAmount.inWei(BigInt.parse(ethereumTransaction.value ?? '0')),
+      data: hexToBytes(ethereumTransaction.data!),
+      nonce: ethereumTransaction.nonce != null
+          ? int.tryParse(ethereumTransaction.nonce!)
+          : null,
+      maxFeePerGas: EtherAmount.inWei(
+          BigInt.parse(ethereumTransaction.maxFeePerGas ?? '0')),
+      maxPriorityFeePerGas: EtherAmount.inWei(
+          BigInt.parse(ethereumTransaction.maxPriorityFeePerGas ?? '0')),
+    );
   }
 }
 

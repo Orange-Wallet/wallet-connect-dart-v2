@@ -17,6 +17,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   eth_sig_util: ^0.0.3
   json_annotation: ^4.7.0
+  bip39: ^1.0.6
+  bip32: ^2.0.0
   wallet_connect:
     path: ../
 
