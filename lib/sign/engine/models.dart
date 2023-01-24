@@ -79,6 +79,8 @@ class SessionConnectParams {
 
   factory SessionConnectParams.fromJson(Map<String, dynamic> json) =>
       _$SessionConnectParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionConnectParamsToJson(this);
 }
 
 @JsonSerializable()
@@ -95,6 +97,8 @@ class SessionApproveParams {
 
   factory SessionApproveParams.fromJson(Map<String, dynamic> json) =>
       _$SessionApproveParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionApproveParamsToJson(this);
 }
 
 @JsonSerializable()
@@ -109,6 +113,8 @@ class SessionRejectParams {
 
   factory SessionRejectParams.fromJson(Map<String, dynamic> json) =>
       _$SessionRejectParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionRejectParamsToJson(this);
 }
 
 @JsonSerializable()
@@ -123,6 +129,8 @@ class SessionUpdateParams {
 
   factory SessionUpdateParams.fromJson(Map<String, dynamic> json) =>
       _$SessionUpdateParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionUpdateParamsToJson(this);
 }
 
 @JsonSerializable()
@@ -139,6 +147,8 @@ class SessionRequestParams {
 
   factory SessionRequestParams.fromJson(Map<String, dynamic> json) =>
       _$SessionRequestParamsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SessionRequestParamsToJson(this);
 }
 
 class SessionRespondParams {
