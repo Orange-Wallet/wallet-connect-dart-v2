@@ -1,6 +1,6 @@
 import 'package:example/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
+import 'package:wallet_connect_v2/sign/sign-client/client/sign_client.dart';
 
 class SessionsPage extends StatelessWidget {
   final SignClient signClient;

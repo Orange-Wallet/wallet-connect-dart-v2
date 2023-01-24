@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:wallet_connect/wc_utils/jsonrpc/provider/i_json_rpc_connection.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/url.dart';
-import 'package:wallet_connect/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/provider/i_json_rpc_connection.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/url.dart';
+import 'package:wallet_connect_v2/wc_utils/misc/events/events.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WsConnection with Events implements IJsonRpcConnection {

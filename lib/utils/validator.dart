@@ -1,10 +1,10 @@
-import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/utils/misc.dart';
-import 'package:wallet_connect/utils/namespaces.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_v2/core/relayer/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect_v2/utils/error.dart';
+import 'package:wallet_connect_v2/utils/misc.dart';
+import 'package:wallet_connect_v2/utils/namespaces.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
 
 class ErrorObject {
   final String message;

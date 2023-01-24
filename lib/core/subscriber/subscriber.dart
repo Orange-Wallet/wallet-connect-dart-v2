@@ -1,22 +1,22 @@
 import 'dart:async';
 
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/relayer/constants.dart';
-import 'package:wallet_connect/core/relayer/i_relayer.dart';
-import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/core/subscriber/constants.dart';
-import 'package:wallet_connect/core/subscriber/i_subscriber.dart';
-import 'package:wallet_connect/core/subscriber/models.dart';
-import 'package:wallet_connect/core/topicmap/i_topicmap.dart';
-import 'package:wallet_connect/core/topicmap/topicmap.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/utils/relay.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect/wc_utils/misc/events/events.dart';
-import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
-import 'package:wallet_connect/wc_utils/relay/models.dart';
+import 'package:wallet_connect_v2/core/constants.dart';
+import 'package:wallet_connect_v2/core/relayer/constants.dart';
+import 'package:wallet_connect_v2/core/relayer/i_relayer.dart';
+import 'package:wallet_connect_v2/core/relayer/models.dart';
+import 'package:wallet_connect_v2/core/subscriber/constants.dart';
+import 'package:wallet_connect_v2/core/subscriber/i_subscriber.dart';
+import 'package:wallet_connect_v2/core/subscriber/models.dart';
+import 'package:wallet_connect_v2/core/topicmap/i_topicmap.dart';
+import 'package:wallet_connect_v2/core/topicmap/topicmap.dart';
+import 'package:wallet_connect_v2/utils/error.dart';
+import 'package:wallet_connect_v2/utils/relay.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect_v2/wc_utils/misc/heartbeat/constants.dart';
+import 'package:wallet_connect_v2/wc_utils/relay/models.dart';
 
 class Subscriber with Events implements ISubscriber {
   @override
