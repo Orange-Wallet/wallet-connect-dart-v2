@@ -1,14 +1,9 @@
 import 'package:example/main.dart';
 import 'package:example/widgets/custom_app_bar.dart';
-import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scan/scan.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect/wallet_connect.dart';
 
 class ConnectPage extends StatefulWidget {
   final SignClient signClient;
@@ -163,127 +158,5 @@ class _ConnectPageState extends State<ConnectPage> {
     if (Uri.tryParse(value) != null) {
       widget.signClient.pair(value);
     }
-  }
-
-  _connectToPreviousSession() {
-    // final _sessionSaved = _prefs.getString('session');
-    // debugPrint('_sessionSaved $_sessionSaved');
-    // _sessionStore = _sessionSaved != null
-    //     ? WCSessionStore.fromJson(jsonDecode(_sessionSaved))
-    //     : null;
-    // if (_sessionStore != null) {
-    //   debugPrint('_sessionStore $_sessionStore');
-    //   widget.signClient.connectFromSessionStore(_sessionStore!);
-    // } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('No previous session found.'),
-    ));
-    // }
-  }
-
-  _onSwitchNetwork(int id, int chainId) async {
-    // await widget.signClient.updateSession(chainId: chainId);
-    // widget.signClient.approveRequest<Null>(id: id, result: null);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Changed network to $chainId.'),
-    ));
-  }
-
-  _onSessionRequest(int id, ProposalStruct proposal) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        child: SessionRequestView(
-          proposal: proposal,
-          onApprove: (namespaces) async {
-            final params = SessionApproveParams(
-              id: id,
-              namespaces: namespaces,
-            );
-            //  final approved = await
-            widget.signClient.approve(params);
-            // await approved.acknowledged;
-            Navigator.pop(context);
-          },
-          onReject: () {
-            widget.signClient.reject(SessionRejectParams(
-              id: id,
-              reason: formatErrorMessage(
-                  error: getSdkError(SdkErrorKey.USER_DISCONNECTED)),
-            ));
-            Navigator.pop(context);
-          },
-        ),
-      ),
-    );
-  }
-
-  _onSessionError(dynamic message) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return SimpleDialog(
-          title: Text("Error"),
-          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Some Error Occured. $message'),
-            ),
-            Row(
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('CLOSE'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _onSessionClosed(int? code, String? reason) {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return SimpleDialog(
-          title: Text("Session Ended"),
-          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text('Some Error Occured. ERROR CODE: $code'),
-            ),
-            if (reason != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text('Failure Reason: $reason'),
-              ),
-            Row(
-              children: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    primary: Colors.white,
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('CLOSE'),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
   }
 }

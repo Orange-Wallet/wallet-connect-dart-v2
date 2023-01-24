@@ -1,7 +1,6 @@
 import 'package:example/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/wallet_connect.dart';
 
 class PairingsPage extends StatelessWidget {
   final SignClient signClient;

@@ -251,9 +251,9 @@ class SignClient with Events implements ISignClient {
       await pendingRequest.init();
       await engine.init();
       logger.i('SignClient Initilization Success');
-    } catch (error) {
+    } catch (error, trace) {
       logger.i('SignClient Initilization Failure');
-      logger.e(error is ErrorResponse ? error.message : error.toString());
+      logger.e(error is ErrorResponse ? error.message : trace.toString());
       rethrow;
     }
   }

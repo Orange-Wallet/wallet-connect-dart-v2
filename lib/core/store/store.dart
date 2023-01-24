@@ -68,7 +68,7 @@ class Store<K, V> implements IStore<K, V> {
         if (value is ProposalStruct
             //  && value.proposer.publicKey != null
             ) {
-          map[value.id as K] = value;
+          map[value.id.toString() as K] = value;
         } else if (value is SessionStruct
             //  && value.topic != null
             ) {

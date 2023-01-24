@@ -76,7 +76,7 @@ extension Eip155MethodsX on Eip155Methods {
   String? get value => Eip155Data.methods[this];
 }
 
-extension StringX on String {
+extension Eip155MethodsStringX on String {
   Eip155Methods? toEip155Method() {
     final entries =
         Eip155Data.methods.entries.where((element) => element.value == this);

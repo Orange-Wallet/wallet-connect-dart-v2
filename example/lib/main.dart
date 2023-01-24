@@ -7,6 +7,7 @@ import 'package:example/pages/pairings_page.dart';
 import 'package:example/pages/sessions_page.dart';
 import 'package:example/pages/settings_page.dart';
 import 'package:example/utils/eip155_data.dart';
+import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:wallet_connect/wallet_connect.dart';
@@ -82,13 +83,13 @@ class _HomePageState extends State<HomePage> {
       final eventData = data as SignClientEventParams<RequestSessionPropose>;
       log('SESSION_PROPOSAL: $eventData');
 
-      // _onSessionRequest(eventData.id, eventData.params!);
+      _onSessionRequest(eventData.id!, eventData.params!);
     });
 
     _signClient!.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
       final eventData = data as SignClientEventParams<RequestSessionRequest>;
       log('SESSION_REQUEST: $eventData');
-      final pairing = _signClient!.pairing.get(eventData.topic!);
+      final session = _signClient!.session.get(eventData.topic!);
 
       switch (eventData.params!.request.method.toEip155Method()) {
         case Eip155Methods.PERSONAL_SIGN:
@@ -98,7 +99,7 @@ class _HomePageState extends State<HomePage> {
             raw: requestParams,
             type: WCSignType.PERSONAL_MESSAGE,
           );
-          return _onSign(eventData.id!, eventData.topic!, pairing, message);
+          return _onSign(eventData.id!, eventData.topic!, session, message);
         case Eip155Methods.ETH_SIGN:
           // TODO: Handle this case.
           break;
@@ -255,10 +256,131 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  _connectToPreviousSession() {
+    // final _sessionSaved = _prefs.getString('session');
+    // debugPrint('_sessionSaved $_sessionSaved');
+    // _sessionStore = _sessionSaved != null
+    //     ? WCSessionStore.fromJson(jsonDecode(_sessionSaved))
+    //     : null;
+    // if (_sessionStore != null) {
+    //   debugPrint('_sessionStore $_sessionStore');
+    //   widget.signClient.connectFromSessionStore(_sessionStore!);
+    // } else {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('No previous session found.'),
+    ));
+    // }
+  }
+
+  _onSwitchNetwork(int id, int chainId) async {
+    // await widget.signClient.updateSession(chainId: chainId);
+    // widget.signClient.approveRequest<Null>(id: id, result: null);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Changed network to $chainId.'),
+    ));
+  }
+
+  _onSessionRequest(int id, RequestSessionPropose proposal) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        child: SessionRequestView(
+          proposal: proposal,
+          onApprove: (namespaces) async {
+            final params = SessionApproveParams(
+              id: id,
+              namespaces: namespaces,
+            );
+            //  final approved = await
+            _signClient!.approve(params);
+            // await approved.acknowledged;
+            Navigator.pop(context);
+          },
+          onReject: () {
+            _signClient!.reject(SessionRejectParams(
+              id: id,
+              reason: getSdkError(SdkErrorKey.USER_DISCONNECTED),
+            ));
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  _onSessionError(dynamic message) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return SimpleDialog(
+          title: Text("Error"),
+          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text('Some Error Occured. $message'),
+            ),
+            Row(
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('CLOSE'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _onSessionClosed(int? code, String? reason) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return SimpleDialog(
+          title: Text("Session Ended"),
+          contentPadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text('Some Error Occured. ERROR CODE: $code'),
+            ),
+            if (reason != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text('Failure Reason: $reason'),
+              ),
+            Row(
+              children: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('CLOSE'),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   _onSign(
     int id,
     String topic,
-    PairingStruct pairing,
+    SessionStruct session,
     WCEthereumSignMessage message,
   ) {
     // TBD

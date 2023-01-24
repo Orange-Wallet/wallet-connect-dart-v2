@@ -710,9 +710,9 @@ class Engine with Events implements IEngine {
       await _setProposal(request.id.toString(), proposal);
       client.events.emit(
         SignClientEvent.SESSION_PROPOSAL.value,
-        SignClientEventParams<ProposalStruct>(
+        SignClientEventParams<RequestSessionPropose>(
           id: id,
-          params: proposal,
+          params: request.params!,
         ),
       );
     } catch (err) {
