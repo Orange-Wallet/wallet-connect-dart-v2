@@ -1,6 +1,6 @@
 name: wallet_connect
 description: Wallet Connect sdk for dart.
-version: 0.0.1
+version: 2.0.0
 homepage: https://github.com/Orange-Wallet/wallet-connect-dart
 
 environment:
@@ -16,12 +16,12 @@ dependencies:
   convert: ^3.1.0
   cryptography: ^2.0.5
   hive: ^2.2.3
-  hive_flutter:
+  hive_flutter: ^1.1.0
   bs58: ^1.0.2
-  ed25519_edwards:
-  x25519:
+  ed25519_edwards: ^0.3.1
+  x25519: ^0.1.1
   pointycastle: ^3.6.2
-  yx_tool:
+  yx_tool: ^0.1.2
 
 dev_dependencies:
   test:
