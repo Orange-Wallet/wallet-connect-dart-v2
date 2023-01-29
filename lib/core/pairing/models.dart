@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect_v2/core/models/app_metadata.dart';
-import 'package:wallet_connect_v2/core/relayer/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
 
 part 'models.g.dart';
 

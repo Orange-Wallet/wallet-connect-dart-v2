@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
-import 'package:wallet_connect_v2/core/i_core.dart';
-import 'package:wallet_connect_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 part 'models.g.dart';
 

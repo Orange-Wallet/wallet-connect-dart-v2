@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
-import 'package:wallet_connect_v2/wc_utils/relay_auth/relay_auth.dart';
+import 'package:wallet_connect/wc_utils/relay_auth/relay_auth.dart';
 
 import 'mock_data.dart';
 

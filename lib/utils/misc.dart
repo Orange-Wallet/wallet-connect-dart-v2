@@ -1,5 +1,5 @@
-import 'package:wallet_connect_v2/sign/engine/models.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
 const SDK_TYPE = "js";
 

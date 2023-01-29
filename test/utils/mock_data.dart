@@ -1,8 +1,8 @@
-import 'package:wallet_connect_v2/core/crypto/models.dart';
-import 'package:wallet_connect_v2/core/models/app_metadata.dart';
-import 'package:wallet_connect_v2/core/relayer/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 const TEST_PAIRING_TOPIC =
     "c9e6d30fb34afe70a15c14e9337ba8e4d5a35dd695c39b94884b0ee60c69d168";

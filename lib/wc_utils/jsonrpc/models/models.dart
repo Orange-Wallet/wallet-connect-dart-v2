@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect_v2/utils/validator.dart';
+import 'package:wallet_connect/utils/validator.dart';
 
 class JsonRpcProviderMessage<T> {
   final String type;

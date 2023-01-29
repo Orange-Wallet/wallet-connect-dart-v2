@@ -1,30 +1,30 @@
 import 'dart:async';
 
 import 'package:logger/logger.dart';
-import 'package:wallet_connect_v2/core/constants.dart';
-import 'package:wallet_connect_v2/core/expirer/constants.dart';
-import 'package:wallet_connect_v2/core/expirer/models.dart';
-import 'package:wallet_connect_v2/core/i_core.dart';
-import 'package:wallet_connect_v2/core/models/app_metadata.dart';
-import 'package:wallet_connect_v2/core/pairing/constants.dart';
-import 'package:wallet_connect_v2/core/pairing/i_pairing.dart';
-import 'package:wallet_connect_v2/core/pairing/models.dart';
-import 'package:wallet_connect_v2/core/relayer/constants.dart';
-import 'package:wallet_connect_v2/core/relayer/models.dart';
-import 'package:wallet_connect_v2/core/store/i_store.dart';
-import 'package:wallet_connect_v2/core/store/store.dart';
-import 'package:wallet_connect_v2/sign/engine/models.dart';
-import 'package:wallet_connect_v2/utils/crypto.dart';
-import 'package:wallet_connect_v2/utils/error.dart';
-import 'package:wallet_connect_v2/utils/misc.dart';
-import 'package:wallet_connect_v2/utils/timeout_completer.dart';
-import 'package:wallet_connect_v2/utils/uri.dart';
-import 'package:wallet_connect_v2/utils/validator.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/format.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/validator.dart';
-import 'package:wallet_connect_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect/core/constants.dart';
+import 'package:wallet_connect/core/expirer/constants.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
+import 'package:wallet_connect/core/i_core.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/pairing/constants.dart';
+import 'package:wallet_connect/core/pairing/i_pairing.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
+import 'package:wallet_connect/core/relayer/constants.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/core/store/i_store.dart';
+import 'package:wallet_connect/core/store/store.dart';
+import 'package:wallet_connect/sign/engine/models.dart';
+import 'package:wallet_connect/utils/crypto.dart';
+import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/utils/misc.dart';
+import 'package:wallet_connect/utils/timeout_completer.dart';
+import 'package:wallet_connect/utils/uri.dart';
+import 'package:wallet_connect/utils/validator.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/validator.dart';
+import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 
 class Pairing with Events implements IPairing {
   @override

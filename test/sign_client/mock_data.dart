@@ -1,7 +1,7 @@
-import 'package:wallet_connect_v2/core/models/app_metadata.dart';
-import 'package:wallet_connect_v2/core/relayer/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 const TEST_RELAY_URL =
     String.fromEnvironment('TEST_RELAY_URL', defaultValue: "ws://0.0.0.0:5555");

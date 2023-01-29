@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:wallet_connect_v2/core/expirer/models.dart';
-import 'package:wallet_connect_v2/core/history/models.dart';
-import 'package:wallet_connect_v2/core/models/app_metadata.dart';
-import 'package:wallet_connect_v2/core/pairing/models.dart';
-import 'package:wallet_connect_v2/core/relayer/models.dart';
-import 'package:wallet_connect_v2/core/subscriber/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/jsonrpc/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/pending_request/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect_v2/wc_utils/misc/keyvaluestorage/i_key_value_storage.dart';
+import 'package:wallet_connect/core/expirer/models.dart';
+import 'package:wallet_connect/core/history/models.dart';
+import 'package:wallet_connect/core/models/app_metadata.dart';
+import 'package:wallet_connect/core/pairing/models.dart';
+import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:wallet_connect/core/subscriber/models.dart';
+import 'package:wallet_connect/sign/sign-client/jsonrpc/models.dart';
+import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
+import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/i_key_value_storage.dart';
 
 const DB_NAME = "walletconnect.db";
 

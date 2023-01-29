@@ -1,7 +1,7 @@
-import 'package:wallet_connect_v2/core/store/store.dart';
-import 'package:wallet_connect_v2/sign/sign-client/client/constants.dart';
-import 'package:wallet_connect_v2/sign/sign-client/session/constants.dart';
-import 'package:wallet_connect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect/core/store/store.dart';
+import 'package:wallet_connect/sign/sign-client/client/constants.dart';
+import 'package:wallet_connect/sign/sign-client/session/constants.dart';
+import 'package:wallet_connect/sign/sign-client/session/models.dart';
 
 class Session extends Store<String, SessionStruct> {
   Session({required super.core, required super.logger})

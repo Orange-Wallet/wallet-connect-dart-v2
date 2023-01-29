@@ -7,8 +7,8 @@ import 'package:cryptography/cryptography.dart' as crypto;
 import 'package:pointycastle/digests/sha256.dart';
 import 'package:pointycastle/key_derivators/hkdf.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
-import 'package:wallet_connect_v2/core/crypto/models.dart';
-import 'package:wallet_connect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect/core/crypto/models.dart';
+import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:x25519/x25519.dart' as curve;
 import 'package:yx_tool/yx_crypto.dart';
 
