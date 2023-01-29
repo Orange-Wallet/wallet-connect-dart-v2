@@ -44,6 +44,7 @@ class _ConnectPageState extends State<ConnectPage> {
         const CustomAppBar(
           title: 'Wallet Connect',
           alignment: Alignment.center,
+          textAlign: TextAlign.center,
         ),
         Expanded(
           child: Padding(

@@ -1,20 +1,83 @@
+import 'package:example/models/accounts.dart';
 import 'package:example/utils/constants.dart';
 import 'package:example/utils/helpers.dart';
 import 'package:example/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class AccountsPage extends StatelessWidget {
-  const AccountsPage({super.key});
+class AccountsPage extends StatefulWidget {
+  final List<Account> accounts;
+
+  const AccountsPage({super.key, required this.accounts});
+
+  @override
+  State<AccountsPage> createState() => _AccountsPageState();
+}
+
+class _AccountsPageState extends State<AccountsPage> {
+  late Account selectedAccount;
+
+  @override
+  void initState() {
+    selectedAccount = widget.accounts.first;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final selectedAccount = Constants.accounts.first;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const CustomAppBar(title: 'Accounts'),
+        CustomAppBar(
+          title: 'Accounts',
+          padding: EdgeInsets.fromLTRB(
+            8.0,
+            MediaQuery.of(context).padding.top + 8.0,
+            8.0,
+            8.0,
+          ),
+          trailing: [
+            Container(
+              padding: const EdgeInsets.only(left: 16.0, right: 4.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                color: Colors.grey.shade200,
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  elevation: 2,
+                  value: selectedAccount.id,
+                  borderRadius: BorderRadius.circular(10.0),
+                  dropdownColor: Colors.white,
+                  selectedItemBuilder: (_) => widget.accounts
+                      .map((e) => Center(child: Text(e.name)))
+                      .toList(),
+                  items: widget.accounts
+                      .map((e) => DropdownMenuItem(
+                            value: e.id,
+                            child: Text(
+                              e.name,
+                              style: TextStyle(
+                                color: e.id == selectedAccount.id
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : null,
+                                fontWeight: e.id == selectedAccount.id
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                  onChanged: (v) {
+                    setState(() {});
+                    selectedAccount = widget.accounts
+                        .firstWhere((element) => element.id == v);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
         const Divider(height: 1.0),
         Expanded(
           child: selectedAccount.details.isEmpty

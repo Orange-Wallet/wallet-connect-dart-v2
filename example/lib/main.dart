@@ -227,7 +227,7 @@ class _HomePageState extends State<HomePage> {
                 _activePage = page;
               }),
               children: [
-                const AccountsPage(),
+                AccountsPage(accounts: accounts),
                 SessionsPage(signClient: _signClient!),
                 ConnectPage(
                   signClient: _signClient!,
