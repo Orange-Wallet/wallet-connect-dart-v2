@@ -2,7 +2,7 @@ import 'package:example/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
 
-class SessionsPage extends StatelessWidget {
+class SessionsPage extends StatefulWidget {
   final SignClient signClient;
 
   const SessionsPage({
@@ -11,8 +11,13 @@ class SessionsPage extends StatelessWidget {
   });
 
   @override
+  State<SessionsPage> createState() => _SessionsPageState();
+}
+
+class _SessionsPageState extends State<SessionsPage> {
+  @override
   Widget build(BuildContext context) {
-    final sessions = signClient.session.getAll();
+    final sessions = widget.signClient.session.getAll();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,7 +44,9 @@ class SessionsPage extends StatelessWidget {
                   separatorBuilder: (_, __) => const SizedBox(height: 8.0),
                   itemCount: sessions.length,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
+                    horizontal: 8.0,
+                    vertical: 16.0,
+                  ),
                 ),
         ),
       ],

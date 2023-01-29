@@ -15,8 +15,8 @@ import 'package:example/utils/hd_key_utils.dart';
 import 'package:example/widgets/session_request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:web3dart/crypto.dart';
 import 'package:wallet_connect/wallet_connect.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 
 void main() {
@@ -54,25 +54,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final _pageController = PageController();
-  int _activePage = 0;
-  SignClient? _signClient;
-  late bool initializing;
+  final accounts = Constants.accounts;
+
+  final _pageController = PageController(initialPage: 2);
+
+  late int _activePage;
+
+  late bool _initializing;
+
+  late bool _enableScanView;
+
   final _web3client = Web3Client('', http.Client());
+
+  SignClient? _signClient;
 
   @override
   void initState() {
-    _pageController.addListener(() {
-      setState(() {
-        _activePage = _pageController.page?.toInt() ?? 0;
-      });
-    });
+    _activePage = _pageController.initialPage;
+    _enableScanView = false;
     _initialize();
     super.initState();
   }
 
   void _initialize() async {
-    initializing = true;
+    _initializing = true;
     _signClient = await SignClient.init(
       projectId: "73801621aec60dfaa2197c7640c15858",
       relayUrl: "wss://relay.walletconnect.com",
@@ -88,6 +93,10 @@ class _HomePageState extends State<HomePage> {
     _signClient!.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
       final eventData = data as SignClientEventParams<RequestSessionPropose>;
       log('SESSION_PROPOSAL: $eventData');
+
+      setState(() {
+        _enableScanView = false;
+      });
 
       _onSessionRequest(eventData.id!, eventData.params!);
     });
@@ -196,7 +205,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     setState(() {
-      initializing = false;
+      _initializing = false;
     });
   }
 
@@ -205,19 +214,25 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       extendBodyBehindAppBar: true,
-      body: initializing
-          ? const Padding(
-              padding: EdgeInsets.only(top: kToolbarHeight),
-              child: Center(
+      body: _initializing
+          ? Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             )
           : PageView(
               controller: _pageController,
+              onPageChanged: (page) => setState(() {
+                _activePage = page;
+              }),
               children: [
                 const AccountsPage(),
                 SessionsPage(signClient: _signClient!),
-                ConnectPage(signClient: _signClient!),
+                ConnectPage(
+                  signClient: _signClient!,
+                  enableScanView: _enableScanView,
+                ),
                 PairingsPage(signClient: _signClient!),
                 const SettingsPage(),
               ],
@@ -236,7 +251,7 @@ class _HomePageState extends State<HomePage> {
             _pageController.animateToPage(
               2,
               duration: const Duration(milliseconds: 350),
-              curve: Curves.easeInBack,
+              curve: Curves.ease,
             );
           },
           backgroundColor: Colors.transparent,
@@ -260,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                 _pageController.animateToPage(
                   0,
                   duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeInBack,
+                  curve: Curves.ease,
                 );
               },
               active: _activePage == 0,
@@ -272,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                 _pageController.animateToPage(
                   1,
                   duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeInBack,
+                  curve: Curves.ease,
                 );
               },
               active: _activePage == 1,
@@ -285,7 +300,7 @@ class _HomePageState extends State<HomePage> {
                 _pageController.animateToPage(
                   3,
                   duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeInBack,
+                  curve: Curves.ease,
                 );
               },
               active: _activePage == 3,
@@ -297,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                 _pageController.animateToPage(
                   4,
                   duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeInBack,
+                  curve: Curves.ease,
                 );
               },
               active: _activePage == 4,
@@ -315,6 +330,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (_) => Dialog(
         child: SessionRequestView(
+          accounts: accounts,
           proposal: proposal,
           onApprove: (namespaces) async {
             final params = SessionApproveParams(
@@ -786,7 +802,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Account _getAccountFromAddr(String address) {
-    return Constants.accounts
+    return accounts
         .where((element) => element.details.any((element) =>
             element.address.toLowerCase() == address.toLowerCase()))
         .first;

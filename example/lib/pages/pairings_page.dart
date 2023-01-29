@@ -2,7 +2,7 @@ import 'package:example/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/wallet_connect.dart';
 
-class PairingsPage extends StatelessWidget {
+class PairingsPage extends StatefulWidget {
   final SignClient signClient;
 
   const PairingsPage({
@@ -11,8 +11,13 @@ class PairingsPage extends StatelessWidget {
   });
 
   @override
+  State<PairingsPage> createState() => _PairingsPageState();
+}
+
+class _PairingsPageState extends State<PairingsPage> {
+  @override
   Widget build(BuildContext context) {
-    final pairings = signClient.pairing.values;
+    final pairings = widget.signClient.pairing.values;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,7 +41,7 @@ class PairingsPage extends StatelessWidget {
                       ),
                       trailing: IconButton(
                         onPressed: () {
-                          signClient.pairing
+                          widget.signClient.pairing
                               .delete(
                             pairings[idx].topic,
                             getSdkError(SdkErrorKey.USER_DISCONNECTED),
@@ -48,6 +53,7 @@ class PairingsPage extends StatelessWidget {
                               behavior: SnackBarBehavior.floating,
                               duration: Duration(milliseconds: 500),
                             ));
+                            setState(() {});
                           }).catchError((_) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(const SnackBar(
@@ -55,6 +61,7 @@ class PairingsPage extends StatelessWidget {
                               behavior: SnackBarBehavior.floating,
                               duration: Duration(milliseconds: 500),
                             ));
+                            setState(() {});
                           });
                         },
                         icon: Icon(
@@ -67,7 +74,9 @@ class PairingsPage extends StatelessWidget {
                   separatorBuilder: (_, __) => const SizedBox(height: 8.0),
                   itemCount: pairings.length,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
+                    horizontal: 8.0,
+                    vertical: 16.0,
+                  ),
                 ),
         ),
       ],

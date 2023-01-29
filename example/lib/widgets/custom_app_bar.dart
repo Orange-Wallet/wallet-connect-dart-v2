@@ -17,8 +17,12 @@ class CustomAppBar extends StatelessWidget {
       color: Colors.white,
       width: double.infinity,
       child: Padding(
-        padding:
-            const EdgeInsets.fromLTRB(8.0, kToolbarHeight + 8.0, 8.0, 16.0),
+        padding: EdgeInsets.fromLTRB(
+          8.0,
+          MediaQuery.of(context).padding.top + 16.0,
+          8.0,
+          16.0,
+        ),
         child: Text(
           title,
           style: const TextStyle(

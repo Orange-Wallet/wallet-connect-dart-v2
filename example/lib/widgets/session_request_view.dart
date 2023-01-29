@@ -1,18 +1,19 @@
 import 'dart:developer';
 
 import 'package:example/models/accounts.dart';
-import 'package:example/utils/constants.dart';
 import 'package:example/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/wallet_connect.dart';
 
 class SessionRequestView extends StatefulWidget {
+  final List<Account> accounts;
   final RequestSessionPropose proposal;
   final void Function(SessionNamespaces) onApprove;
   final void Function() onReject;
 
   const SessionRequestView({
     Key? key,
+    required this.accounts,
     required this.proposal,
     required this.onApprove,
     required this.onReject,
@@ -24,12 +25,12 @@ class SessionRequestView extends StatefulWidget {
 
 class _SessionRequestViewState extends State<SessionRequestView> {
   late AppMetadata _metadata;
-  late List<Account> _selectedAccounts;
+  late List<String> _selectedAccountIds;
 
   @override
   void initState() {
     _metadata = widget.proposal.proposer.metadata;
-    _selectedAccounts = [];
+    _selectedAccountIds = [];
     super.initState();
   }
 
@@ -96,21 +97,24 @@ class _SessionRequestViewState extends State<SessionRequestView> {
             ),
           ),
           const Divider(height: 1.5, thickness: 1.5),
-          ListView.separated(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            itemBuilder: (_, idx) {
-              final item =
-                  widget.proposal.requiredNamespaces.entries.elementAt(idx);
-              return NamespaceView(
-                type: item.key,
-                namespace: item.value,
-                selectedAccounts: _selectedAccounts,
-              );
-            },
-            separatorBuilder: (_, __) =>
-                const Divider(height: 1.5, thickness: 1.5),
-            itemCount: widget.proposal.requiredNamespaces.entries.length,
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              itemBuilder: (_, idx) {
+                final item =
+                    widget.proposal.requiredNamespaces.entries.elementAt(idx);
+                return NamespaceView(
+                  type: item.key,
+                  accounts: widget.accounts,
+                  namespace: item.value,
+                  selectedAccountIds: _selectedAccountIds,
+                );
+              },
+              separatorBuilder: (_, __) =>
+                  const Divider(height: 1.5, thickness: 1.5),
+              itemCount: widget.proposal.requiredNamespaces.entries.length,
+            ),
           ),
           const Divider(height: 1.5, thickness: 1.5),
           Padding(
@@ -131,14 +135,15 @@ class _SessionRequestViewState extends State<SessionRequestView> {
                         for (final entry
                             in widget.proposal.requiredNamespaces.entries) {
                           final List<String> accounts = [];
-                          for (final acc in _selectedAccounts) {
-                            final idx = acc.details.indexWhere((element) =>
-                                element.chain.startsWith(entry.key));
-                            if (idx >= 0) {
-                              for (final chain in entry.value.chains
-                                  .where((e) => e == acc.details[idx].chain)) {
-                                accounts
-                                    .add('$chain:${acc.details[idx].address}');
+                          for (final idStr in _selectedAccountIds) {
+                            final accs = widget.accounts.where((element) =>
+                                '${entry.key}:${element.id}' == idStr);
+                            if (accs.isNotEmpty) {
+                              for (final chain in entry.value.chains.where(
+                                  (c) => accs.first.details
+                                      .any((ad) => ad.chain == c))) {
+                                accounts.add(
+                                    '$chain:${accs.first.details.firstWhere((e) => e.chain == chain).address}');
                               }
                             }
                           }
@@ -180,14 +185,16 @@ class _SessionRequestViewState extends State<SessionRequestView> {
 
 class NamespaceView extends StatefulWidget {
   final String type;
+  final List<Account> accounts;
   final ProposalRequiredNamespace namespace;
-  final List<Account> selectedAccounts;
+  final List<String> selectedAccountIds;
 
   const NamespaceView({
     super.key,
     required this.type,
+    required this.accounts,
     required this.namespace,
-    required this.selectedAccounts,
+    required this.selectedAccountIds,
   });
 
   @override
@@ -266,15 +273,14 @@ class _NamespaceViewState extends State<NamespaceView> {
               style: const TextStyle(fontSize: 17.0),
             ),
           ),
-          ...Constants.accounts
+          ...widget.accounts
               .where((acc) => acc.details.any(
                   (accDetails) => accDetails.chain.startsWith(widget.type)))
               .map((acc) {
             final details =
                 acc.details.firstWhere((e) => e.chain.startsWith(widget.type));
-            final isSelected = widget.selectedAccounts.any((selectAcc) =>
-                selectAcc.name == acc.name &&
-                selectAcc.details.any((e) => e.address == details.address));
+            final isSelected =
+                widget.selectedAccountIds.contains('${widget.type}:${acc.id}');
 
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 4.0),
@@ -288,20 +294,12 @@ class _NamespaceViewState extends State<NamespaceView> {
                   Checkbox(
                     value: isSelected,
                     onChanged: (val) {
-                      final selectedIdx = widget.selectedAccounts.indexWhere(
-                          (selectAcc) => selectAcc.name == acc.name);
-                      if (selectedIdx >= 0) {
-                        if (isSelected) {
-                          widget.selectedAccounts[selectedIdx].details
-                              .removeWhere((element) =>
-                                  element.address == details.address);
-                        } else {
-                          widget.selectedAccounts[selectedIdx].details
-                              .add(details);
-                        }
+                      if (isSelected) {
+                        widget.selectedAccountIds
+                            .remove('${widget.type}:${acc.id}');
                       } else {
-                        widget.selectedAccounts
-                            .add(acc.copyWith(details: [details]));
+                        widget.selectedAccountIds
+                            .add('${widget.type}:${acc.id}');
                       }
                       setState(() {});
                     },

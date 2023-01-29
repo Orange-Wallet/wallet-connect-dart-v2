@@ -2,7 +2,7 @@ class ChainMetadata {
   final String chainId;
   final String name;
   final String logo;
-  final String rpc;
+  final List<String> rpc;
 
   const ChainMetadata({
     required this.chainId,

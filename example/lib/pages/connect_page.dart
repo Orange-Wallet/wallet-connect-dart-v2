@@ -7,10 +7,12 @@ import 'package:wallet_connect/wallet_connect.dart';
 
 class ConnectPage extends StatefulWidget {
   final SignClient signClient;
+  final bool enableScanView;
 
   const ConnectPage({
     super.key,
     required this.signClient,
+    this.enableScanView = false,
   });
 
   @override
@@ -24,9 +26,15 @@ class _ConnectPageState extends State<ConnectPage> {
 
   @override
   void initState() {
-    _scanView = false;
+    _scanView = widget.enableScanView;
     _uriController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant ConnectPage oldWidget) {
+    _scanView = widget.enableScanView;
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -47,13 +55,32 @@ class _ConnectPageState extends State<ConnectPage> {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: _scanView
-                  ? ScanView(
-                      controller: ScanController(),
-                      scanAreaScale: 1,
-                      scanLineColor: Colors.green.shade400,
-                      onCapture: (data) {
-                        _qrScanHandler(data);
-                      },
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Stack(
+                        children: [
+                          ScanView(
+                            controller: ScanController(),
+                            scanAreaScale: 1,
+                            scanLineColor: Colors.green.shade400,
+                            onCapture: (data) {
+                              _qrScanHandler(data);
+                            },
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _scanView = false;
+                                });
+                              },
+                              icon: const Icon(Icons.close),
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
