@@ -1,46 +1,62 @@
+<div align="center">
+<img src="https://i.imgur.com/fwGGvJj.png" alt="Wallet Connect Logo" width="70"/>
+<h1>Wallet Connect</h1>
+</div>
+
+### [Wallet Connect SDK](https://docs.walletconnect.com/2.0) made in ❤️ with dart.
+
+<br>
+
 # Getting started
 
+To configure your app use latest version of `wallet_connect`, see [pub.dev](https://pub.dev/packages/wallet_connect)
+
+**_Note: In order to use wallet_connect v2 alongside the legacy v1 sdk, see [walelt_connect_v1](https://pub.dev/packages/wallet_connect_v1)._**
+
+- [Dapp Usage](#dapp-usage)
+- [Wallet Usage](#wallet-usage)
+
 <br>
 
-### This SDK is built with inspiration from official [WalletConnect SDK 2.0](https://docs.walletconnect.com/2.0).
+# Dapp Usage
+
+For detailed implementation of dapp usage, see [example-dapp](https://github.com/Orange-Wallet/wallet-connect-dart/tree/master/example).
 
 <br>
 
-# Index
+# Wallet Usage
 
-1. [Usage](#usage)
-2. [Initialization](#initialization)
-3. [Pairing via QR](#pairing-via-qr-code)
-4. [Pairing Via URI](#pairing-via-uri)
-5. [Session Approval and Rejection](#session-approval-and-rejection)
-6. [Responding to Session Requests](#responding-to-session-requests)
-7. [Delete Session](#session-delete)
-8. [Extend Session](#extend-a-session)
-9. [Update Session](#updating-a-session​)
-10. [Session Emit](#emit-a-session)
+For detailed implementation of wallet usage, see [example-wallet](https://github.com/Orange-Wallet/wallet-connect-dart/tree/master/example).
 
-## Usage
-
-To configure your app to use latest version of `wallet-connect-v2`, see [example](https://github.com/orange-wallet/wallet-connect-dart)
+1. [Initialization](#initialization)
+2. [Pairing via QR](#pairing-via-qr-code)
+3. [Pairing Via URI](#pairing-via-uri)
+4. [Responding to Session Proposal](#responding-to-session-proposal)
+5. [Responding to Dapp Requests](#responding-to-dapp-requests)
+6. [Responding to Dapp Events](#responding-to-dapp-events)
+7. [Responding to Ping](#responding-to-ping)
+8. [Responding to Session Delete](#responding-to-session-delete​)
+9. [Sending Requests to Dapp](#sending-requests-to-dapp)
 
 <br>
 
 ## Initialization
 
-Create a new instance of `SignClient` and initialize it with a `projectId`, `relayUrl` and `metadata` created from installation.
-You can opt to use `Hive` to save session details or they will be saved in memory by default.
-
+```dart
+import 'package:wallet_connect/wallet_connect.dart';
 ```
-final _signClient = await SignClient.init(
+
+```dart
+final signClient = await SignClient.init(
       projectId: "PROJECY_ID",
-      relayUrl: "RELAY_URL" // or use defalut "wss://relay.walletconnect.com",
+      relayUrl: "RELAY_URL" // or leaving it empty, uses default "wss://relay.walletconnect.com",
       metadata: const AppMetadata(
         name: "Demo app",
         description: "Demo Client as Wallet/Peer",
         url: "www.walletconnect.com",
         icons: [],
       ),
-      database: 'HIVE_DB_NAME', // optional, if empty all session data will be stored in memory
+      database: 'DB_NAME', // optional, if empty all session data will be stored in memory
     );
 ```
 
@@ -50,25 +66,18 @@ final _signClient = await SignClient.init(
 
 We have used [ScanView](https://pub.dev/packages/scan) for this you can use any other package as well.
 
-1. Scan the QR code and get the data
-   ```
-   ScanView(
-     controller: ScanController(),
-     scanAreaScale: 1,
-     scanLineColor: Colors.green.shade400,
-     onCapture: (data) {
-       _qrScanHandler(data);
-     },
-   );
-   ```
-2. Convert the Scanned data to URI
-   ```
-   _qrScanHandler(String value) {
-     if (Uri.tryParse(value) != null) {
-       _signClient.pair(value);
+Scan the QR code to get pairing URI.
+
+```dart
+ScanView(
+  controller: ScanController(),
+  onCapture: (data) {
+       if (Uri.tryParse(value) != null) {
+         signClient.pair(value);
      }
-   }
-   ```
+  },
+);
+```
 
 <br>
 
@@ -76,129 +85,194 @@ We have used [ScanView](https://pub.dev/packages/scan) for this you can use any 
 
 Directly use `pair` functionality from `SignClient` instance
 
-```
-await _signClient.pair(value);
+```dart
+await signClient.pair(value);
 ```
 
 <br>
 
-### Session Approval and Rejection
+## Responding to Session Proposal
 
 The `SignClientEvent.SESSION_PROPOSAL` event is emitted when a dapp initiates a new session with a user's wallet. The event will include a proposal object with information about the dapp and requested permissions. The wallet should display a prompt for the user to approve or reject the session. If approved, call approveSession and pass in the proposal.id and requested namespaces.
 
-You can listen for this event while initilizing app:
+You can listen for this event while initializing client:
 
-```
-_signClient.on(SignClientEvent.SESSION_PROPOSAL.value, (data) async {
-      final eventData = (data as Map<String, dynamic>);
-      final id = eventData['id'] as int;
-      final proposal = ProposalStruct.fromJson(eventData['params'] as Map<String, dynamic>);
-      // add custom popup to either approve or rejet this session here or use `SessionRequestView` from our example
+```dart
+signClient.on(SignClientEvent.SESSION_PROPOSAL.value, (data) {
+      final eventData = data as SignClientEventParams<RequestSessionPropose>;
+
+      // Show session proposal data to the user i.e. in a popup with options to approve / reject it
+
       const approve = true;
-      if(approve)
-      {
+      // On Approve Session Proposal
+      if(approve) {
+        //
+        final SessionNamespaces namespaces = {
+          // Provide the namespaces and chains (e.g. `eip155` for EVM-based chains) being requested by dapp.
+          "eip155": SessionNamespace(
+              // `accounts` addresses need to be passed from the wallet side int the specified format as per the number of chains being requested by dapp
+              accounts: ["eip155:1:0x0000000000..., eip155:10:0x0000000000..."],
+              // `methods and `events` Can be accessed at `eventData.params!.requiredNamespaces`
+              methods: [
+                  "eth_sendTransaction",
+                  "eth_signTransaction",
+                  "eth_sign",
+                  "personal_sign",
+                  "eth_signTypedData",
+              ],
+              events: ["chainChanged", "accountsChanged"],
+          )
+        };
+
         final params = SessionApproveParams(
-              id: id,
+              id: eventData.id!,
               namespaces: namespaces,
             );
-        _signClient.approve(params);
+        signClient.approve(params);
       }
+      // Or Reject Session Proposal
       else {
         final params = SessionRejectParams(
-              id: id,
+              id: eventData.id!,
               reason: formatErrorMessage(
-                  error: getSdkError(SdkErrorKey.USER_DISCONNECTED)),
+                  error: getSdkError(SdkErrorKey.USER_DISCONNECTED),
+              ),
             );
-        _signClient.reject(params);
+        signClient.reject(params);
       }
     });
 ```
 
 <br>
 
-## Responding to Session Requests
+## Responding to Dapp Requests
 
 The `SignClientEvent.SESSION_REQUEST` event is triggered when a dapp sends a request to the wallet for a specific action, such as signing a transaction. This event is emitted by the dapp and received by the wallet. To respond to the request, wallets should call the specific required sign function and pass in details from the request. You can then approve or reject the request based on the response.
 
-```
-_signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
-      final eventData = (data as Map<String, dynamic>);
-      log('DATA $eventData');
-      final id = eventData['id'] as int;
-      final sessionRequest = SessionRequestParams.fromJson(
-        eventData['params'] as Map<String, dynamic>,
-      );
+```dart
+signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
+      final eventData = data as SignClientEventParams<RequestSessionRequest>;
+      final String method = eventData.params!.request.method;
 
-      if (sessionRequest.request.method == Eip155Methods.PERSONAL_SIGN.value) {
-        final requestParams = sessionRequest.request.params as List<String>;
+      // Example handling some methods from EVM-based chains
+      if (method == "personal_sign") {
+        final requestParams =
+              (eventData.params!.request.params as List).cast<String>();
         final dataToSign = requestParams[0];
         final address = requestParams[1];
-        // use specific function for personal sign
+
+        // Handle request params to generate necessary result and send back the response to dapp.
+        final signedDataHex = personalSign(dataToSign, address);
+        // Approve the request
+        signClient!.respond(
+          SessionRespondParams(
+            topic: eventData.topic!,
+            response: JsonRpcResult<String>(
+              id: eventData.id!,
+              result: signedDataHex,
+            ),
+          ),
+        );
+        // Or Reject the request with error
+        _signClient!.respond(SessionRespondParams(
+          topic: eventData.topic!,
+          response: JsonRpcError(id: eventData.id!),
+        ));
+      } else if (method == "eth_sign") {
+        // Handle `eth_sign`
+      } else if (method == "eth_signTypedData") {
+        // Handle `eth_signTypedData`
+      } else if (method == "eth_sendTransaction") {
+        // Handle `eth_sendTransaction`
+      } else if (method == "eth_signTransaction") {
+        // Handle `eth_signTransaction`
       }
     });
 ```
 
 <br>
 
-## Session Delete
+## Responding to Dapp Events
+
+```dart
+signClient!.on(SignClientEvent.SESSION_EVENT.value, (data) {
+      final eventData = data as SignClientEventParams<RequestSessionEvent>;
+      // Handle events request
+    });
+```
+
+<br>
+
+## Responding to Ping
+
+```dart
+signClient!.on(SignClientEvent.SESSION_PING.value, (data) {
+      final eventData = data as SignClientEventParams<void>;
+      // Handle Ping request
+    });
+```
+
+<br>
+
+## Responding to Session Delete
+
+```dart
+ signClient!.on(SignClientEvent.SESSION_DELETE.value, (data) {
+      final eventData = data as SignClientEventParams<void>;
+      // Handle Session Delete request
+    });
+```
+
+<br>
+
+## Sending Requests to Dapp
+
+### Session Delete
 
 If either the dapp or the wallet decides to disconnect the session, the `SignClientEvent.SESSION_DELETE` event will be emitted. The wallet should listen for this event in order to update the UI.
 
 To disconnect a session from the wallet, call the `disconnect` function and pass in the topic and reason. You can optionally send the reason for disconnect to dapp.
 
-```
-await _signClient.disconnect(topic: "TOPIC");
-```
-
-Here is how to listen to `SignClientEvent.SESSION_DELETE` event:
-
-```
-_signClient.on(SignClientEvent.SESSION_DELETE.value, (data) async {
-      final eventData = JsonRpcRequest.fromJson(
-        data as Map<String, dynamic>,
-        (v) => RequestSessionDelete.fromJson(v as Map<String, dynamic>),
-      );
-      log('SESSION_DELETE: ${eventData.toJson()}');
-      // Do other thing with the info.
-    });
+```dart
+await signClient.disconnect(topic: "TOPIC");
 ```
 
 <br>
 
-## Extend a Session
+### Extend a Session
 
 To extend the session, call the `extend` method and pass in the new topic. The `SignClientEvent.SESSION_UPDATE` event will be emitted from the wallet.
 
-```
-await _signClient.extend("TOPIC");
+```dart
+await signClient.extend("TOPIC");
 ```
 
 <br>
 
-## Updating a Session​
+### Updating a Session​
 
 The `SignClientEvent.SESSION_UPDATE` event is emitted from the wallet when the session is updated by calling `update`.
 To update a session, pass in the new `SessionUpdateParams`
 
-```
-await _signClient.update(params);
+```dart
+await signClient.update(params);
 ```
 
 <br>
 
-## Emit a Session
+### Emit a Session Event
 
 To emit sesssion events, call the `emit` and pass in the params. It takes `SessionEmitParams` as a parameter.
 
-```
-SessionEmitParams params = SessionEmitParams(
+```dart
+final SessionEmitParams params = SessionEmitParams(
     topic: "TOPIC",
     event: SessionEmitEvent(
       name: "NAME",
       data: ["DATA_1"],
     ),
     chainId: "CHAIN_ID");
-await _signClient.emit(params);
+await signClient.emit(params);
 ```
 
 <br>
