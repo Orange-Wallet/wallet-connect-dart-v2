@@ -32,7 +32,7 @@ class SignClient with Events implements ISignClient {
   final AppMetadata metadata;
 
   @override
-  final ICore core;
+  late final ICore core;
 
   @override
   final Logger logger;
@@ -58,20 +58,22 @@ class SignClient with Events implements ISignClient {
     String? relayUrl,
     required this.metadata,
     ICore? core,
-    Level? logLevel,
+    Logger? logger,
     String? database,
   })  : name = name ?? SignClientDefault.name,
         events = EventEmitter(),
-        core = core ??
-            Core(
-              projectId: projectId,
-              relayUrl: relayUrl,
-              database: database,
-            ),
-        logger = Logger(
-          printer: PrefixPrinter(PrettyPrinter(colors: false)),
-          level: logLevel ?? Level.info,
-        ) {
+        logger = logger ??
+            Logger(
+              printer: PrefixPrinter(PrettyPrinter(colors: false)),
+              level: Level.info,
+            ) {
+    this.core = core ??
+        Core(
+          projectId: projectId,
+          relayUrl: relayUrl,
+          database: database,
+          logger: logger,
+        );
     engine = Engine(client: this);
     session = Session(core: this.core, logger: logger);
     proposal = Proposal(core: this.core, logger: logger);
@@ -84,7 +86,7 @@ class SignClient with Events implements ISignClient {
     String? relayUrl,
     AppMetadata? metadata,
     ICore? core,
-    Level? logLevel,
+    Logger? logger,
     String? database,
   }) async {
     final client = SignClient._(
@@ -93,7 +95,7 @@ class SignClient with Events implements ISignClient {
       relayUrl: relayUrl,
       metadata: metadata ?? AppMetadata.empty(),
       core: core,
-      logLevel: logLevel,
+      logger: logger,
       database: database,
     );
     await client._initialize();
