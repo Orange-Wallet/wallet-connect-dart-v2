@@ -2,10 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "example",
+      "name": "example_wallet",
       "request": "launch",
       "type": "dart",
-      "program": "example/lib/main.dart",
+      "program": "example/wallet/lib/main.dart",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "example_dapp",
+      "request": "launch",
+      "type": "dart",
+      "program": "example/dapp/lib/main.dart",
       "flutterMode": "debug"
     },
     {
