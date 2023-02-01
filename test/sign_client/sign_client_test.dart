@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:logger/logger.dart';
 import 'package:test/test.dart';
 import 'package:wallet_connect/utils/uri.dart';
 import 'package:wallet_connect/wallet_connect.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect/wc_utils/misc/logger/logger.dart';
 
 import 'mock_data.dart';
 
@@ -254,7 +254,7 @@ void main() {
         // vi.useFakeTimers();
         // Fast-forward system time by 60 seconds after expiry was first set.
         // vi.setSystemTime(Date.now() + 60_000);
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(const Duration(milliseconds: 1000));
         final extend = await clients.clientA.extend(topic);
         await extend.acknowledged;
         final updatedExpiry = clients.clientA.session.get(topic).expiry;
@@ -300,9 +300,14 @@ class Clients {
 }
 
 Future<Clients> initTwoClients() async {
+  final logger = Logger(
+    printer: PrefixPrinter(PrettyPrinter(colors: false)),
+    level: Level.debug,
+  );
+
   final clientA = await SignClient.init(
     name: "clientA",
-    logLevel: Level.debug,
+    logger: logger,
     relayUrl: TEST_RELAY_URL,
     projectId: TEST_PROJECT_ID,
     database: ":memory:",
@@ -311,7 +316,7 @@ Future<Clients> initTwoClients() async {
 
   final clientB = await SignClient.init(
     name: "clientB",
-    logLevel: Level.debug,
+    logger: logger,
     relayUrl: TEST_RELAY_URL,
     projectId: TEST_PROJECT_ID,
     database: ":memory:",

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
@@ -170,6 +172,7 @@ class Store<K, V> implements IStore<K, V> {
 
   Future<List<V>?> _getDataStore() async {
     final value = await core.storage.getItem(storageKey);
+    log('_getDataStore: $value');
     return listFromJson<V>(value, (v) => fromJson(v));
   }
 
@@ -202,7 +205,7 @@ class Store<K, V> implements IStore<K, V> {
         logger.e(error.message);
         throw WCException(error.message);
       }
-      _cached = persisted?.map((e) => e as V).toList() ?? [];
+      _cached = persisted ?? [];
       logger.d('Successfully Restored value for $name');
       logger.v({
         'type': "method",

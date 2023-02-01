@@ -66,10 +66,10 @@ class KeyValueStorage implements IKeyValueStorage {
   Future<dynamic> getItem(String key) async {
     await _initilization();
     // log('GET_ITEM: $key ${_data[key].runtimeType}\n${_data[key]}');
-    final item = _data[key] is List
-        ? _data[key].map((e) => e is Map ? _dynamicToMap(e) : e).toList()
-        : _data[key];
-    return item is Map ? _dynamicToMap(item) : item;
+    // final item = _data[key] is List
+    //     ? _data[key].map((e) => e is Map ? _dynamicToMap(e) : e).toList()
+    //     : _data[key];
+    return _dynamicToMap(_data[key]);
   }
 
   @override
@@ -101,10 +101,14 @@ class KeyValueStorage implements IKeyValueStorage {
     }
   }
 
-  Map<String, dynamic> _dynamicToMap(Map map) {
-    return map.map((k, v) => MapEntry(
-          k.toString(),
-          (v is Map) ? _dynamicToMap(v) : v,
-        ));
+  // Convert Map<dynamic, dynamic> to Map<String, dynamic>
+  dynamic _dynamicToMap(dynamic map) {
+    if (map is List) {
+      return map.map((e) => _dynamicToMap(e)).toList();
+    } else if (map is Map) {
+      return map.map((k, v) => MapEntry(k.toString(), _dynamicToMap(v)));
+    } else {
+      return map;
+    }
   }
 }
