@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/i_core.dart';
@@ -7,17 +6,15 @@ import 'package:wallet_connect/wc_utils/misc/events/events.dart';
 part 'models.g.dart';
 
 @JsonSerializable()
-@HiveType(typeId: 0)
-class JsonRpcRecord extends HiveObject {
-  @HiveField(0)
+class JsonRpcRecord {
   final int id;
-  @HiveField(1)
+
   final String topic;
-  @HiveField(2)
+
   final Map<String, dynamic> request;
-  @HiveField(3)
+
   final String? chainId;
-  @HiveField(4)
+
   final Map<String, dynamic>? response;
 
   JsonRpcRecord({

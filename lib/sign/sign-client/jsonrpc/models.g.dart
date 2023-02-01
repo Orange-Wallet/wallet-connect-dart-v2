@@ -3,47 +3,6 @@
 part of 'models.dart';
 
 // **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
-class RequestSessionRequestAdapter extends TypeAdapter<RequestSessionRequest> {
-  @override
-  final int typeId = 16;
-
-  @override
-  RequestSessionRequest read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return RequestSessionRequest(
-      request: fields[0] as RequestArguments<dynamic>,
-      chainId: fields[1] as String,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, RequestSessionRequest obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.request)
-      ..writeByte(1)
-      ..write(obj.chainId);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RequestSessionRequestAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

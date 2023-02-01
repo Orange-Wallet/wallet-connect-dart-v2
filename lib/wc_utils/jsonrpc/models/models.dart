@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/utils/validator.dart';
 
@@ -38,38 +35,6 @@ class RequestArguments<T> {
           paramsToJson ?? (v) => v,
         ),
       };
-}
-
-class RequestArgumentsAdapter extends TypeAdapter<RequestArguments> {
-  @override
-  final int typeId = 17;
-
-  @override
-  RequestArguments read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return RequestArguments.fromJson(jsonDecode(fields[0]), (v) => v);
-  }
-
-  @override
-  void write(BinaryWriter writer, RequestArguments obj) {
-    writer
-      ..writeByte(1)
-      ..writeByte(0)
-      ..write(jsonEncode(obj.toJson()));
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RequestArgumentsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
 }
 
 abstract class JsonRpcPayload<T> {

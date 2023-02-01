@@ -1,4 +1,3 @@
-import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:wallet_connect/core/relayer/models.dart';
 import 'package:wallet_connect/sign/engine/models.dart';
@@ -9,11 +8,9 @@ import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 part 'models.g.dart';
 
 @JsonSerializable()
-@HiveType(typeId: 16)
 class RequestSessionRequest {
-  @HiveField(0)
   final RequestArguments request;
-  @HiveField(1)
+
   final String chainId;
 
   const RequestSessionRequest({
