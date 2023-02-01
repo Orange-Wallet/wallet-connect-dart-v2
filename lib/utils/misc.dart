@@ -1,31 +1,31 @@
+import 'package:platform_info/platform_info.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:wallet_connect/sign/engine/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:web_browser_detect/web_browser_detect.dart';
 
-const SDK_TYPE = "js";
+const SDK_TYPE = "dart";
+const ENV = "flutter";
 
 // -- rpcUrl ----------------------------------------------//
 
-String getJavascriptOS() {
-  // final info = detect();
-  // if (info == null)
-  // return "unknown";
-  // final os = info.os ? info.os.replace(" ", "").toLowerCase() : "unknown";
-  // if (info.type == "browser") {
-  //   return [os, info.name, info.version].join("-");
-  // }
-  // return [os, info.version].join("-");
-  return "darwin-16.14.0"; // TODO: Remove
+String getOS() {
+  final os = platform.operatingSystem.name.toLowerCase();
+  if (platform.isWeb) {
+    final info = Browser.detectOrNull();
+    return [os, info!.browser, info.version].join("-");
+  } else {
+    return os;
+  }
 }
 
-String getJavascriptID() {
-  // final env = getEnvironment();
-  // return env === ENV_MAP.browser ? [env, getLocation()?.host || "unknown"].join(":") : env;
-  return "node"; // TODO: Remove
+String getID() {
+  return platform.isWeb ? [ENV, html.window.location.host].join("-") : ENV;
 }
 
 String formatUA(String protocol, int version, String sdkVersion) {
-  final os = getJavascriptOS();
-  final id = getJavascriptID();
+  final os = getOS();
+  final id = getID();
   return [
     [protocol, version].join("-"),
     [SDK_TYPE, sdkVersion].join("-"),
