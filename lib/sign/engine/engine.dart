@@ -507,7 +507,7 @@ class Engine with Events implements IEngine {
     client.core.expirer.set(id, proposal.expiry);
   }
 
-  setPendingSessionRequest(
+  Future<void> setPendingSessionRequest(
     PendingRequestStruct pendingRequest,
   ) async {
     final expiry =

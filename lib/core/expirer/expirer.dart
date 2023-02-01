@@ -5,6 +5,7 @@ import 'package:wallet_connect/core/expirer/i_expirer.dart';
 import 'package:wallet_connect/core/expirer/models.dart';
 import 'package:wallet_connect/core/i_core.dart';
 import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/utils/list.dart';
 import 'package:wallet_connect/utils/misc.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/misc/events/events.dart';
@@ -130,14 +131,17 @@ class Expirer with Events implements IExpirer {
   }
 
   Future<void> _setExpirations(List<ExpirerExpiration> expirations) async {
-    await core.storage.setItem(storageKey, expirations);
+    await core.storage.setItem(
+      storageKey,
+      listToJson<ExpirerExpiration>(expirations, (v) => v.toJson()),
+    );
   }
 
   Future<List<ExpirerExpiration>?> _getExpirations() async {
     final expirations = await core.storage.getItem(storageKey);
-    return List.from(expirations ?? [])
-        .map((e) => e as ExpirerExpiration)
-        .toList();
+    return listFromJson<ExpirerExpiration>(
+            expirations, (v) => ExpirerExpiration.fromJson(v)) ??
+        [];
   }
 
   Future<void> _persist() async {

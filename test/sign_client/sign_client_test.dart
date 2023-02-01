@@ -2,15 +2,8 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:test/test.dart';
-import 'package:wallet_connect/core/pairing/models.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/client/sign_client.dart';
-import 'package:wallet_connect/sign/sign-client/client/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/utils/error.dart';
 import 'package:wallet_connect/utils/uri.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect/wallet_connect.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/format.dart';
 
@@ -183,10 +176,11 @@ void main() {
                   final params = pendingRequests[0].params;
                   final topic = pendingRequests[0].topic;
                   final id = pendingRequests[0].id;
-                  final args = event as Map<String, dynamic>;
-                  expect(params.toJson(), equals(args['params']));
-                  expect(topic, equals(args['topic']));
-                  expect(id, equals(args['id']));
+                  final args =
+                      event as SignClientEventParams<RequestSessionRequest>;
+                  expect(params.toJson(), equals(args.params!.toJson()));
+                  expect(topic, equals(args.topic));
+                  expect(id, equals(args.id));
                   rejection = formatJsonRpcError(
                     id: id,
                     error:
@@ -368,19 +362,12 @@ Future<Connection> testConnectMethod({
 
   final resolveSessionProposal = Completer<void>();
   clientB.once(SignClientEvent.SESSION_PROPOSAL.value, (event) async {
-    final proposal = event as Map<String, dynamic>;
+    final evventData = event as SignClientEventParams<RequestSessionPropose>;
 
-    final ProposalRequiredNamespaces reqNamespaces =
-        (proposal['params']['requiredNamespaces'] as Map<String, dynamic>)
-            .entries
-            .map((e) =>
-                {e.key.toString(): ProposalRequiredNamespace.fromJson(e.value)})
-            .reduce((value, element) => value..addAll(element));
-
-    expect(reqNamespaces, equals(requiredNamespaces));
+    expect(evventData.params!.requiredNamespaces, equals(requiredNamespaces));
 
     final approval = await clientB.approve(SessionApproveParams(
-      id: proposal['id'] as int,
+      id: evventData.id!,
       namespaces: namespaces!,
     ));
 

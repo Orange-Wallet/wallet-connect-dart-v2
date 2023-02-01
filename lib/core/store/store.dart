@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:logger/logger.dart';
 import 'package:wallet_connect/core/constants.dart';
 import 'package:wallet_connect/core/i_core.dart';
@@ -9,6 +7,7 @@ import 'package:wallet_connect/core/store/i_store.dart';
 import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
 import 'package:wallet_connect/sign/sign-client/session/models.dart';
 import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/utils/list.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
 
 class Store<K, V> implements IStore<K, V> {
@@ -164,12 +163,14 @@ class Store<K, V> implements IStore<K, V> {
 
   // ---------- Private ----------------------------------------------- //
 
-  Future<void> _setDataStore(List<dynamic> values) =>
-      core.storage.setItem(storageKey, values);
+  Future<void> _setDataStore(List<V> values) => core.storage.setItem(
+        storageKey,
+        listToJson<V>(values, (v) => toJson(v)),
+      );
 
-  Future<List<dynamic>?> _getDataStore() async {
+  Future<List<V>?> _getDataStore() async {
     final value = await core.storage.getItem(storageKey);
-    return List<dynamic>.from(value ?? []);
+    return listFromJson<V>(value, (v) => fromJson(v));
   }
 
   V _getData(K key) {

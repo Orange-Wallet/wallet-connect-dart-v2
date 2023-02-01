@@ -11,6 +11,7 @@ import 'package:wallet_connect/core/subscriber/models.dart';
 import 'package:wallet_connect/core/topicmap/i_topicmap.dart';
 import 'package:wallet_connect/core/topicmap/topicmap.dart';
 import 'package:wallet_connect/utils/error.dart';
+import 'package:wallet_connect/utils/list.dart';
 import 'package:wallet_connect/utils/relay.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
 import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
@@ -304,13 +305,18 @@ class Subscriber with Events implements ISubscriber {
   }
 
   Future<void> _setRelayerSubscriptions(List<SubscriberActive> subscriptions) =>
-      relayer.core.storage.setItem(storageKey, subscriptions);
+      relayer.core.storage.setItem(
+        storageKey,
+        listToJson<SubscriberActive>(
+          subscriptions,
+          (v) => v.toJson(),
+        ),
+      );
 
   Future<List<SubscriberActive>?> _getRelayerSubscriptions() async {
     final subscriptions = await relayer.core.storage.getItem(storageKey);
-    return subscriptions == null
-        ? null
-        : List.from(subscriptions).map((e) => e as SubscriberActive).toList();
+    return listFromJson<SubscriberActive>(
+        subscriptions, (v) => SubscriberActive.fromJson(v));
   }
 
   void _setSubscription(String id, SubscriberActive subscription) {
