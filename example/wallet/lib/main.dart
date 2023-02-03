@@ -408,18 +408,19 @@ class _HomePageState extends State<HomePage> {
         final account = _getAccountFromAddr(ethereumTransaction.from);
         final privateKey = HDKeyUtils.getPrivateKey(account.mnemonic);
         final creds = EthPrivateKey.fromHex(privateKey);
-        final tx = await _web3client.signTransaction(
+        final signedTx = await _web3client.signTransaction(
           creds,
           _wcEthTxToWeb3Tx(ethereumTransaction),
           chainId: chainId,
         );
+        final signedTxHex = bytesToHex(signedTx, include0x: true);
         _signClient!
             .respond(
           SessionRespondParams(
             topic: session.topic,
             response: JsonRpcResult<String>(
               id: id,
-              result: bytesToHex(tx),
+              result: signedTxHex,
             ),
           ),
         )
@@ -825,10 +826,13 @@ class _HomePageState extends State<HomePage> {
       nonce: ethereumTransaction.nonce != null
           ? int.tryParse(ethereumTransaction.nonce!)
           : null,
-      maxFeePerGas: EtherAmount.inWei(
-          BigInt.parse(ethereumTransaction.maxFeePerGas ?? '0')),
-      maxPriorityFeePerGas: EtherAmount.inWei(
-          BigInt.parse(ethereumTransaction.maxPriorityFeePerGas ?? '0')),
+      maxFeePerGas: ethereumTransaction.maxFeePerGas != null
+          ? EtherAmount.inWei(BigInt.parse(ethereumTransaction.maxFeePerGas!))
+          : null,
+      maxPriorityFeePerGas: ethereumTransaction.maxPriorityFeePerGas != null
+          ? EtherAmount.inWei(
+              BigInt.parse(ethereumTransaction.maxPriorityFeePerGas!))
+          : null,
     );
   }
 }
