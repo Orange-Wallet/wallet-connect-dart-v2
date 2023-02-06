@@ -2,7 +2,7 @@ import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:example_dapp/utils/eip155_data.dart';
 import 'package:example_dapp/utils/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:wallet_connect/wallet_connect.dart';
+import 'package:walletconnect_v2/walletconnect_v2.dart';
 import 'package:web3dart/web3dart.dart';
 
 class SessionRequestView extends StatefulWidget {

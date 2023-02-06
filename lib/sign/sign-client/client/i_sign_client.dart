@@ -1,16 +1,16 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/models/app_metadata.dart';
-import 'package:wallet_connect/core/pairing/models.dart';
-import 'package:wallet_connect/sign/engine/i_engine.dart';
-import 'package:wallet_connect/sign/engine/models.dart';
-import 'package:wallet_connect/sign/sign-client/pending_request/i_pending_request.dart';
-import 'package:wallet_connect/sign/sign-client/pending_request/models.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/i_proposal.dart';
-import 'package:wallet_connect/sign/sign-client/session/i_session.dart';
-import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/misc/events/events.dart';
+import 'package:walletconnect_v2/core/i_core.dart';
+import 'package:walletconnect_v2/core/models/app_metadata.dart';
+import 'package:walletconnect_v2/core/pairing/models.dart';
+import 'package:walletconnect_v2/sign/engine/i_engine.dart';
+import 'package:walletconnect_v2/sign/engine/models.dart';
+import 'package:walletconnect_v2/sign/sign-client/pending_request/i_pending_request.dart';
+import 'package:walletconnect_v2/sign/sign-client/pending_request/models.dart';
+import 'package:walletconnect_v2/sign/sign-client/proposal/i_proposal.dart';
+import 'package:walletconnect_v2/sign/sign-client/session/i_session.dart';
+import 'package:walletconnect_v2/sign/sign-client/session/models.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:walletconnect_v2/wc_utils/misc/events/events.dart';
 
 abstract class ISignClient with IEvents {
   String get name;

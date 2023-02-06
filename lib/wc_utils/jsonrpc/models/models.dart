@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect/utils/validator.dart';
+import 'package:walletconnect_v2/utils/validator.dart';
 
 class JsonRpcProviderMessage<T> {
   final String type;

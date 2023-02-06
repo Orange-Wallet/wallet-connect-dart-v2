@@ -1,14 +1,14 @@
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/publisher/constants.dart';
-import 'package:wallet_connect/core/publisher/i_publisher.dart';
-import 'package:wallet_connect/core/publisher/models.dart';
-import 'package:wallet_connect/core/relayer/i_relayer.dart';
-import 'package:wallet_connect/core/relayer/models.dart';
-import 'package:wallet_connect/utils/crypto.dart';
-import 'package:wallet_connect/utils/relay.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/misc/heartbeat/constants.dart';
-import 'package:wallet_connect/wc_utils/relay/models.dart';
+import 'package:walletconnect_v2/core/publisher/constants.dart';
+import 'package:walletconnect_v2/core/publisher/i_publisher.dart';
+import 'package:walletconnect_v2/core/publisher/models.dart';
+import 'package:walletconnect_v2/core/relayer/i_relayer.dart';
+import 'package:walletconnect_v2/core/relayer/models.dart';
+import 'package:walletconnect_v2/utils/crypto.dart';
+import 'package:walletconnect_v2/utils/relay.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:walletconnect_v2/wc_utils/misc/heartbeat/constants.dart';
+import 'package:walletconnect_v2/wc_utils/relay/models.dart';
 
 class Publisher implements IPublisher {
   @override

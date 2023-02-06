@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bs58/bs58.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/base64.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/constants.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/models.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:walletconnect_v2/wc_utils/relay_auth/base64.dart';
+import 'package:walletconnect_v2/wc_utils/relay_auth/constants.dart';
+import 'package:walletconnect_v2/wc_utils/relay_auth/models.dart';
 
 // ---------- JSON ----------------------------------------------- //
 

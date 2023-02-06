@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:wallet_connect/core/relayer/models.dart';
+import 'package:walletconnect_v2/core/relayer/models.dart';
 
 part 'models.g.dart';
 

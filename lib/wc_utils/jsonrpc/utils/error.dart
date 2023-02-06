@@ -1,5 +1,5 @@
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/constants.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/constants.dart';
 
 bool isServerErrorCode(int code) {
   return code <= SERVER_ERROR_CODE_RANGE[0] &&

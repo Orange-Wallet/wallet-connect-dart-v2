@@ -9,9 +9,9 @@
 
 # Getting started
 
-To configure your app use latest version of `wallet_connect`, see [pub.dev](https://pub.dev/packages/wallet_connect)
+To configure your app use latest version of `walletconnect_v2`, see [pub.dev](https://pub.dev/packages/walletconnect_v2)
 
-**_Note: In order to use wallet_connect v2 alongside the legacy v1 sdk, see [walelt_connect_v1](https://pub.dev/packages/wallet_connect_v1)._**
+**_Note: In order to use walletconnect_v2 v2 alongside the legacy v1 sdk, see [walelt_connect_v1](https://pub.dev/packages/walletconnect_v2_v1)._**
 
 - [Dapp Usage](#dapp-usage)
 - [Wallet Usage](#wallet-usage)
@@ -43,7 +43,7 @@ For detailed implementation of wallet usage, see [example-wallet](https://github
 ## Initialization
 
 ```dart
-import 'package:wallet_connect/wallet_connect.dart';
+import 'package:walletconnect_v2/walletconnect_v2.dart';
 ```
 
 ```dart

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:wallet_connect/wc_utils/misc/keyvaluestorage/i_key_value_storage.dart';
+import 'package:walletconnect_v2/wc_utils/misc/keyvaluestorage/i_key_value_storage.dart';
 
 const DB_NAME = "walletconnect.db";
 

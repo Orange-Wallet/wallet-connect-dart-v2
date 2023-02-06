@@ -1,8 +1,8 @@
 import 'package:test/test.dart';
-import 'package:wallet_connect/utils/crypto.dart' as crypto;
-import 'package:wallet_connect/utils/misc.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/ws-connection/ws.dart';
-import 'package:wallet_connect/wc_utils/relay_auth/api.dart';
+import 'package:walletconnect_v2/utils/crypto.dart' as crypto;
+import 'package:walletconnect_v2/utils/misc.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/ws-connection/ws.dart';
+import 'package:walletconnect_v2/wc_utils/relay_auth/api.dart';
 
 import 'mock_data.dart';
 

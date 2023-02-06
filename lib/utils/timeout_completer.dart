@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:wallet_connect/wc_utils/jsonrpc/models/models.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
 
 const DEFAULT_COMPLETER_TIMEOUT = Duration(minutes: 5);
 

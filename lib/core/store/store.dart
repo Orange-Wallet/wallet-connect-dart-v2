@@ -1,16 +1,16 @@
 import 'dart:developer';
 
 import 'package:logger/logger.dart';
-import 'package:wallet_connect/core/constants.dart';
-import 'package:wallet_connect/core/i_core.dart';
-import 'package:wallet_connect/core/pairing/models.dart';
-import 'package:wallet_connect/core/store/constants.dart';
-import 'package:wallet_connect/core/store/i_store.dart';
-import 'package:wallet_connect/sign/sign-client/proposal/models.dart';
-import 'package:wallet_connect/sign/sign-client/session/models.dart';
-import 'package:wallet_connect/utils/error.dart';
-import 'package:wallet_connect/utils/list.dart';
-import 'package:wallet_connect/wc_utils/jsonrpc/utils/error.dart';
+import 'package:walletconnect_v2/core/constants.dart';
+import 'package:walletconnect_v2/core/i_core.dart';
+import 'package:walletconnect_v2/core/pairing/models.dart';
+import 'package:walletconnect_v2/core/store/constants.dart';
+import 'package:walletconnect_v2/core/store/i_store.dart';
+import 'package:walletconnect_v2/sign/sign-client/proposal/models.dart';
+import 'package:walletconnect_v2/sign/sign-client/session/models.dart';
+import 'package:walletconnect_v2/utils/error.dart';
+import 'package:walletconnect_v2/utils/list.dart';
+import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
 
 class Store<K, V> implements IStore<K, V> {
   @override
