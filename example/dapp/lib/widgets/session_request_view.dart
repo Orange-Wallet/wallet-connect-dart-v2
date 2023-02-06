@@ -1,6 +1,9 @@
+import 'package:eth_sig_util/eth_sig_util.dart';
+import 'package:example_dapp/utils/eip155_data.dart';
 import 'package:example_dapp/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet_connect/wallet_connect.dart';
+import 'package:web3dart/web3dart.dart';
 
 class SessionRequestView extends StatefulWidget {
   final SessionStruct session;
@@ -16,7 +19,6 @@ class SessionRequestView extends StatefulWidget {
 
 class _SessionRequestViewState extends State<SessionRequestView> {
   late AppMetadata _metadata;
-  late List<String> _selectedAccountIds;
 
   @override
   void initState() {
@@ -27,6 +29,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Colors.white,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -90,7 +93,7 @@ class _SessionRequestViewState extends State<SessionRequestView> {
           Flexible(
             child: ListView.separated(
               shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.all(16.0),
               itemBuilder: (_, idx) {
                 final item = widget.session.namespaces.entries.elementAt(idx);
                 return NamespaceView(
@@ -103,67 +106,6 @@ class _SessionRequestViewState extends State<SessionRequestView> {
               itemCount: widget.session.namespaces.entries.length,
             ),
           ),
-          // const Divider(height: 1.5, thickness: 1.5),
-          // Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Row(
-          //     children: [
-          //       Expanded(
-          //         child: SizedBox(
-          //           height: 40.0,
-          //           child: TextButton(
-          //             style: TextButton.styleFrom(
-          //               primary: Colors.white,
-          //               backgroundColor:
-          //                   Theme.of(context).colorScheme.secondary,
-          //             ),
-          //             onPressed: () {
-          //               final SessionNamespaces params = {};
-          //               for (final entry
-          //                   in widget.proposal.requiredNamespaces.entries) {
-          //                 final List<String> accounts = [];
-          //                 for (final idStr in _selectedAccountIds) {
-          //                   final accs = widget.accounts.where((element) =>
-          //                       '${entry.key}:${element.id}' == idStr);
-          //                   if (accs.isNotEmpty) {
-          //                     for (final chain in entry.value.chains.where(
-          //                         (c) => accs.first.details
-          //                             .any((ad) => ad.chain == c))) {
-          //                       accounts.add(
-          //                           '$chain:${accs.first.details.firstWhere((e) => e.chain == chain).address}');
-          //                     }
-          //                   }
-          //                 }
-          //                 params[entry.key] = SessionNamespace(
-          //                   accounts: accounts,
-          //                   methods: entry.value.methods,
-          //                   events: entry.value.events,
-          //                 );
-          //                 log('SESSION: ${params[entry.key]!.toJson()}');
-          //               }
-          //               widget.onApprove(params);
-          //             },
-          //             child: const Text('Approve'),
-          //           ),
-          //         ),
-          //       ),
-          //       const SizedBox(width: 16.0),
-          //       Expanded(
-          //         child: SizedBox(
-          //           height: 40.0,
-          //           child: TextButton(
-          //             style: TextButton.styleFrom(
-          //               primary: Colors.white,
-          //               backgroundColor: Colors.red.shade300,
-          //             ),
-          //             onPressed: widget.onReject,
-          //             child: const Text('Reject'),
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
     );
@@ -214,9 +156,15 @@ class _NamespaceViewState extends State<NamespaceView> {
                 style: const TextStyle(
                     fontWeight: FontWeight.w500, fontSize: 16.0),
               ),
+              const SizedBox(height: 4.0),
               Text(
                 accAddress,
-                style: const TextStyle(fontSize: 16.0),
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.grey.shade600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const Padding(
                 padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
@@ -226,18 +174,24 @@ class _NamespaceViewState extends State<NamespaceView> {
                 ),
               ),
               ...widget.namespace.methods
-                  .map((e) => TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondary,
-                          textStyle:
-                              const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(e),
+                  .map((method) => Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: TextButton(
+                          onPressed: () => _onMethodCalled(
+                            namespace: widget.type,
+                            method: method,
+                          ),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                            textStyle:
+                                const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(method),
+                          ),
                         ),
                       ))
                   .toList(),
@@ -250,5 +204,41 @@ class _NamespaceViewState extends State<NamespaceView> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
     );
+  }
+}
+
+_onMethodCalled({
+  required String namespace,
+  required String method,
+}) {
+  if (namespace == 'eip155') {
+    switch (method.toEip155Method()) {
+      case Eip155Methods.PERSONAL_SIGN:
+        // TODO: Handle this case.
+
+        break;
+      case Eip155Methods.ETH_SIGN:
+        // TODO: Handle this case.
+        break;
+      case Eip155Methods.ETH_SIGN_TRANSACTION:
+// EthSigUtil.recoverSignature(signature: signature, message: message)
+        break;
+      case Eip155Methods.ETH_SIGN_TYPED_DATA:
+        // TODO: Handle this case.
+        break;
+      case Eip155Methods.ETH_SIGN_TYPED_DATA_V3:
+        // TODO: Handle this case.
+        break;
+      case Eip155Methods.ETH_SIGN_TYPED_DATA_V4:
+        // TODO: Handle this case.
+        break;
+      case Eip155Methods.ETH_SEND_RAW_TRANSACTION:
+        // TODO: Handle this case.
+        break;
+      case Eip155Methods.ETH_SEND_TRANSACTION:
+        // TODO: Handle this case.
+        break;
+      default:
+    }
   }
 }

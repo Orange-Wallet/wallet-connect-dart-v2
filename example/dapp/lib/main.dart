@@ -6,6 +6,7 @@ import 'package:example_dapp/utils/helpers.dart';
 import 'package:example_dapp/utils/solana_data.dart';
 import 'package:example_dapp/widgets/custom_app_bar.dart';
 import 'package:example_dapp/widgets/networks_view.dart';
+import 'package:example_dapp/widgets/pairings_view.dart';
 import 'package:example_dapp/widgets/session_request_view.dart';
 import 'package:example_dapp/widgets/uri_view.dart';
 import 'package:flutter/material.dart';
@@ -169,31 +170,41 @@ class _HomePageState extends State<HomePage> {
                               }
                             }
 
-                            _signClient!
-                                .connect(SessionConnectParams(
-                              requiredNamespaces: requiredNamespaces,
-                            ))
-                                .then((connection) {
-                              connection.approval?.then((value) {
-                                _activeSession = value;
-                                _getSessions();
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Session approval successful.'),
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: Duration(milliseconds: 500),
-                                ));
-                              }).catchError((_) {
-                                _activeSession = null;
-                                _getSessions();
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Session approval failed.'),
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: Duration(milliseconds: 500),
-                                ));
-                              });
-                              _onConnection(connection.uri!);
+                            _getPairings();
+
+                            _onChoosePairing(_pairings).then((pairingTopic) {
+                              if (pairingTopic != null) {
+                                _signClient!
+                                    .connect(SessionConnectParams(
+                                  requiredNamespaces: requiredNamespaces,
+                                  pairingTopic: pairingTopic.isEmpty
+                                      ? null
+                                      : pairingTopic,
+                                ))
+                                    .then((connection) {
+                                  connection.approval?.then((value) {
+                                    _activeSession = value;
+                                    _getSessions();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content:
+                                          Text('Session approval successful.'),
+                                      behavior: SnackBarBehavior.floating,
+                                      duration: Duration(milliseconds: 500),
+                                    ));
+                                  }).catchError((_) {
+                                    _activeSession = null;
+                                    _getSessions();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text('Session approval failed.'),
+                                      behavior: SnackBarBehavior.floating,
+                                      duration: Duration(milliseconds: 500),
+                                    ));
+                                  });
+                                  _onConnection(connection.uri!);
+                                });
+                              }
                             });
                           },
                         )
@@ -213,11 +224,27 @@ class _HomePageState extends State<HomePage> {
           child: Material(
             color: Colors.white,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            child: UriView(
-              signClient: _signClient!,
-              connectionUri: uri,
+              borderRadius: BorderRadius.circular(10.0),
             ),
+            child: UriView(connectionUri: uri),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String?> _onChoosePairing(List<PairingStruct> pairings) {
+    return showDialog<String?>(
+      context: context,
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(56.0),
+          child: Material(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: PairingsView(pairings: pairings),
           ),
         );
       },

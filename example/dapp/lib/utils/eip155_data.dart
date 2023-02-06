@@ -143,7 +143,7 @@ extension Eip155EventsX on Eip155Events {
 }
 
 extension Eip155EventsStringX on String {
-  Eip155Events? toEip155Method() {
+  Eip155Events? toEip155Event() {
     final entries =
         Eip155Data.events.entries.where((element) => element.value == this);
     return (entries.isNotEmpty) ? entries.first.key : null;

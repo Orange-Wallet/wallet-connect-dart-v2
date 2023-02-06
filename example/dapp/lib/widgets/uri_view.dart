@@ -4,15 +4,12 @@ import 'package:example_dapp/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:wallet_connect/wallet_connect.dart';
 
 class UriView extends StatefulWidget {
-  final SignClient signClient;
   final String connectionUri;
 
   const UriView({
     super.key,
-    required this.signClient,
     required this.connectionUri,
   });
 
