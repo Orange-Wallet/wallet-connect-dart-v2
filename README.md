@@ -11,7 +11,7 @@
 
 To configure your app use latest version of `walletconnect_v2`, see [pub.dev](https://pub.dev/packages/walletconnect_v2)
 
-**_Note: In order to use walletconnect_v2 v2 alongside the legacy v1 sdk, see [walelt_connect_v1](https://pub.dev/packages/walletconnect_v2_v1)._**
+**_Note: In order to use walletconnect_v2 alongside the legacy v1 sdk, see [wallet_connect](https://pub.dev/packages/wallet_connect)._**
 
 - [Dapp Usage](#dapp-usage)
 - [Wallet Usage](#wallet-usage)
@@ -20,13 +20,13 @@ To configure your app use latest version of `walletconnect_v2`, see [pub.dev](ht
 
 # Dapp Usage
 
-For detailed implementation of dapp usage, see [example-dapp](https://github.com/Orange-Wallet/wallet-connect-dart/tree/master/example).
+For detailed implementation of dapp usage, see [example-dapp](https://github.com/Orange-Wallet/wallet-connect-dart-v2/tree/master/example/dapp).
 
 <br>
 
 # Wallet Usage
 
-For detailed implementation of wallet usage, see [example-wallet](https://github.com/Orange-Wallet/wallet-connect-dart/tree/master/example).
+For detailed implementation of wallet usage, see [example-wallet](https://github.com/Orange-Wallet/wallet-connect-dart-v2/tree/master/example/wallet).
 
 1. [Initialization](#initialization)
 2. [Pairing via QR](#pairing-via-qr-code)
