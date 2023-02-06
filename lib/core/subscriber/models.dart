@@ -16,15 +16,11 @@ class SubscriberParams extends RelayerSubscribeOptions {
 class SubscriberActive extends SubscriberParams {
   final String id;
 
-  final RelayerProtocolOptions relay;
-
-  final String topic;
-
   SubscriberActive({
     required this.id,
-    required this.relay,
-    required this.topic,
-  }) : super(relay: relay, topic: topic);
+    required super.relay,
+    required super.topic,
+  });
 
   factory SubscriberActive.fromJson(Map<String, dynamic> json) =>
       _$SubscriberActiveFromJson(json);

@@ -69,8 +69,8 @@ class Expirer with Events implements IExpirer {
   bool has(dynamic key) {
     try {
       final target = _formatTarget(key);
-      final expiration = _getExpiration(target);
-      return expiration != null;
+      _getExpiration(target);
+      return true;
     } catch (e) {
       return false;
     }

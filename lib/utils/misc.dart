@@ -67,9 +67,8 @@ int calcExpiry({required int ttl, int? now}) {
       1000;
 }
 
-// TODO: Reverify logic
 bool isExpired(int expiry) {
-  return (DateTime.now().millisecondsSinceEpoch ~/ 1000) >= (expiry * 1000);
+  return (DateTime.now().millisecondsSinceEpoch) >= (expiry * 1000);
 }
 
 // -- expirer --------------------------------------------- //

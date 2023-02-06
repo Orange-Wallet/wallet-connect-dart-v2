@@ -61,9 +61,9 @@ class Engine with Events implements IEngine {
     _isInitialized();
     await _isValidConnect(params);
 
-    var topic = params.pairingTopic;
-    var uri;
-    var active = false;
+    String? topic = params.pairingTopic;
+    String? uri;
+    bool active = false;
 
     if (topic != null) {
       final pairing = client.core.pairing.pairings.get(topic);
@@ -115,11 +115,11 @@ class Engine with Events implements IEngine {
       },
     );
 
-    if (topic == null) {
-      final error = getInternalError(InternalErrorKey.NO_MATCHING_KEY,
-          context: 'connect() pairing topic: ${topic}');
-      throw WCException(error.message);
-    }
+    // if (topic == null) {
+    //   final error = getInternalError(InternalErrorKey.NO_MATCHING_KEY,
+    //       context: 'connect() pairing topic: ${topic}');
+    //   throw WCException(error.message);
+    // }
 
     final id = await _sendRequest<ProposalRequestStruct>(
       topic,
@@ -221,7 +221,7 @@ class Engine with Events implements IEngine {
         metadata: session.peer.metadata,
       );
     }
-    if (pairingTopic != null && id != null) {
+    if (pairingTopic != null) {
       await _sendResult<ResultSessionPropose>(
         id,
         pairingTopic,
@@ -1179,7 +1179,7 @@ class Engine with Events implements IEngine {
     }
     if (!isValidRelays(relays, true)) {
       final error = getInternalError(InternalErrorKey.MISSING_OR_INVALID,
-          context: 'connect() relays: ${relays}');
+          context: 'connect() relays: $relays');
       throw WCException(error.message);
     }
   }
@@ -1187,7 +1187,6 @@ class Engine with Events implements IEngine {
   Future<void> _isValidApprove(SessionApproveParams params) async {
     final id = params.id;
     final namespaces = params.namespaces;
-    final relayProtocol = params.relayProtocol;
 
     await _isValidProposalId(id);
     final proposal = client.proposal.get(id.toString());
@@ -1275,7 +1274,7 @@ class Engine with Events implements IEngine {
     if (!isValidNamespacesChainId(namespaces, chainId)) {
       final error = getInternalError(
         InternalErrorKey.MISSING_OR_INVALID,
-        context: 'request() chainId: ${chainId}',
+        context: 'request() chainId: $chainId',
       );
       throw WCException(error.message);
     }
@@ -1310,7 +1309,7 @@ class Engine with Events implements IEngine {
     if (!isValidNamespacesEvent(namespaces, params.chainId, event.name)) {
       final error = getInternalError(
         InternalErrorKey.MISSING_OR_INVALID,
-        context: 'emit() event: ${event}',
+        context: 'emit() event: $event',
       );
       throw WCException(error.message);
     }

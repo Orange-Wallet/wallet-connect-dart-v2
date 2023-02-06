@@ -1,9 +1,7 @@
-import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:example_dapp/utils/eip155_data.dart';
 import 'package:example_dapp/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:walletconnect_v2/walletconnect_v2.dart';
-import 'package:web3dart/web3dart.dart';
 
 class SessionRequestView extends StatefulWidget {
   final SessionStruct session;
@@ -214,29 +212,21 @@ _onMethodCalled({
   if (namespace == 'eip155') {
     switch (method.toEip155Method()) {
       case Eip155Methods.PERSONAL_SIGN:
-        // TODO: Handle this case.
-
         break;
       case Eip155Methods.ETH_SIGN:
-        // TODO: Handle this case.
         break;
       case Eip155Methods.ETH_SIGN_TRANSACTION:
-// EthSigUtil.recoverSignature(signature: signature, message: message)
+        // EthSigUtil.recoverSignature(signature: signature, message: message)
         break;
       case Eip155Methods.ETH_SIGN_TYPED_DATA:
-        // TODO: Handle this case.
         break;
       case Eip155Methods.ETH_SIGN_TYPED_DATA_V3:
-        // TODO: Handle this case.
         break;
       case Eip155Methods.ETH_SIGN_TYPED_DATA_V4:
-        // TODO: Handle this case.
         break;
       case Eip155Methods.ETH_SEND_RAW_TRANSACTION:
-        // TODO: Handle this case.
         break;
       case Eip155Methods.ETH_SEND_TRANSACTION:
-        // TODO: Handle this case.
         break;
       default:
     }

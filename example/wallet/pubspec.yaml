@@ -21,6 +21,7 @@ dependencies:
   bip32: ^2.0.0
   walletconnect_v2:
     path: ../../
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

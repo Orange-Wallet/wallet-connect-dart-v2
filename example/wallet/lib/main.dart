@@ -183,7 +183,6 @@ class _HomePageState extends State<HomePage> {
             ethereumTransaction,
           );
         case Eip155Methods.ETH_SEND_RAW_TRANSACTION:
-          // TODO
           break;
         default:
           debugPrint('Unsupported request.');

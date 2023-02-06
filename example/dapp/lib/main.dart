@@ -10,10 +10,8 @@ import 'package:example_dapp/widgets/pairings_view.dart';
 import 'package:example_dapp/widgets/session_request_view.dart';
 import 'package:example_dapp/widgets/uri_view.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:walletconnect_v2/walletconnect_v2.dart';
 import 'package:walletconnect_v2/wc_utils/misc/logger/logger.dart';
-import 'package:web3dart/web3dart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,8 +55,6 @@ class _HomePageState extends State<HomePage> {
   late List<ChainMetadata> _chains;
 
   late List<ChainMetadata> _selectedChains;
-
-  final _web3client = Web3Client('', http.Client());
 
   SignClient? _signClient;
 

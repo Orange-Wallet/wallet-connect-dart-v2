@@ -75,7 +75,7 @@ bool isValidAccountId(String value) {
   if (value.contains(":")) {
     final split = value.split(":");
     if (split.length == 3) {
-      final chainId = split[0] + ":" + split[1];
+      final chainId = '${split[0]}:${split[1]}';
       return split[2].isNotEmpty && isValidChainId(chainId);
     }
   }
@@ -353,9 +353,6 @@ bool isValidRelays(
 
 bool isValidErrorReason(ErrorResponse? input) {
   if (input == null) return false;
-  if (input.code == null) return false;
-  if (input.message == null) return false;
-
   return true;
 }
 

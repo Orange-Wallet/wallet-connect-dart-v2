@@ -8,9 +8,9 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const CustomAppBar(title: 'Settings'),
-        const Divider(height: 1.0),
+      children: const [
+        CustomAppBar(title: 'Settings'),
+        Divider(height: 1.0),
       ],
     );
   }
