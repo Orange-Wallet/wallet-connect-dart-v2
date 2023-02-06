@@ -1,7 +1,7 @@
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/crypto/models.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/core/keychain/i_key_chain.dart';
+import 'package:wallet_connect_dart_v2/core/crypto/models.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/core/keychain/i_key_chain.dart';
 
 abstract class ICrypto {
   String get name;

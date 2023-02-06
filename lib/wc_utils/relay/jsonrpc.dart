@@ -1,4 +1,4 @@
-import 'package:walletconnect_v2/wc_utils/relay/models.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/relay/models.dart';
 
 const RELAY_JSONRPC = {
   'waku': RelayJsonRpcMethods(

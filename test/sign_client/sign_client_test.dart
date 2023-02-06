@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:test/test.dart';
-import 'package:walletconnect_v2/utils/uri.dart';
-import 'package:walletconnect_v2/walletconnect_v2.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/format.dart';
-import 'package:walletconnect_v2/wc_utils/misc/logger/logger.dart';
+import 'package:wallet_connect_dart_v2/utils/uri.dart';
+import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/format.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/logger/logger.dart';
 
 import 'mock_data.dart';
 

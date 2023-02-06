@@ -1,7 +1,7 @@
-import 'package:walletconnect_v2/core/pairing/models.dart';
-import 'package:walletconnect_v2/core/relayer/models.dart';
-import 'package:walletconnect_v2/sign/engine/models.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/core/pairing/models.dart';
+import 'package:wallet_connect_dart_v2/core/relayer/models.dart';
+import 'package:wallet_connect_dart_v2/sign/engine/models.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
 
 const ENGINE_CONTEXT = "engine";
 

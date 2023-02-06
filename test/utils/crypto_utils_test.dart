@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
-import 'package:walletconnect_v2/core/crypto/models.dart';
-import 'package:walletconnect_v2/utils/crypto.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_dart_v2/core/crypto/models.dart';
+import 'package:wallet_connect_dart_v2/utils/crypto.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/models/models.dart';
 
 import 'mock_data.dart';
 

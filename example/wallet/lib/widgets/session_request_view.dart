@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:example_wallet/models/accounts.dart';
 import 'package:example_wallet/utils/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:walletconnect_v2/walletconnect_v2.dart';
+import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
 
 class SessionRequestView extends StatefulWidget {
   final List<Account> accounts;

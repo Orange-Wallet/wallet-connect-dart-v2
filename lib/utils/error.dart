@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:walletconnect_v2/wc_utils/jsonrpc/models/models.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/models/models.dart';
 
 // Constants
 

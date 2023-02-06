@@ -1,4 +1,4 @@
-import 'package:walletconnect_v2/sign/sign-client/session/models.dart';
+import 'package:wallet_connect_dart_v2/sign/sign-client/session/models.dart';
 
 List<String> getAccountsChains(List<String> accounts) {
   final List<String> chains = [];

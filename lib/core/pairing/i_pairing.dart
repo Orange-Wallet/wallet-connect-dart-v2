@@ -1,8 +1,8 @@
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/core/models/app_metadata.dart';
-import 'package:walletconnect_v2/core/pairing/models.dart';
-import 'package:walletconnect_v2/core/store/i_store.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/core/models/app_metadata.dart';
+import 'package:wallet_connect_dart_v2/core/pairing/models.dart';
+import 'package:wallet_connect_dart_v2/core/store/i_store.dart';
 
 abstract class IPairing {
   String get name;

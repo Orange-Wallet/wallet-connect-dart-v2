@@ -1,15 +1,15 @@
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/constants.dart';
-import 'package:walletconnect_v2/core/expirer/constants.dart';
-import 'package:walletconnect_v2/core/expirer/i_expirer.dart';
-import 'package:walletconnect_v2/core/expirer/models.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/utils/error.dart';
-import 'package:walletconnect_v2/utils/list.dart';
-import 'package:walletconnect_v2/utils/misc.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
-import 'package:walletconnect_v2/wc_utils/misc/events/events.dart';
-import 'package:walletconnect_v2/wc_utils/misc/heartbeat/constants.dart';
+import 'package:wallet_connect_dart_v2/core/constants.dart';
+import 'package:wallet_connect_dart_v2/core/expirer/constants.dart';
+import 'package:wallet_connect_dart_v2/core/expirer/i_expirer.dart';
+import 'package:wallet_connect_dart_v2/core/expirer/models.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/utils/error.dart';
+import 'package:wallet_connect_dart_v2/utils/list.dart';
+import 'package:wallet_connect_dart_v2/utils/misc.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/heartbeat/constants.dart';
 
 class Expirer with Events implements IExpirer {
   Map<String, ExpirerExpiration> expirations;

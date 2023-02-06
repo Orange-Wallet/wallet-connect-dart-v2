@@ -20,7 +20,7 @@ dependencies:
   json_annotation: ^4.7.0
   bip39: ^1.0.6
   bip32: ^2.0.0
-  walletconnect_v2:
+  wallet_connect_dart_v2:
     path: ../../
 
 dev_dependencies:

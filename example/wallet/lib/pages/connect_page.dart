@@ -3,7 +3,7 @@ import 'package:example_wallet/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:scan/scan.dart';
-import 'package:walletconnect_v2/walletconnect_v2.dart';
+import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
 
 class ConnectPage extends StatefulWidget {
   final SignClient signClient;

@@ -1,4 +1,4 @@
-import 'package:walletconnect_v2/core/relayer/models.dart';
+import 'package:wallet_connect_dart_v2/core/relayer/models.dart';
 
 class PublisherParams {
   final String topic;

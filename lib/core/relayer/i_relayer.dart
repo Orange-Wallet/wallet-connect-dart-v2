@@ -1,11 +1,11 @@
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/core/messages/i_message_tracker.dart';
-import 'package:walletconnect_v2/core/publisher/i_publisher.dart';
-import 'package:walletconnect_v2/core/relayer/models.dart';
-import 'package:walletconnect_v2/core/subscriber/i_subscriber.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/provider/i_json_rpc_provider.dart';
-import 'package:walletconnect_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/core/messages/i_message_tracker.dart';
+import 'package:wallet_connect_dart_v2/core/publisher/i_publisher.dart';
+import 'package:wallet_connect_dart_v2/core/relayer/models.dart';
+import 'package:wallet_connect_dart_v2/core/subscriber/i_subscriber.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/provider/i_json_rpc_provider.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/events/events.dart';
 
 abstract class IRelayer with IEvents {
   ICore get core;

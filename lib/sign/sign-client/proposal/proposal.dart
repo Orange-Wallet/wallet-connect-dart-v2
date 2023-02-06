@@ -1,7 +1,7 @@
-import 'package:walletconnect_v2/core/store/store.dart';
-import 'package:walletconnect_v2/sign/sign-client/client/constants.dart';
-import 'package:walletconnect_v2/sign/sign-client/proposal/constants.dart';
-import 'package:walletconnect_v2/sign/sign-client/proposal/models.dart';
+import 'package:wallet_connect_dart_v2/core/store/store.dart';
+import 'package:wallet_connect_dart_v2/sign/sign-client/client/constants.dart';
+import 'package:wallet_connect_dart_v2/sign/sign-client/proposal/constants.dart';
+import 'package:wallet_connect_dart_v2/sign/sign-client/proposal/models.dart';
 
 class Proposal extends Store<String, ProposalStruct> {
   Proposal({required super.core, required super.logger})

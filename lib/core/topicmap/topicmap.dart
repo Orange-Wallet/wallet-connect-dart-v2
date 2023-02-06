@@ -1,4 +1,4 @@
-import 'package:walletconnect_v2/core/topicmap/i_topicmap.dart';
+import 'package:wallet_connect_dart_v2/core/topicmap/i_topicmap.dart';
 
 class SubscriberTopicMap implements ISubscriberTopicMap {
   final Map<String, List<String>> _map;

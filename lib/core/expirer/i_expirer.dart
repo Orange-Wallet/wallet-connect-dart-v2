@@ -1,7 +1,7 @@
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/expirer/models.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/wc_utils/misc/events/events.dart';
+import 'package:wallet_connect_dart_v2/core/expirer/models.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/events/events.dart';
 
 abstract class IExpirer with IEvents {
   String get name;

@@ -1,7 +1,7 @@
 import 'package:platform_info/platform_info.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:walletconnect_v2/sign/engine/models.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/sign/engine/models.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
 import 'package:web_browser_detect/web_browser_detect.dart';
 
 const SDK_TYPE = "dart";

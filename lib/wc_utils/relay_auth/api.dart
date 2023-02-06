@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
-import 'package:walletconnect_v2/wc_utils/relay_auth/constants.dart';
-import 'package:walletconnect_v2/wc_utils/relay_auth/models.dart';
-import 'package:walletconnect_v2/wc_utils/relay_auth/relay_auth.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/relay_auth/constants.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/relay_auth/models.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/relay_auth/relay_auth.dart';
 
 Future<RelayAuthKeyPair> generateKeyPair([Uint8List? seed]) async {
   // seed ??= Uint8List.fromList(randomBytes(KEY_PAIR_SEED_LENGTH));

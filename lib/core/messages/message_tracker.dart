@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:logger/logger.dart';
-import 'package:walletconnect_v2/core/constants.dart';
-import 'package:walletconnect_v2/core/i_core.dart';
-import 'package:walletconnect_v2/core/messages/constants.dart';
-import 'package:walletconnect_v2/core/messages/i_message_tracker.dart';
-import 'package:walletconnect_v2/utils/crypto.dart';
-import 'package:walletconnect_v2/utils/error.dart';
-import 'package:walletconnect_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/core/constants.dart';
+import 'package:wallet_connect_dart_v2/core/i_core.dart';
+import 'package:wallet_connect_dart_v2/core/messages/constants.dart';
+import 'package:wallet_connect_dart_v2/core/messages/i_message_tracker.dart';
+import 'package:wallet_connect_dart_v2/utils/crypto.dart';
+import 'package:wallet_connect_dart_v2/utils/error.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
 
 class MessageTracker implements IMessageTracker {
   @override

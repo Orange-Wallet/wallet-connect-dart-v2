@@ -10,8 +10,8 @@ import 'package:example_dapp/widgets/pairings_view.dart';
 import 'package:example_dapp/widgets/session_request_view.dart';
 import 'package:example_dapp/widgets/uri_view.dart';
 import 'package:flutter/material.dart';
-import 'package:walletconnect_v2/walletconnect_v2.dart';
-import 'package:walletconnect_v2/wc_utils/misc/logger/logger.dart';
+import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
+import 'package:wallet_connect_dart_v2/wc_utils/misc/logger/logger.dart';
 
 void main() {
   runApp(const MyApp());

@@ -1,7 +1,7 @@
 import 'package:example_dapp/utils/eip155_data.dart';
 import 'package:example_dapp/utils/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:walletconnect_v2/walletconnect_v2.dart';
+import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
 
 class SessionRequestView extends StatefulWidget {
   final SessionStruct session;
