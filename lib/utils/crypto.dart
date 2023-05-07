@@ -10,7 +10,7 @@ import 'package:pointycastle/pointycastle.dart' as pc;
 import 'package:wallet_connect_dart_v2/core/crypto/models.dart';
 import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
 import 'package:x25519/x25519.dart' as curve;
-import 'package:yx_tool/yx_crypto.dart';
+import 'package:wallet_connect_dart_v2/utils/yx_util/yx_crypto.dart';
 
 const TYPE_0 = 0;
 const TYPE_1 = 1;

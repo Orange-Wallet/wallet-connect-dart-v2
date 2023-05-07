@@ -24,10 +24,10 @@ dependencies:
   platform_info: ^3.2.0
   web_browser_detect: ^2.0.3
   universal_html: ^2.0.8
-  yx_tool: 
-    git:
-      url: https://github.com/levischechter/yx_tool.git
-      ref: master
+  # yx_tool: 
+  #   git:
+  #     url: https://github.com/levischechter/yx_tool.git
+  #     ref: master
 
 dev_dependencies:
   test: ^1.21.0
