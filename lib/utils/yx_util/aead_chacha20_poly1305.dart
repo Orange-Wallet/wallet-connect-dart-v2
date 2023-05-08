@@ -1,7 +1,5 @@
 import 'dart:typed_data';
-
 import 'package:pointycastle/export.dart';
-
 import 'symmetric_crypto.dart';
 
 class AEADChaCha20Poly1305 extends SymmetricCrypto {
