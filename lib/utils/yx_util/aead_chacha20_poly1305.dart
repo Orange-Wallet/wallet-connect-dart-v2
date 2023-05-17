@@ -26,10 +26,11 @@ class AEADChaCha20Poly1305 extends SymmetricCrypto {
   }
 
   @override
-  Uint8List encrypt(Uint8List data) {
+  Uint8List encrypt(List<int> data_list) {
     _init(true);
     var encrypt = _encrypt;
     encrypt!.reset();
+    var data = Uint8List.fromList(data_list);
     var enc = Uint8List(encrypt.getOutputSize(data.length));
     var len = encrypt.processBytes(data, 0, data.length, enc, 0);
     encrypt.doFinal(enc, len);
@@ -38,10 +39,11 @@ class AEADChaCha20Poly1305 extends SymmetricCrypto {
   }
 
   @override
-  Uint8List decrypt(Uint8List data) {
+  Uint8List decrypt(List<int> data_list) {
     _init(false);
     var decrypt = _decrypt;
     decrypt!.reset();
+    var data = Uint8List.fromList(data_list);
     var enc = Uint8List(decrypt.getOutputSize(data.length));
     var len = decrypt.processBytes(data, 0, data.length, enc, 0);
     decrypt.doFinal(enc, len);

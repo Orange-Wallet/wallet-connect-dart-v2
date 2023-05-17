@@ -124,7 +124,7 @@ Future<String> decrypt({
       Uint8List.fromList(hex.decode(symKey)),
       decoded.iv,
     );
-    final message = box.decrypt(decoded.sealed);
+    final message = box.decrypt(decoded.sealed.toList());
     return utf8.decode(message);
   } catch (e) {
     throw WCException("Failed to decrypt");
