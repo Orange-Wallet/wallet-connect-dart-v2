@@ -4,9 +4,9 @@ import 'package:convert/convert.dart' as convert;
 import 'dart:convert' as convert_dart;
 
 abstract class SymmetricCrypto {
-  Uint8List encrypt(List<int> data_list);
+  Uint8List encrypt(Uint8List data);
 
-  Uint8List decrypt(List<int> data_list);
+  Uint8List decrypt(Uint8List data);
 
   String encryptHex(Uint8List data) {
     return convert.hex.encode(encrypt(data).toList());
