@@ -49,7 +49,7 @@ import 'package:wallet_connect_dart_v2/wallet_connect_dart_v2.dart';
 ```dart
 final signClient = await SignClient.init(
       projectId: "PROJECY_ID",
-      relayUrl: "RELAY_URL" // or leaving it empty, uses default "wss://relay.walletconnect.com",
+      relayUrl: "RELAY_URL", // or leaving it empty, uses default "wss://relay.walletconnect.com"
       metadata: const AppMetadata(
         name: "Demo app",
         description: "Demo Client as Wallet/Peer",
@@ -156,10 +156,9 @@ signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
 
       // Example handling some methods from EVM-based chains
       if (method == "personal_sign") {
-        final requestParams =
-              (eventData.params!.request.params as List).cast<String>();
-        final dataToSign = requestParams[0];
-        final address = requestParams[1];
+        final requestParams = eventData.params!.request.params[0];
+        final dataToSign = requestParams["data"];
+        final address = requestParams["to"];
 
         // Handle request params to generate necessary result and send back the response to dapp.
         final signedDataHex = personalSign(dataToSign, address);
@@ -183,7 +182,47 @@ signClient.on(SignClientEvent.SESSION_REQUEST.value, (data) async {
       } else if (method == "eth_signTypedData") {
         // Handle `eth_signTypedData`
       } else if (method == "eth_sendTransaction") {
+        final requestParams = eventData.params!.request.params[0];
         // Handle `eth_sendTransaction`
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Send transaction'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    // You can use web3dart package to excecute transaction
+                    // then pass it in params to respond
+                    final txhash = _web3client.sendTransaction();
+                    
+                    signClient.respond(
+                      SessionRespondParams(
+                        topic: eventData.topic!,
+                        response: JsonRpcResult<String>(
+                          id: eventData.id!,
+                          result: txhash,
+                        ),
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Accept'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    signClient.respond(SessionRespondParams(
+                      topic: eventData.topic!,
+                      response: JsonRpcError(id: eventData.id!),
+                    ));
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        );
       } else if (method == "eth_signTransaction") {
         // Handle `eth_signTransaction`
       }
