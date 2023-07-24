@@ -9,8 +9,8 @@ import 'package:pointycastle/key_derivators/hkdf.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
 import 'package:wallet_connect_dart_v2/core/crypto/models.dart';
 import 'package:wallet_connect_dart_v2/wc_utils/jsonrpc/utils/error.dart';
+import 'package:wallet_connect_dart_v2/utils/yx_util/yx_crypto.dart';
 import 'package:x25519/x25519.dart' as curve;
-import 'package:yx_tool/yx_crypto.dart';
 
 const TYPE_0 = 0;
 const TYPE_1 = 1;
@@ -100,9 +100,7 @@ Future<String> encrypt({
 
   final dIV =
       Uint8List.fromList(iv != null ? hex.decode(iv) : randomBytes(IV_LENGTH));
-  // final box = await crypto.Chacha20.poly1305Aead().encrypt(utf8.encode(message),
-  //     secretKey: crypto.SecretKey(hex.decode(symKey)), nonce: dIV);
-  // final sealed = Uint8List.fromList(box.cipherText);
+
   final box = AEADChaCha20Poly1305.withIV(
     Uint8List.fromList(hex.decode(symKey)),
     dIV,
@@ -122,14 +120,6 @@ Future<String> decrypt({
 }) async {
   final decoded = deserialize(encoded);
   try {
-    // final secretKey = crypto.SecretKey(hex.decode(symKey));
-    // final mac = await crypto.Chacha20.poly1305Aead()
-    //     .macAlgorithm
-    //     .calculateMac(decoded.sealed, secretKey: secretKey, nonce: decoded.iv);
-    // final message = await crypto.Chacha20.poly1305Aead().decrypt(
-    //   crypto.SecretBox(decoded.sealed, nonce: decoded.iv, mac: mac),
-    //   secretKey: secretKey,
-    // );
     final box = AEADChaCha20Poly1305.withIV(
       Uint8List.fromList(hex.decode(symKey)),
       decoded.iv,
