@@ -1194,14 +1194,6 @@ class Engine with Events implements IEngine {
     if (validNamespacesError != null) {
       throw WCException(validNamespacesError.message);
     }
-    final conformingNamespacesError = isConformingNamespaces(
-      proposal.requiredNamespaces,
-      namespaces,
-      "update()",
-    );
-    if (conformingNamespacesError != null) {
-      throw WCException(conformingNamespacesError.message);
-    }
   }
 
   Future<void> _isValidReject(SessionRejectParams params) async {

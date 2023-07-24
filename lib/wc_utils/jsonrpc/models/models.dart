@@ -38,7 +38,7 @@ class RequestArguments<T> {
 }
 
 abstract class JsonRpcPayload<T> {
-  int get id;
+  dynamic get id;
   String get jsonrpc;
 
   Map<String, dynamic> toJson();
@@ -47,7 +47,7 @@ abstract class JsonRpcPayload<T> {
 class JsonRpcRequest<T> extends RequestArguments<T>
     implements JsonRpcPayload<T> {
   @override
-  final int id;
+  final dynamic id;
   @override
   final String jsonrpc;
 
@@ -84,7 +84,7 @@ abstract class JsonRpcResponse<T> implements JsonRpcPayload<T> {}
 
 class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
   @override
-  final int id;
+  final dynamic id;
   @override
   final String jsonrpc;
   final T? result;
@@ -121,7 +121,7 @@ class JsonRpcResult<T extends Object?> implements JsonRpcResponse<T> {
 
 class JsonRpcError implements JsonRpcResponse<ErrorResponse> {
   @override
-  final int id;
+  final dynamic id;
   @override
   final String jsonrpc;
   final ErrorResponse? error;

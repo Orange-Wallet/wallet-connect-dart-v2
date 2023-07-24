@@ -16,7 +16,7 @@ SubscriberActive _$SubscriberActiveFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SubscriberActiveToJson(SubscriberActive instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'relay': instance.relay.toJson(),
       'topic': instance.topic,
+      'id': instance.id,
     };
